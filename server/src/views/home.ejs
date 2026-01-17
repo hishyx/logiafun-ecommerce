@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #0f172a;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+      }
+
+      .container {
+        text-align: center;
+      }
+
+      h1 {
+        margin-bottom: 10px;
+        font-size: 2.2rem;
+      }
+
+      p {
+        margin-bottom: 30px;
+        color: #cbd5e1;
+      }
+
+      .buttons {
+        display: grid;
+        grid-template-columns: repeat(2, 120px);
+        gap: 15px;
+        justify-content: center;
+      }
+
+      .btn {
+        padding: 15px;
+        background: #2563eb;
+        border-radius: 10px;
+        text-decoration: none;
+        color: white;
+        font-weight: bold;
+        transition: 0.2s;
+      }
+
+      .btn:hover {
+        background: #1d4ed8;
+        transform: translateY(-2px);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Welcome</h1>
+      <p>Your home screen</p>
+
+      <div class="buttons">
+        <a href="#" class="btn">Apps</a>
+        <a href="#" class="btn">Files</a>
+        <a href="#" class="btn">Settings</a>
+        <a href="#" class="btn">Profile</a>
+      </div>
+    </div>
+  </body>
+</html>

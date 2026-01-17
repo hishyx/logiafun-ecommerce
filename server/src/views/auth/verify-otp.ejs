@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Enter OTP</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f2f4f8;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .container {
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 10px;
+        width: 300px;
+        text-align: center;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      h2 {
+        margin-bottom: 10px;
+      }
+
+      /* Updated to style a single input box */
+      .otp-container {
+        margin: 20px 0;
+      }
+
+      .otp-container input {
+        width: 100%;
+        padding: 12px;
+        text-align: center;
+        font-size: 20px;
+        letter-spacing: 8px; /* Adds space between digits for readability */
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        outline: none;
+        box-sizing: border-box;
+      }
+
+      .otp-container input:focus {
+        border-color: #4a6cf7;
+      }
+
+      button {
+        width: 100%;
+        padding: 10px;
+        background: #4a6cf7;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      button:hover {
+        background: #3b5be0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Verify OTP</h2>
+      <p>Enter the 4-digit code</p>
+
+      <form action="/signup/verify-otp" method="POST">
+        <div class="otp-container">
+          <input
+            type="text"
+            name="otp"
+            maxlength="4"
+            pattern="\d{4}"
+            placeholder="0000"
+            required
+          />
+        </div>
+        <p style="color: red"><%=error%></p>
+        <button type="submit">Verify</button>
+      </form>
+    </div>
+  </body>
+</html>
