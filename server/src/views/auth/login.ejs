@@ -53,13 +53,17 @@
 
           <button type="submit" class="btn-primary">Sign in</button>
 
-          <button type="button" class="btn-google">
+          <button
+            type="button"
+            class="btn-google"
+            onclick="window.location.href = '/auth/google'"
+          >
             <img src="/images/google.png" alt="Google" width="20" />
             Continue with google
           </button>
 
           <p class="footer-text">
-            Don't have an account? <a href="/signup">Sign up for free!</a>
+            Don't have an account? <a href="/auth/signup">Sign up for free!</a>
           </p>
         </form>
       </div>

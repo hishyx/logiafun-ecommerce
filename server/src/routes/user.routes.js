@@ -1,5 +1,5 @@
 import express from "express";
-
+import passport from "../config/passport.js";
 //importing Controllers
 
 import {
@@ -26,10 +26,30 @@ router.route("/auth/login").get(isUserGuest, loginPage).post(loginUser);
 
 router.route("/auth/signup").get(isUserGuest, signupPage).post(signupUser);
 
+//Google related
+
+router.get(
+  "/auth/google",
+  isUserGuest,
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+  }),
+);
+
+router.get(
+  "/auth/google/callback",
+  passport.authenticate("google", {
+    successRedirect: "/home",
+    failureRedirect: "/auth/login",
+  }),
+);
+
 router
   .route("/auth/signup/verify-otp")
   .get(isUserGuest, verifyOTPPage)
   .post(verifyUserOTP);
+
+//Google related End
 
 router.use(isAuth);
 router.use(checkUserStatus);

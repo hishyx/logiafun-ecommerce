@@ -2,6 +2,7 @@ import express from "express";
 import path from "path";
 import sessionConfig from "./config/session.js";
 import flash from "connect-flash";
+import passport from "./config/passport.js";
 
 //importing routers
 
@@ -20,6 +21,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "../public")));
 app.use(sessionConfig);
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(flash());
 
 app.set("view engine", "ejs");

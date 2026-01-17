@@ -55,3 +55,31 @@ export const aunthenticateUser = async (body) => {
 
   return user;
 };
+
+export const googleUserExist = async (googleUser) => {
+  const user = await User.findOne({
+    googleId: googleUser.id,
+  });
+
+  if (user) return user;
+
+  const nonGoogleUser = await User.findOne({
+    email: googleUser.emails[0].value,
+  });
+
+  if (nonGoogleUser) {
+    nonGoogleUser.googleId = googleUser.id;
+    nonGoogleUser.isVerified = true;
+    await nonGoogleUser.save();
+  }
+
+  const newUser = await User.create({
+    name: googleUser.displayName,
+    googleId: googleUser.id,
+    email: googleUser.emails[0].value,
+    profileImage: googleUser.photos[0].value,
+    isVerified: true,
+  });
+
+  return newUser;
+};
