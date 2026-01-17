@@ -22,12 +22,12 @@ import {
 
 const router = express.Router();
 
-router.route("/login").get(isUserGuest, loginPage).post(loginUser);
+router.route("/auth/login").get(isUserGuest, loginPage).post(loginUser);
 
-router.route("/signup").get(isUserGuest, signupPage).post(signupUser);
+router.route("/auth/signup").get(isUserGuest, signupPage).post(signupUser);
 
 router
-  .route("/signup/verify-otp")
+  .route("/auth/signup/verify-otp")
   .get(isUserGuest, verifyOTPPage)
   .post(verifyUserOTP);
 

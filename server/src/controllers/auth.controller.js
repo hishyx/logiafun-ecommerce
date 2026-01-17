@@ -27,10 +27,10 @@ export const signupUser = async (req, res) => {
 
     await createAndSendOTP(req.body.email);
 
-    res.redirect("/signup/verify-otp");
+    res.redirect("/auth/signup/verify-otp");
   } catch (err) {
     req.flash("error", err.message);
-    res.redirect("/signup");
+    res.redirect("/auth/signup");
   }
 };
 
@@ -44,7 +44,7 @@ export const loginUser = async (req, res) => {
     res.redirect("/home");
   } catch (err) {
     req.flash("error", err.message);
-    res.redirect("/login");
+    res.redirect("/auth/login");
   }
 };
 
@@ -63,6 +63,6 @@ export const verifyUserOTP = async (req, res) => {
   } catch (err) {
     console.log(err);
     req.flash("error", err.message);
-    res.redirect("/signup/verify-otp");
+    res.redirect("/auth/signup/verify-otp");
   }
 };

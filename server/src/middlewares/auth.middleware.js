@@ -4,7 +4,7 @@ export const isAuth = (req, res, next) => {
   if (req.session.user && req.session.user.isVerified) {
     next();
   } else {
-    return res.redirect("/login");
+    return res.redirect("/auth/login");
   }
 };
 
@@ -12,7 +12,7 @@ export const isAdmin = (req, res, next) => {
   if (req.session.admin) {
     next();
   } else {
-    return res.redirect("/admin/login");
+    return res.redirect("/admin/auth/login");
   }
 };
 
@@ -70,7 +70,7 @@ export const checkAdminStatus = async (req, res, next) => {
       delete req.session.admin;
       req.flash("error", `error`);
 
-      return res.redirect(`/admin/login`);
+      return res.redirect(`/admin/auth/login`);
     }
   } catch (err) {
     console.log(err);
