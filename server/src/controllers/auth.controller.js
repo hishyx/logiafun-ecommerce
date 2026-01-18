@@ -1,18 +1,31 @@
 import { registerUser, aunthenticateUser } from "../services/auth.services.js";
-import { createAndSendOTP, verifyOTP } from "../services/OTP.services.js";
+import {
+  createAndSendOTP,
+  verifyOTP,
+  getRemainingTime,
+} from "../services/OTP.services.js";
 
 //Public Pages
 
 export const loginPage = (req, res) => {
-  res.render("auth/login", { error: req.flash("error") });
+  res.render("auth/login");
 };
 
 export const signupPage = (req, res) => {
   res.render("auth/signup", { error: req.flash("error") });
 };
 
-export const verifyOTPPage = (req, res) => {
-  res.render("auth/verify-otp", { error: req.flash("error") });
+export const verifyOTPPage = async (req, res) => {
+  try {
+    const remainingS = await getRemainingTime(req.session.tempOTPMail);
+    res.render("auth/verify-otp", {
+      error: req.flash("error"),
+      remaining: remainingS,
+    });
+  } catch (err) {
+    req.flash("error", err.message);
+    return res.redirect(`/auth/login`);
+  }
 };
 
 //Page works
@@ -21,11 +34,9 @@ export const signupUser = async (req, res) => {
   try {
     const user = await registerUser(req.body);
 
-    const { password, ...safeUser } = user.toObject();
+    req.session.tempOTPMail = user.email;
 
-    req.session.user = safeUser;
-
-    await createAndSendOTP(req.body.email);
+    await createAndSendOTP(user.email);
 
     res.redirect("/auth/signup/verify-otp");
   } catch (err) {
@@ -38,10 +49,10 @@ export const loginUser = async (req, res) => {
   try {
     const user = await aunthenticateUser(req.body);
 
-    const { password, ...safeUser } = user.toObject();
-
-    req.session.user = safeUser;
-    res.redirect("/home");
+    req.login(user, (err) => {
+      if (err) return next(err); // 2. Handle potential serialization errors
+      return res.redirect("/home"); // 3. Redirect now that req.user is active
+    });
   } catch (err) {
     req.flash("error", err.message);
     res.redirect("/auth/login");
@@ -51,13 +62,16 @@ export const loginUser = async (req, res) => {
 export const verifyUserOTP = async (req, res) => {
   try {
     const email =
-      req.session && req.session.user && req.session.user.email
-        ? req.session.user.email
-        : null;
+      req.session && req.session.tempOTPMail ? req.session.tempOTPMail : null;
 
-    await verifyOTP(email, req.body.otp);
+    const user = await verifyOTP(email, req.body.otp);
 
-    req.session.user.isVerified = true;
+    delete req.session.tempOTPMail;
+
+    req.login(user, (err) => {
+      if (err) return next(err); // 2. Handle potential serialization errors
+      return res.redirect("/home"); // 3. Redirect now that req.user is active
+    });
 
     res.redirect("/home");
   } catch (err) {

@@ -1,7 +1,7 @@
 import User from "../models/user.model.js";
 
 export const isAuth = (req, res, next) => {
-  if (req.session.user && req.session.user.isVerified) {
+  if (req.isAuthenticated() && req.user.isVerified) {
     next();
   } else {
     return res.redirect("/auth/login");
@@ -17,7 +17,7 @@ export const isAdmin = (req, res, next) => {
 };
 
 export const isUserGuest = (req, res, next) => {
-  if (req.session.user && req.session.user.isVerified) {
+  if (req.isAuthenticated() && req.user.isVerified) {
     return res.redirect("/home");
   } else {
     next();
@@ -34,23 +34,21 @@ export const isAdminGuest = (req, res, next) => {
 
 export const checkUserStatus = async (req, res, next) => {
   try {
-    const user = await User.findOne({ email: req.session.user.email });
+    const user = req.user;
 
     if (!user) {
-      delete req.session.user;
       req.flash("error", "User doesn't exist");
+      return res.redirect("/auth/login");
     }
 
     if (user.status === "blocked") {
-      delete req.session.user;
       req.flash("error", "User is blocked please contact admin");
+      return res.redirect("/auth/login");
     }
 
     if (!user.isVerified) {
-      req.flash(
-        "error",
-        "Please verify your account first <a> Click here </a>",
-      );
+      req.flash("error", "Please verify your account first");
+      return res.redirect("/auth/login");
     }
 
     next();

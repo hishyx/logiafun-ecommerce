@@ -38,18 +38,22 @@ router.get(
 
 router.get(
   "/auth/google/callback",
+  isUserGuest,
   passport.authenticate("google", {
-    successRedirect: "/home",
     failureRedirect: "/auth/login",
   }),
+  (req, res) => {
+    res.set("Cache-Control", "no-store");
+    res.redirect(303, "/home");
+  },
 );
+
+//GOOGLE RELATED END
 
 router
   .route("/auth/signup/verify-otp")
   .get(isUserGuest, verifyOTPPage)
   .post(verifyUserOTP);
-
-//Google related End
 
 router.use(isAuth);
 router.use(checkUserStatus);

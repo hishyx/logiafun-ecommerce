@@ -15,9 +15,12 @@ export const createAndSendOTP = async (email) => {
 
   await sendMail(email, otp);
 
+  const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+
   await OTP.create({
     email: email,
     OTP: hashedOTP,
+    expiresAt,
   });
 };
 
@@ -32,5 +35,26 @@ export const verifyOTP = async (email, userOTP) => {
 
   if (!isValid) throw new Error("OTP is invalid");
 
-  await User.updateOne({ email: email }, { $set: { isVerified: true } });
+  const user = await User.findOneAndUpdate(
+    { email },
+    { $set: { isVerified: true } },
+    { new: true },
+  );
+
+  return user;
+};
+
+export const getRemainingTime = async (email) => {
+  const otp = await OTP.findOne({ email });
+
+  if (!otp) throw new Error("No otp found");
+
+  const now = Date.now();
+  const expiresAt = otp.expiresAt.getTime();
+
+  const remainingMs = Math.max(0, expiresAt - now);
+
+  const remainingSeconds = Math.floor(remainingMs / 1000);
+
+  return remainingSeconds;
 };
