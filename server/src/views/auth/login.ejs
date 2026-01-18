@@ -3,19 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Welcome Back - Login</title>
+    <link rel="stylesheet" href="/css/login-signup.css" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Fredoka:wght@300..700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="/css/login.css" />
-    <!-- SVGs for Google Icon -->
   </head>
   <body>
     <div class="form-section">
-      <img src="/images/logo.png" alt="Logo" class="logo" />
-
       <div class="form-container">
+        <div class="logo-container">
+          <a href="index.html" class="logo">logia<span>Fun</span></a>
+        </div>
+
         <h1>WELCOME BACK</h1>
         <p class="subtitle">Welcome back! Please enter your details.</p>
 
@@ -25,7 +25,6 @@
             <input
               type="email"
               id="email"
-              name="email"
               placeholder="Enter your email"
               required
             />
@@ -36,16 +35,10 @@
             <input
               type="password"
               id="password"
-              name="password"
               placeholder="**********"
               required
             />
           </div>
-          <p style="color: red; margin-bottom: 10px"><%= error %></p>
-          <div
-            id="errorBox"
-            style="color: #dc2626; margin-top: 10px; min-height: 18px"
-          ></div>
 
           <div class="form-actions">
             <label class="checkbox-container">
@@ -62,8 +55,8 @@
             class="btn-google"
             onclick="window.location.href = '/auth/google'"
           >
-            <img src="/images/google.png" alt="Google" width="20" />
-            Continue with google
+            <img src="/images/google.png" alt="" width="20" />
+            Continue with Google
           </button>
 
           <p class="footer-text">

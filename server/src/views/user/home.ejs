@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>logiaFun - Play, learn, & grow!</title>
+    <link rel="stylesheet" href="/css/home.css" />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <a href="#" class="logo">logia<span>Fun</span></a>
+
+          <nav class="nav">
+            <a href="#">Home</a>
+            <a href="#">Shop</a>
+            <a href="#">Pages</a>
+            <a href="#">Blog</a>
+            <a href="#">Contact</a>
+          </nav>
+
+          <div class="header-right">
+            <div class="search-box">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
+              </svg>
+              <input type="text" placeholder="Search" />
+            </div>
+
+            <div class="profile-btn">
+              <div class="profile-icon">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+              </div>
+              <span class="profile-name"><%=user.name%></span>
+            </div>
+
+            <div class="cart-icon">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <circle cx="9" cy="21" r="1" />
+                <circle cx="20" cy="21" r="1" />
+                <path
+                  d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"
+                />
+              </svg>
+              <span class="cart-badge">2</span>
+            </div>
+
+            <button class="menu-toggle" aria-label="Toggle menu">
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- Hero Section -->
+      <section class="hero">
+        <img
+          src="/images/banner.jpeg"
+          alt="Children playing"
+          class="hero-image"
+        />
+        <div class="container">
+          <div class="hero-content">
+            <h1>Play, learn, & grow!</h1>
+            <p>
+              Crafting smiles with every toy, making learning fun and growth
+              joyful.
+            </p>
+            <a href="#" class="btn btn-primary">Shop now</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Categories Section -->
+      <section class="section">
+        <div class="container">
+          <div class="section-header">
+            <h2>Find the Perfect Toy</h2>
+            <p>Our Collections</p>
+          </div>
+
+          <div class="categories-grid">
+            <div class="category-card">
+              <div class="category-icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                >
+                  <path
+                    d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+                  />
+                </svg>
+              </div>
+              <h3>Logic & Puzzles</h3>
+            </div>
+
+            <div class="category-card">
+              <div class="category-icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                >
+                  <rect x="3" y="3" width="7" height="7" />
+                  <rect x="14" y="3" width="7" height="7" />
+                  <rect x="14" y="14" width="7" height="7" />
+                  <rect x="3" y="14" width="7" height="7" />
+                </svg>
+              </div>
+              <h3>Board games</h3>
+            </div>
+
+            <div class="category-card">
+              <div class="category-icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                >
+                  <rect x="2" y="4" width="20" height="16" rx="2" />
+                  <path d="M12 8v8M8 12h8" />
+                </svg>
+              </div>
+              <h3>Card Games</h3>
+            </div>
+
+            <div class="category-card">
+              <div class="category-icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                >
+                  <path
+                    d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+                  />
+                </svg>
+              </div>
+              <h3>Building Toys</h3>
+            </div>
+
+            <div class="category-card">
+              <div class="category-icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                >
+                  <path
+                    d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"
+                  />
+                  <path
+                    d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"
+                  />
+                </svg>
+              </div>
+              <h3>STEM Toys</h3>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Products Section -->
+      <section class="section" style="background: #f8f9fa">
+        <div class="container">
+          <div class="section-header">
+            <h2>Top picks for your little ones</h2>
+          </div>
+
+          <div class="product-tabs">
+            <button class="tab-btn active">Featured</button>
+            <button class="tab-btn">Best seller</button>
+            <button class="tab-btn">New arrivals</button>
+          </div>
+
+          <div class="products-grid">
+            <!-- Product 1 -->
+            <div class="product-card">
+              <div class="product-image">
+                <span class="product-badge badge-sale">Sale</span>
+                <button class="product-wishlist" aria-label="Add to wishlist">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                    />
+                  </svg>
+                </button>
+                <img
+                  src="/images/temp-products/small-kids-buiding-blocks.png"
+                  alt="Building Blocks"
+                />
+              </div>
+              <div class="product-info">
+                <h3>Building Blocks Set</h3>
+                <div class="product-price">
+                  <span class="price-current">$39.00</span>
+                  <span class="price-old">$49.00</span>
+                </div>
+                <div class="product-rating">
+                  <span class="star">★</span><span class="star">★</span
+                  ><span class="star">★</span><span class="star">★</span
+                  ><span class="star">★</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Product 2 -->
+            <div class="product-card">
+              <div class="product-image">
+                <button class="product-wishlist" aria-label="Add to wishlist">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                    />
+                  </svg>
+                </button>
+                <img
+                  src="/images/temp-products/rubix-cube.png"
+                  alt="Rubik's Cube"
+                />
+              </div>
+              <div class="product-info">
+                <h3>Rubik's Cube</h3>
+                <div class="product-price">
+                  <span class="price-current">$15.00</span>
+                  <span class="price-old">$20.00</span>
+                </div>
+                <div class="product-rating">
+                  <span class="star">★</span><span class="star">★</span
+                  ><span class="star">★</span><span class="star">★</span
+                  ><span class="star empty">★</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Product 3 -->
+            <div class="product-card">
+              <div class="product-image">
+                <button class="product-wishlist" aria-label="Add to wishlist">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                    />
+                  </svg>
+                </button>
+                <img
+                  src="/images/temp-products/chess-board-set.png"
+                  alt="Chess Set"
+                />
+              </div>
+              <div class="product-info">
+                <h3>Classic Chess Set</h3>
+                <div class="product-price">
+                  <span class="price-current">$38.00</span>
+                </div>
+                <div class="product-rating">
+                  <span class="star">★</span><span class="star">★</span
+                  ><span class="star">★</span><span class="star">★</span
+                  ><span class="star">★</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Product 4 -->
+            <div class="product-card">
+              <div class="product-image">
+                <button class="product-wishlist" aria-label="Add to wishlist">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                    />
+                  </svg>
+                </button>
+                <img
+                  src="/images/temp-products/girls-chemistry-science-kit.png"
+                  alt="Science Kit"
+                />
+              </div>
+              <div class="product-info">
+                <h3>Chemistry Science Kit</h3>
+                <div class="product-price">
+                  <span class="price-current">$35.00</span>
+                </div>
+                <div class="product-rating">
+                  <span class="star">★</span><span class="star">★</span
+                  ><span class="star">★</span><span class="star">★</span
+                  ><span class="star empty">★</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Eco Section -->
+      <section class="eco-section">
+        <div class="eco-image">
+          <img
+            src="https://images.unsplash.com/photo-1545558014-8692077e9b5c?q=80&w=2070&auto=format&fit=crop"
+            alt="Children playing outdoors"
+          />
+          <div class="eco-overlay">
+            <h3>Discover the Joy of Play</h3>
+            <p>Quality toys that inspire imagination</p>
+          </div>
+        </div>
+        <div class="eco-content">
+          <h2>Eco - Friendly Toys</h2>
+          <p>
+            Made from 100% recycled materials for a sustainable future for our
+            children.
+          </p>
+          <a href="#" class="btn btn-secondary">Buy Now</a>
+        </div>
+      </section>
+
+      <!-- Use placeholders for the rest of similar sections for brevity if needed, but here's the full structure -->
+      <!-- Customer Loves Section -->
+      <section class="section">
+        <div class="container">
+          <div class="section-header">
+            <h2>Customer Loves</h2>
+            <p>Popular product</p>
+          </div>
+          <div class="products-grid">
+            <!-- Repeating products for demo -->
+            <div class="product-card">
+              <div class="product-image">
+                <img
+                  src="https://placehold.co/300x300/f8f9fa/1e3a5f?text=Dinosaur+Set"
+                  alt="Dinosaur"
+                />
+              </div>
+              <div class="product-info">
+                <h3>Magna etiam tempor orci</h3>
+                <div class="product-price">
+                  <span class="price-current">$35.00</span>
+                  <span class="price-old">$45.00</span>
+                </div>
+                <div class="product-rating">
+                  <span class="star">★</span><span class="star">★</span
+                  ><span class="star">★</span><span class="star">★</span
+                  ><span class="star empty">★</span>
+                </div>
+              </div>
+            </div>
+            <div class="product-card">
+              <div class="product-image">
+                <span class="product-badge badge-sale">Sale</span>
+                <img
+                  src="https://placehold.co/300x300/f8f9fa/1e3a5f?text=Rainbow+Stacker"
+                  alt="Stacker"
+                />
+              </div>
+              <div class="product-info">
+                <h3>Magna etiam tempor orci</h3>
+                <div class="product-price">
+                  <span class="price-current">$29.00</span>
+                </div>
+                <div class="product-rating">
+                  <span class="star">★</span><span class="star">★</span
+                  ><span class="star">★</span><span class="star">★</span
+                  ><span class="star">★</span>
+                </div>
+              </div>
+            </div>
+            <div class="product-card">
+              <div class="product-image">
+                <img
+                  src="https://placehold.co/300x300/f8f9fa/1e3a5f?text=Walker"
+                  alt="Walker"
+                />
+              </div>
+              <div class="product-info">
+                <h3>Magna etiam tempor orci</h3>
+                <div class="product-price">
+                  <span class="price-current">$38.00</span>
+                </div>
+                <div class="product-rating">
+                  <span class="star">★</span><span class="star">★</span
+                  ><span class="star">★</span><span class="star">★</span
+                  ><span class="star">★</span>
+                </div>
+              </div>
+            </div>
+            <div class="product-card">
+              <div class="product-image">
+                <span class="product-badge badge-sale">Sale</span>
+                <img
+                  src="https://placehold.co/300x300/f8f9fa/1e3a5f?text=Scooter"
+                  alt="Scooter"
+                />
+              </div>
+              <div class="product-info">
+                <h3>Magna etiam tempor orci</h3>
+                <div class="product-price">
+                  <span class="price-current">$55.00</span>
+                </div>
+                <div class="product-rating">
+                  <span class="star">★</span><span class="star">★</span
+                  ><span class="star">★</span><span class="star">★</span
+                  ><span class="star">★</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Testimonials -->
+      <section class="section" style="background: #f8f9fa">
+        <div class="container">
+          <div class="section-header">
+            <h2>Hear from Other Happy Parents</h2>
+            <p>Customer testimonials</p>
+          </div>
+
+          <div class="testimonials-wrapper">
+            <button class="nav-arrow">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+
+            <div class="testimonials-grid">
+              <div class="testimonial-card">
+                <div class="testimonial-rating">
+                  <span class="star">★</span><span class="star">★</span
+                  ><span class="star">★</span><span class="star">★</span
+                  ><span class="star">★</span>
+                </div>
+                <p class="testimonial-text">
+                  "Sagittis vitae et leo duis ut diam quam. Nulla porttitor
+                  massa id neque."
+                </p>
+                <div class="testimonial-author">
+                  <div class="author-avatar">H</div>
+                  <span class="author-name">Hisham</span>
+                </div>
+              </div>
+              <div class="testimonial-card">
+                <div class="testimonial-rating">
+                  <span class="star">★</span><span class="star">★</span
+                  ><span class="star">★</span><span class="star">★</span
+                  ><span class="star">★</span>
+                </div>
+                <p class="testimonial-text">
+                  "Sagittis vitae et leo duis ut diam quam nulla porttitor massa
+                  id neque adipiscing vestibulum."
+                </p>
+                <div class="testimonial-author">
+                  <div class="author-avatar">H</div>
+                  <span class="author-name">Hasheem</span>
+                </div>
+              </div>
+              <div class="testimonial-card">
+                <div class="testimonial-rating">
+                  <span class="star">★</span><span class="star">★</span
+                  ><span class="star">★</span><span class="star">★</span
+                  ><span class="star">★</span>
+                </div>
+                <p class="testimonial-text">
+                  "Sagittis vitae et leo duis ut diam quam nulla porttitor massa
+                  id neque."
+                </p>
+                <div class="testimonial-author">
+                  <div class="author-avatar">H</div>
+                  <span class="author-name">Haseeb</span>
+                </div>
+              </div>
+            </div>
+
+            <button class="nav-arrow">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Gallery -->
+      <section class="section">
+        <div class="container">
+          <div class="section-header">
+            <h2>Recent photoshoots</h2>
+            <p>Check gallery</p>
+          </div>
+        </div>
+        <div class="gallery-grid">
+          <div class="gallery-item">
+            <img
+              src="https://placehold.co/500x500/f8f9fa/1e3a5f?text=Photo+1"
+              alt="Gallery"
+            />
+          </div>
+          <div class="gallery-item">
+            <img
+              src="https://placehold.co/500x500/f8f9fa/1e3a5f?text=Photo+2"
+              alt="Gallery"
+            />
+          </div>
+          <div class="gallery-item">
+            <img
+              src="https://placehold.co/500x500/f8f9fa/1e3a5f?text=Photo+3"
+              alt="Gallery"
+            />
+          </div>
+          <div class="gallery-item">
+            <img
+              src="https://placehold.co/500x500/f8f9fa/1e3a5f?text=Photo+4"
+              alt="Gallery"
+            />
+          </div>
+        </div>
+      </section>
+
+      <!-- Features -->
+      <section class="section">
+        <div class="container">
+          <div class="features-grid">
+            <div class="feature-card">
+              <div class="feature-icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+              </div>
+              <h3>Customer care</h3>
+              <p>24H hour follow up</p>
+            </div>
+
+            <div class="feature-card">
+              <div class="feature-icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                >
+                  <rect x="1" y="3" width="15" height="13" />
+                  <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+                  <circle cx="5.5" cy="18.5" r="2.5" />
+                  <circle cx="18.5" cy="18.5" r="2.5" />
+                </svg>
+              </div>
+              <h3>Free ship</h3>
+              <p>Free shipping for $100 and up</p>
+            </div>
+
+            <div class="feature-card">
+              <div class="feature-icon">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                >
+                  <polyline points="23 4 23 10 17 10" />
+                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                </svg>
+              </div>
+              <h3>Return</h3>
+              <p>Within 7 days</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Newsletter -->
+      <section class="newsletter">
+        <div class="container">
+          <h2>Newsletter</h2>
+          <p>
+            Get 15% off your first purchase! Plus, be the first to know about
+            sales, new product launches, and exclusive offers!
+          </p>
+          <form class="newsletter-form">
+            <input type="email" placeholder="Enter your email" required />
+            <button type="submit">Join</button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-grid">
+          <div>
+            <div class="footer-logo">logia<span>Fun</span></div>
+            <p class="footer-desc">
+              Nunc consequat interdum varius sit amet mattis.
+            </p>
+            <div class="social-links">
+              <a href="#" class="social-link" aria-label="Instagram">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+                </svg>
+              </a>
+              <a href="#" class="social-link" aria-label="Twitter">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"
+                  />
+                </svg>
+              </a>
+              <a href="#" class="social-link" aria-label="Facebook">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"
+                  />
+                </svg>
+              </a>
+              <a href="#" class="social-link" aria-label="YouTube">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"
+                  />
+                  <polygon
+                    points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"
+                  />
+                </svg>
+              </a>
+            </div>
+          </div>
+
+          <div>
+            <h4 class="footer-title">My account</h4>
+            <div class="footer-links">
+              <a href="#">Track my order</a>
+              <a href="#">Terms of Use</a>
+              <a href="#">Wishlist</a>
+              <a href="#">Submit Your Feedback</a>
+            </div>
+          </div>
+
+          <div>
+            <h4 class="footer-title">Customer service</h4>
+            <div class="footer-links">
+              <a href="#">Monday to Friday</a>
+              <a href="#">10am - 6pm (New York time)</a>
+              <a href="#">Call us: 123-456-7890</a>
+              <a href="#">Email us: info@example.com</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <p>© 2024 ToGlaFun. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

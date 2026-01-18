@@ -2,140 +2,357 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Verify Code</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+    <title>Verify Code - LogiaFun</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Fredoka:wght@300..700&display=swap"
+      rel="stylesheet"
+    />
     <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Fredoka:wght@300..700&display=swap");
+
+      :root {
+        --primary: #1e3a5f;
+        --secondary: #f8b500;
+        --accent: #4361ee;
+        --text-dark: #1b263b;
+        --text-light: #415a77;
+        --text-muted: #778da9;
+        --bg-body: #ffffff;
+        --bg-light: #f8f9fa;
+        --white: #ffffff;
+        --danger: #ef4444;
+        --radius-lg: 16px;
+        --radius-pill: 50px;
+        --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+        --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.08); /* Slightly stronger for auth card feel */
+        --transition: 0.3s ease;
+      }
+
       * {
+        margin: 0;
+        padding: 0;
         box-sizing: border-box;
       }
 
       body {
-        margin: 0;
-        font-family:
-          system-ui,
-          -apple-system,
-          BlinkMacSystemFont,
-          sans-serif;
-        min-height: 100vh;
+        font-family: "Poppins", sans-serif;
+        color: var(--text-dark);
+        background-color: var(--white);
+        height: 100vh;
         display: flex;
+        overflow: hidden; /* Prevent scroll on full split screen */
+      }
+
+      /* --- Layout Split --- */
+      .form-section {
+        width: 50%;
+        padding: 2rem; /* Increased slightly for breathing room */
+        display: flex;
+        flex-direction: column;
         justify-content: center;
-        align-items: center;
-        background: radial-gradient(circle at top, #e8ecf7, #f8fafc);
+        position: relative;
+        overflow-y: auto;
+        height: 100vh;
       }
 
-      .card {
-        background: #ffffff;
-        width: 340px;
-        padding: 32px 28px;
-        border-radius: 16px;
+      .image-section {
+        width: 50%;
+        background: url("/images/child.jpeg") no-repeat center center/cover;
+        position: relative;
+      }
+
+      /* Gradient overlay for text readability if needed on image side */
+      .image-section::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          135deg,
+          rgba(30, 58, 95, 0.2),
+          rgba(30, 58, 95, 0)
+        );
+      }
+
+      /* --- Form Container --- */
+      .form-container {
+        max-width: 440px; /* Slightly wider */
+        width: 100%;
+        margin: 0 auto;
+      }
+
+      .logo-container {
+        margin-bottom: 1.5rem; /* Better spacing */
         text-align: center;
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
       }
 
-      h2 {
-        margin: 0 0 6px;
+      .logo {
+        font-family: "Fredoka", sans-serif;
+        font-size: 1.85rem;
         font-weight: 600;
-        color: #111827;
+        color: var(--primary);
+        text-decoration: none;
+      }
+
+      .logo span {
+        color: var(--secondary);
+      }
+
+      .form-container h1 {
+        font-family: "Fredoka", sans-serif;
+        font-size: 1.85rem;
+        color: var(--primary);
+        margin-bottom: 0.25rem;
+        letter-spacing: -0.02em;
+        text-align: center;
       }
 
       .subtitle {
-        color: #6b7280;
+        color: var(--text-light);
+        margin-bottom: 1.75rem; /* Increased spacing */
         font-size: 0.95rem;
-        margin-bottom: 24px;
+        line-height: 1.4;
+        text-align: center;
       }
 
+      /* --- Inputs --- */
+      .input-group {
+        margin-bottom: 1rem; /* More comfortable spacing */
+      }
+
+      .input-group label {
+        display: block;
+        font-weight: 500;
+        margin-bottom: 0.35rem;
+        color: var(--text-dark);
+        font-size: 0.9rem;
+      }
+
+      .input-group input {
+        width: 100%;
+        padding: 0.75rem 1.1rem; /* Comfortable padding */
+        border: 1px solid #e2e8f0;
+        border-radius: var(--radius-pill);
+        font-family: inherit;
+        font-size: 0.95rem;
+        transition: var(--transition);
+        background: var(--bg-light);
+        outline: none;
+      }
+
+      .input-group input:focus {
+        border-color: var(--primary);
+        background: var(--white);
+        box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+      }
+
+      .input-group input::placeholder {
+        color: #cbd5e1;
+      }
+
+      /* --- Actions (Checkbox / Forgot Password) --- */
+      .form-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.25rem;
+        font-size: 0.9rem;
+      }
+
+      .checkbox-container {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        color: var(--text-light);
+        user-select: none;
+      }
+
+      .checkbox-container input {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--primary);
+      }
+
+      .forgot-password {
+        color: var(--secondary);
+        font-weight: 500;
+        text-decoration: none;
+      }
+
+      .forgot-password:hover {
+        text-decoration: underline;
+      }
+
+      /* --- Buttons --- */
+      button {
+        width: 100%;
+        padding: 0.85rem;
+        border-radius: var(--radius-pill);
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: var(--transition);
+        border: none;
+        font-family: inherit;
+      }
+
+      .btn-primary {
+        background: var(--primary);
+        color: var(--white);
+        margin-bottom: 1rem;
+        box-shadow: 0 4px 12px rgba(30, 58, 95, 0.2);
+      }
+
+      .btn-primary:hover {
+        background: #152943;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(30, 58, 95, 0.3);
+      }
+
+      .btn-google {
+        background: var(--white);
+        color: var(--text-dark);
+        border: 1px solid #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .btn-google:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+      }
+
+      .footer-text {
+        text-align: center;
+        font-size: 0.9rem;
+        color: var(--text-light);
+      }
+
+      .footer-text a {
+        color: var(--primary);
+        font-weight: 600;
+        text-decoration: none;
+      }
+
+      .footer-text a:hover {
+        text-decoration: underline;
+        color: var(--secondary);
+      }
+
+      /* --- Responsive --- */
+      @media (max-width: 900px) {
+        body {
+          flex-direction: column;
+          height: auto;
+          min-height: 100vh;
+        }
+
+        .image-section {
+          display: none; /* Hide image on mobile for cleaner look or make it a header */
+        }
+
+        .form-section {
+          width: 100%;
+          height: 100vh;
+          padding: 2rem 1.5rem;
+        }
+
+        .form-container {
+          max-width: 100%;
+        }
+      }
+
+      /* --- Page specific --- */
       .otp-input {
         width: 100%;
-        padding: 14px;
+        padding: 0.9rem;
         text-align: center;
-        font-size: 22px;
-        letter-spacing: 10px;
-        border: 1px solid #d1d5db;
-        border-radius: 10px;
+        font-size: 1.5rem;
+        letter-spacing: 0.5rem;
+        border: 1px solid #e2e8f0;
+        border-radius: var(--radius-pill);
+        font-family: "Fredoka", sans-serif;
+        color: var(--text-dark);
         outline: none;
-        transition: 0.2s;
+        transition: var(--transition);
+        background: var(--bg-light);
       }
 
       .otp-input:focus {
-        border-color: #4a6cf7;
-        box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.15);
-      }
-
-      .error {
-        color: #dc2626;
-        font-size: 0.9rem;
-        margin: 12px 0 0;
-        min-height: 18px;
-      }
-
-      button {
-        width: 100%;
-        margin-top: 18px;
-        padding: 12px;
-        background: linear-gradient(135deg, #4a6cf7, #6c8cff);
-        color: white;
-        border: none;
-        border-radius: 10px;
-        font-size: 16px;
-        cursor: pointer;
-        transition: 0.2s;
-      }
-
-      button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 15px rgba(74, 108, 247, 0.35);
+        border-color: var(--primary);
+        background: var(--white);
+        box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
       }
 
       .timer {
-        margin-top: 16px;
+        margin-top: 1rem;
         font-size: 0.9rem;
-        color: #6b7280;
+        color: var(--text-light);
+        text-align: center;
       }
 
       .resend-btn {
-        margin-top: 10px;
-        background: #e5e7eb;
-        color: #374151;
+        margin-top: 1rem;
+        background: #e2e8f0;
+        color: var(--text-light);
         cursor: not-allowed;
         display: none;
       }
 
       .resend-btn.enabled {
-        background: #4a6cf7;
-        color: white;
+        background: var(--primary);
+        color: var(--white);
         cursor: pointer;
       }
     </style>
   </head>
 
   <body>
-    <div class="card">
-      <h2>Verify code</h2>
-      <div class="subtitle">Enter the 4-digit code we sent you</div>
+    <div class="form-section">
+      <div class="form-container">
+        <div class="logo-container">
+          <a href="index.html" class="logo">logia<span>Fun</span></a>
+        </div>
 
-      <form method="POST">
-        <input
-          class="otp-input"
-          type="text"
-          name="otp"
-          maxlength="4"
-          pattern="\d{4}"
-          placeholder="0000"
-          required
-          autofocus
-        />
+        <h1>VERIFY CODE</h1>
+        <p class="subtitle">Enter the 4-digit code we sent you</p>
 
-        <div class="error"><%= error %></div>
-        <p style="display: none" id="remainingTime"><%= remaining %></p>
+        <form method="POST">
+          <div class="input-group">
+            <input
+              class="otp-input"
+              type="text"
+              name="otp"
+              maxlength="4"
+              pattern="\d{4}"
+              placeholder="0000"
+              required
+              autofocus
+            />
+          </div>
 
-        <button type="submit">Verify</button>
-      </form>
+          <div
+            class="error"
+            style="color: red; text-align: center; margin-bottom: 1rem"
+          >
+            <%= error %>
+          </div>
+          <p style="display: none" id="remainingTime"><%= remaining %></p>
 
-      <div id="otp-timer" class="timer"></div>
+          <button type="submit" class="btn-primary">Verify</button>
+        </form>
 
-      <button id="resendBtn" class="resend-btn" disabled>Resend code</button>
+        <div id="otp-timer" class="timer"></div>
+
+        <button id="resendBtn" class="resend-btn" disabled>Resend code</button>
+      </div>
     </div>
+
+    <div class="image-section"></div>
 
     <script>
       var remaining = Number(
@@ -165,7 +382,15 @@
         setTimeout(tick, 1000);
       }
 
-      tick();
+      if (remaining > 0) {
+        tick();
+      } else {
+        // Handle case where started with 0
+        timerEl.textContent = "Code expired.";
+        resendBtn.style.display = "block";
+        resendBtn.disabled = false;
+        resendBtn.classList.add("enabled");
+      }
 
       resendBtn.addEventListener("click", () => {
         window.location.href = "/auth/resend-otp";
