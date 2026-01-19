@@ -71,6 +71,8 @@ export const googleUserExist = async (googleUser) => {
     nonGoogleUser.googleId = googleUser.id;
     nonGoogleUser.isVerified = true;
     await nonGoogleUser.save();
+
+    return nonGoogleUser;
   }
 
   const newUser = await User.create({

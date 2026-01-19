@@ -9,7 +9,7 @@ const googleStrategyConfig = new GoogleStrategy(
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: "http://localhost:2007/auth/google/callback",
   },
-  async (accesToken, refreshToken, profile, done) => {
+  async (accessToken, refreshToken, profile, done) => {
     try {
       const user = await googleUserExist(profile);
 
@@ -26,7 +26,7 @@ passport.use(googleStrategyConfig);
 
 // Store ONLY the ID in the session cookie
 passport.serializeUser((user, done) => {
-  done(null, user.id);
+  return done(null, user.id);
 });
 
 // Use the ID to get the full user back from MongoDB on every request

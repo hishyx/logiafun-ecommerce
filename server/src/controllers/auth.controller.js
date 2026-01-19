@@ -3,12 +3,13 @@ import {
   createAndSendOTP,
   verifyOTP,
   getRemainingTime,
+  OTPExists,
 } from "../services/OTP.services.js";
 
 //Public Pages
 
 export const loginPage = (req, res) => {
-  res.render("auth/login");
+  res.render("auth/login", { error: req.flash("error") });
 };
 
 export const signupPage = (req, res) => {
@@ -32,14 +33,19 @@ export const verifyOTPPage = async (req, res) => {
 
 export const signupUser = async (req, res) => {
   try {
-    const user = await registerUser(req.body);
+    const OTPExistInDB = await OTPExists(req.body.email);
 
-    req.session.tempOTPMail = user.email;
+    if (!OTPExistInDB) {
+      const user = await registerUser(req.body);
 
-    await createAndSendOTP(user.email);
+      req.session.tempOTPMail = user.email;
 
-    res.redirect("/auth/signup/verify-otp");
+      await createAndSendOTP(user.email);
+    }
+
+    return res.redirect("/auth/signup/verify-otp");
   } catch (err) {
+    console.log(err);
     req.flash("error", err.message);
     res.redirect("/auth/signup");
   }
