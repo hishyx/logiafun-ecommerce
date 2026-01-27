@@ -4,10 +4,12 @@ import sessionConfig from "./config/session.js";
 import flash from "connect-flash";
 import passport from "./config/passport.js";
 import nocache from "nocache";
+import methodOverride from "method-override";
 import preventHTMLCache from "./middlewares/prevent.cache.js";
 
 //importing routers
 
+import authRoute from "./routes/auth.routes.js";
 import userRoute from "./routes/user.routes.js";
 
 //Importing dirname
@@ -21,6 +23,7 @@ const app = express();
 
 app.use(nocache());
 
+app.use(methodOverride("_method"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "../public")));
@@ -35,6 +38,7 @@ app.set("views", path.join(__dirname, "views"));
 
 // Routes
 
+app.use("/", authRoute);
 app.use("/", userRoute);
 
 export default app;

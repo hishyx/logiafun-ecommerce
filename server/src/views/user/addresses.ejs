@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Addresses - logiaFun</title>
+    <link rel="stylesheet" href="/css/home.css" />
+    <link rel="stylesheet" href="/css/profile.css" />
+  </head>
+  <body>
+    <!-- Header -->
+    <%- include('../partials/header.ejs')%>
+
+    <main>
+      <div class="profile-container">
+        <!-- Sidebar -->
+        <aside class="profile-sidebar">
+          <div class="profile-user-info">
+            <div class="profile-avatar-large">H</div>
+            <div>
+              <div class="profile-user-name">Hisham</div>
+              <div class="profile-user-email">hishyx@example.com</div>
+            </div>
+          </div>
+          <nav class="sidebar-menu">
+            <a href="/user/profile" class="sidebar-link">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              Profile
+            </a>
+            <a href="/user/addresses" class="sidebar-link active">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+              Addresses
+            </a>
+            <a href="#" class="sidebar-link">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <rect x="1" y="3" width="15" height="13" />
+                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+                <circle cx="5.5" cy="18.5" r="2.5" />
+                <circle cx="18.5" cy="18.5" r="2.5" />
+              </svg>
+              My Orders
+            </a>
+            <a href="#" class="sidebar-link">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                ></path>
+              </svg>
+              Wishlist
+            </a>
+            <a href="#" class="sidebar-link">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <rect x="2" y="5" width="20" height="14" rx="2" />
+                <line x1="2" y1="10" x2="22" y2="10" />
+              </svg>
+              Wallet
+            </a>
+            <form action="/user/logout" method="POST" style="display: inline">
+              <button type="submit" class="sidebar-link logout-link">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Log Out
+              </button>
+            </form>
+          </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <section class="profile-content">
+          <div class="profile-header">
+            <h2>My Addresses</h2>
+            <button class="btn btn-secondary">Add New Address</button>
+          </div>
+
+          <div class="addresses-grid">
+            <!-- Add New Card -->
+            <div class="add-address-card">
+              <div class="add-icon-circle">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+              </div>
+              <span class="add-address-text">Add Address</span>
+            </div>
+
+            <!-- Address Card 1 (Default) -->
+            <div class="address-card default">
+              <span class="address-type-badge">Home (Default)</span>
+              <div class="address-details">
+                <span class="address-name">Hisham</span>
+                123 Dreamy Lane, Cloud City<br />
+                Tech Park, Floor 42<br />
+                San Francisco, CA 94016<br />
+                Phone: +1 234 567 890
+              </div>
+              <div class="address-actions">
+                <button class="btn-link">Edit</button>
+                <!-- Default address usually can't be deleted without setting another one -->
+              </div>
+            </div>
+
+            <!-- Address Card 2 -->
+            <div class="address-card">
+              <span class="address-type-badge">Office</span>
+              <div class="address-details">
+                <span class="address-name">Hisham Work</span>
+                456 Innovation Blvd<br />
+                Startupland, Suite 101<br />
+                New York, NY 10001<br />
+                Phone: +1 987 654 321
+              </div>
+              <div class="address-actions">
+                <button class="btn-link">Edit</button>
+                <button class="btn-link">Set as Default</button>
+                <button class="btn-link delete">Delete</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <%- include('../partials/footer') %>
+  </body>
+</html>

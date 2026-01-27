@@ -1,9 +1,11 @@
-import { registerUser, aunthenticateUser } from "../services/auth.services.js";
 import {
-  createAndSendOTP,
-  verifyOTP,
-  getRemainingTime,
-  OTPExists,
+  createTempUserForSignup,
+  authenticateUser,
+} from "../services/auth.services.js";
+import {
+  createAndSendSignupOTP,
+  verifySignupOTP,
+  getRemainingCooldown,
 } from "../services/OTP.services.js";
 
 //Public Pages
@@ -18,14 +20,22 @@ export const signupPage = (req, res) => {
 
 export const verifyOTPPage = async (req, res) => {
   try {
-    const remainingS = await getRemainingTime(req.session.tempOTPMail);
-    res.render("auth/verify-otp", {
+    const tempUserId = req.session.tempUserId;
+
+    if (!tempUserId) {
+      throw new Error("Signup session expired. Please signup again.");
+    }
+
+    const resendCooldown = await getRemainingCooldown(tempUserId);
+
+    return res.render("auth/verify-otp", {
       error: req.flash("error"),
-      remaining: remainingS,
+      resendCooldown,
     });
   } catch (err) {
+    console.error(err);
     req.flash("error", err.message);
-    return res.redirect(`/auth/login`);
+    return res.redirect("/auth/signup");
   }
 };
 
@@ -33,27 +43,24 @@ export const verifyOTPPage = async (req, res) => {
 
 export const signupUser = async (req, res) => {
   try {
-    const OTPExistInDB = await OTPExists(req.body.email);
+    const tempUser = await createTempUserForSignup(req.body);
 
-    if (!OTPExistInDB) {
-      const user = await registerUser(req.body);
+    // store temp user id in session for verification binding
+    req.session.tempUserId = tempUser._id.toString();
 
-      req.session.tempOTPMail = user.email;
-
-      await createAndSendOTP(user.email);
-    }
+    await createAndSendSignupOTP(tempUser._id, false);
 
     return res.redirect("/auth/signup/verify-otp");
   } catch (err) {
-    console.log(err);
+    console.error(err);
     req.flash("error", err.message);
-    res.redirect("/auth/signup");
+    return res.redirect("/auth/signup");
   }
 };
 
 export const loginUser = async (req, res) => {
   try {
-    const user = await aunthenticateUser(req.body);
+    const user = await authenticateUser(req.body);
 
     req.login(user, (err) => {
       if (err) return next(err); // 2. Handle potential serialization errors
@@ -65,24 +72,50 @@ export const loginUser = async (req, res) => {
   }
 };
 
-export const verifyUserOTP = async (req, res) => {
+export const verifyUserOTP = async (req, res, next) => {
   try {
-    const email =
-      req.session && req.session.tempOTPMail ? req.session.tempOTPMail : null;
+    const tempUserId = req.session.tempUserId;
 
-    const user = await verifyOTP(email, req.body.otp);
+    if (!tempUserId) {
+      throw new Error("Signup session expired. Please signup again.");
+    }
 
-    delete req.session.tempOTPMail;
+    const user = await verifySignupOTP(tempUserId, req.body.otp);
+
+    // cleanup session
+    delete req.session.tempUserId;
 
     req.login(user, (err) => {
-      if (err) return next(err); // 2. Handle potential serialization errors
-      return res.redirect("/home"); // 3. Redirect now that req.user is active
+      if (err) return next(err);
+      return res.redirect("/home");
     });
-
-    res.redirect("/home");
   } catch (err) {
-    console.log(err);
+    console.error(err);
     req.flash("error", err.message);
-    res.redirect("/auth/signup/verify-otp");
+    return res.redirect("/auth/signup/verify-otp");
   }
+};
+
+export const resendOTP = async (req, res) => {
+  try {
+    console.log("reached resedn controller");
+    const { tempUserId } = req.session;
+
+    const otp = await createAndSendSignupOTP(tempUserId, true);
+
+    return res.json({ otpLastResend: otp.lastResentAt });
+  } catch (err) {
+    console.error(err);
+    req.flash("error", err.message);
+    return res.redirect("/auth/signup");
+  }
+};
+
+export const logoutUser = (req, res, next) => {
+  req.logout((err) => {
+    if (err) return next(err);
+    req.session.destroy(() => {
+      res.redirect("/auth/login");
+    });
+  });
 };

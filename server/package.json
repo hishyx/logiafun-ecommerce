@@ -18,6 +18,7 @@
     "ejs": "^4.0.1",
     "express": "^5.2.1",
     "express-session": "^1.18.2",
+    "method-override": "^3.0.0",
     "mongodb": "^7.0.0",
     "mongoose": "^9.1.4",
     "nocache": "^4.0.0",

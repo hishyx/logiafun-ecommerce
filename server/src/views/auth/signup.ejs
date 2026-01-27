@@ -78,7 +78,15 @@
           </div>
           <p style="color: red; margin-bottom: 10px"><%=error%></p>
 
-          <button type="submit" class="btn-primary">Sign Up</button>
+          <div
+            id="signupLoader"
+            class="loader"
+            style="display: none; margin: 15px auto"
+          ></div>
+
+          <button type="submit" id="signupBtn" class="btn-primary">
+            Sign Up
+          </button>
 
           <button
             type="button"
@@ -98,5 +106,17 @@
     </div>
 
     <div class="image-section"></div>
+
+    <script>
+      const signupForm = document.querySelector("form");
+      const signupBtn = document.getElementById("signupBtn");
+      const loader = document.getElementById("signupLoader");
+
+      signupForm.addEventListener("submit", () => {
+        signupBtn.disabled = true;
+        signupBtn.textContent = "Signing up...";
+        loader.style.display = "block";
+      });
+    </script>
   </body>
 </html>

@@ -319,7 +319,7 @@
         </div>
 
         <h1>VERIFY CODE</h1>
-        <p class="subtitle">Enter the 4-digit code we sent you</p>
+        <p class="subtitle">Enter the 6-digit code we sent you</p>
 
         <form method="POST">
           <div class="input-group">
@@ -327,11 +327,17 @@
               class="otp-input"
               type="text"
               name="otp"
-              maxlength="4"
-              pattern="\d{4}"
-              placeholder="0000"
+              maxlength="6"
+              pattern="\d{6}"
+              placeholder="000000"
               required
               autofocus
+            />
+
+            <input
+              type="hidden"
+              id="resendCooldown"
+              value="<%= resendCooldown %>"
             />
           </div>
 
@@ -341,7 +347,6 @@
           >
             <%= error %>
           </div>
-          <p style="display: none" id="remainingTime"><%= remaining %></p>
 
           <button type="submit" class="btn-primary">Verify</button>
         </form>
@@ -355,12 +360,15 @@
     <div class="image-section"></div>
 
     <script>
-      var remaining = Number(
-        document.getElementById("remainingTime").textContent,
-      );
+      let resendCooldown =
+        Number(document.getElementById("resendCooldown").value) || 0;
 
       const timerEl = document.getElementById("otp-timer");
       const resendBtn = document.getElementById("resendBtn");
+
+      let timerId = null;
+
+      resendBtn.style.display = "none";
 
       function format(sec) {
         const m = Math.floor(sec / 60);
@@ -369,31 +377,61 @@
       }
 
       function tick() {
-        if (remaining <= 0) {
-          timerEl.textContent = "Code expired.";
+        if (timerId) clearTimeout(timerId);
+
+        if (resendCooldown <= 0) {
+          timerEl.textContent = "You can resend the code now.";
           resendBtn.style.display = "block";
           resendBtn.disabled = false;
           resendBtn.classList.add("enabled");
+          resendBtn.textContent = "Resend code";
           return;
         }
 
-        timerEl.textContent = `Code expires in ${format(remaining)}`;
-        remaining--;
-        setTimeout(tick, 1000);
+        timerEl.textContent = `Resend available in ${format(resendCooldown)}`;
+        resendCooldown--;
+
+        timerId = setTimeout(tick, 1000);
       }
 
-      if (remaining > 0) {
+      function startCooldown(seconds) {
+        resendCooldown = seconds;
+
+        resendBtn.style.display = "none";
+        resendBtn.disabled = true;
+        resendBtn.classList.remove("enabled");
+
         tick();
-      } else {
-        // Handle case where started with 0
-        timerEl.textContent = "Code expired.";
-        resendBtn.style.display = "block";
-        resendBtn.disabled = false;
-        resendBtn.classList.add("enabled");
       }
 
-      resendBtn.addEventListener("click", () => {
-        window.location.href = "/auth/resend-otp";
+      // Initial start from server value
+      tick();
+
+      resendBtn.addEventListener("click", async () => {
+        resendBtn.disabled = true;
+        resendBtn.textContent = "Sending...";
+
+        try {
+          const res = await fetch("/auth/signup/resend-otp", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+          });
+
+          const data = await res.json();
+
+          const lastResentAt = new Date(data.otpLastResend).getTime();
+          const now = Date.now();
+
+          let cooldown = 60 - Math.floor((now - lastResentAt) / 1000);
+          cooldown = Math.max(cooldown, 0);
+
+          startCooldown(cooldown || 60);
+        } catch (err) {
+          console.error(err);
+          resendBtn.textContent = "Resend code";
+          resendBtn.disabled = false;
+          alert("Failed to resend OTP");
+        }
       });
     </script>
   </body>
