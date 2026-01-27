@@ -6,7 +6,6 @@ export const updateUser = async (userId, userData) => {
 
   const updateFields = {
     name: userData.name,
-    email: userData.email,
     phone: userData.phone,
   };
 

@@ -19,7 +19,7 @@ const sendMail = async (email, otp) => {
   });
 };
 
-const sendMailToTempUser = async (tempUserId, otp) => {
+export const sendMailToTempUser = async (tempUserId, otp) => {
   const tempUser = await TempUser.findById(tempUserId);
 
   if (!tempUser) {
@@ -29,4 +29,7 @@ const sendMailToTempUser = async (tempUserId, otp) => {
   await sendMail(tempUser.email, otp);
 };
 
-export default sendMailToTempUser;
+export const sendMailToNewEmail = async (email, otp) => {
+  console.log("📧 Sending OTP to:", email);
+  await sendMail(email, otp);
+};

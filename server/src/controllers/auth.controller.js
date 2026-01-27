@@ -26,7 +26,7 @@ export const verifyOTPPage = async (req, res) => {
       throw new Error("Signup session expired. Please signup again.");
     }
 
-    const resendCooldown = await getRemainingCooldown(tempUserId);
+    const resendCooldown = await getRemainingCooldown(tempUserId, "signup");
 
     return res.render("auth/verify-otp", {
       error: req.flash("error"),
@@ -96,9 +96,8 @@ export const verifyUserOTP = async (req, res, next) => {
   }
 };
 
-export const resendOTP = async (req, res) => {
+export const resendSignupOTP = async (req, res) => {
   try {
-    console.log("reached resedn controller");
     const { tempUserId } = req.session;
 
     const otp = await createAndSendSignupOTP(tempUserId, true);

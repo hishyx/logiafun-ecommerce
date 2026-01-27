@@ -173,6 +173,35 @@
   box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
 }
 
+.input-with-button {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.input-with-button input {
+  flex: 1;
+}
+
+.btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  transition: var(--transition);
+}
+
+.btn-outline:hover {
+  background: var(--primary);
+  color: var(--white);
+}
+
 .input-with-icon {
   position: relative;
 }
@@ -401,4 +430,105 @@ fieldset {
   border: none;
   padding: 0;
   margin: 0;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  backdrop-filter: blur(4px);
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-content {
+  background: var(--white);
+  padding: 2.5rem;
+  width: 90%;
+  max-width: 450px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  transform: translateY(20px);
+  transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .modal-content {
+  transform: translateY(0);
+}
+
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.5rem;
+  line-height: 1;
+  transition: var(--transition);
+}
+
+.modal-close:hover {
+  color: var(--text-dark);
+  background: var(--bg-light);
+  border-radius: 50%;
+}
+
+.modal-content h3 {
+  margin-bottom: 0.5rem;
+  color: var(--primary);
+  font-size: 1.5rem;
+}
+
+/* OTP Input Styles */
+.otp-input-container {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.otp-digit {
+  width: 45px;
+  height: 50px;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-md);
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--primary);
+  outline: none;
+  transition: var(--transition);
+  background: var(--bg-light);
+}
+
+.otp-digit:focus {
+  border-color: var(--primary);
+  background: var(--white);
+  box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
+}
+
+#changeEmailBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #e5e7eb; /* light gray */
+  color: #9ca3af; /* muted text */
+  border-color: #d1d5db;
 }

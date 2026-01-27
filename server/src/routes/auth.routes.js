@@ -9,7 +9,7 @@ import {
   loginUser,
   verifyOTPPage,
   verifyUserOTP,
-  resendOTP,
+  resendSignupOTP,
   logoutUser,
 } from "../controllers/auth.controller.js";
 
@@ -51,7 +51,7 @@ router
   .get(isUserGuest, verifyOTPPage)
   .post(verifyUserOTP);
 
-router.post("/auth/signup/resend-otp", resendOTP);
+router.post("/auth/signup/resend-otp", resendSignupOTP);
 
 router.post("/user/logout", logoutUser);
 

@@ -21,7 +21,7 @@
               <div class="profile-user-name" id="sidebarName">
                 <%=user.name%>
               </div>
-              <div class="profile-user-email" id="sidebarEmail">
+              <div class="profilacce-user-email" id="sidebarEmail">
                 <%=user.email%>
               </div>
             </div>
@@ -129,7 +129,17 @@
               <div class="form-row">
                 <div class="form-group">
                   <label>Email Address</label>
-                  <input type="email" value="<%=user.email%>" name="email" />
+                  <div class="input-with-button">
+                    <input type="email" value="<%=user.email%>" name="email" />
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline"
+                      id="changeEmailBtn"
+                      disabled
+                    >
+                      Change
+                    </button>
+                  </div>
                 </div>
                 <div class="form-group">
                   <label>Phone Number</label>
@@ -176,6 +186,10 @@
                   />
                 </div>
               </div>
+              <small
+                id="passwordError"
+                style="color: red; display: block"
+              ></small>
 
               <button type="submit" class="btn btn-primary btn-save">
                 Save Changes
@@ -186,60 +200,65 @@
       </div>
     </main>
 
+    <!-- Email Change Modal -->
+    <div class="modal-overlay" id="emailModal">
+      <div class="modal-content">
+        <button class="modal-close" id="closeEmailModal">&times;</button>
+
+        <!-- Step 1: New Email -->
+        <div id="emailStep1">
+          <h3>Change Email Address</h3>
+          <p style="color: var(--text-muted); margin-bottom: 1.5rem">
+            Enter your new email address. We'll send a verification code.
+          </p>
+          <div class="form-group">
+            <label>New Email Address</label>
+            <input
+              type="email"
+              id="newEmailInput"
+              placeholder="name@example.com"
+            />
+          </div>
+          <button class="btn btn-primary" style="width: 100%" id="sendOtpBtn">
+            Proceed
+          </button>
+        </div>
+
+        <!-- Step 2: OTP -->
+        <div id="emailStep2" style="display: none">
+          <h3>Verify Email</h3>
+          <p style="color: var(--text-muted); margin-bottom: 1.5rem">
+            Enter the 6-digit code sent to
+            <strong id="displayNewEmail"></strong>
+          </p>
+          <div class="form-group">
+            <label>Verification Code</label>
+            <div class="otp-input-container">
+              <input type="text" maxlength="1" class="otp-digit" />
+              <input type="text" maxlength="1" class="otp-digit" />
+              <input type="text" maxlength="1" class="otp-digit" />
+              <input type="text" maxlength="1" class="otp-digit" />
+              <input type="text" maxlength="1" class="otp-digit" />
+              <input type="text" maxlength="1" class="otp-digit" />
+            </div>
+          </div>
+          <button class="btn btn-primary" style="width: 100%" id="verifyOtpBtn">
+            Verify & Update
+          </button>
+          <button class="btn btn-link" id="resendOtpBtn">Resend code</button>
+          <button
+            class="btn btn-link"
+            style="width: 100%; margin-top: 1rem"
+            id="backToEmailBtn"
+          >
+            Back to Email
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Footer -->
     <%- include('../partials/footer') %>
-
-    <script>
-      const editBtn = document.getElementById("editInfoButton");
-      const fieldset = document.getElementById("profileFieldset");
-      const form = document.querySelector(".profile-form");
-      const saveBtn = document.querySelector(".btn-save");
-
-      let editing = false;
-
-      // Enable editing
-      editBtn.addEventListener("click", () => {
-        editing = !editing;
-        fieldset.disabled = !editing;
-        editBtn.textContent = editing ? "Cancel" : "Edit Information";
-      });
-
-      // Handle save with fetch
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        saveBtn.disabled = true;
-        saveBtn.textContent = "Saving...";
-
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
-
-        try {
-          const res = await fetch("/user/profile", {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-          });
-
-          const result = await res.json();
-
-          if (!res.ok) throw new Error(result.message || "Update failed");
-
-          alert("Profile updated successfully ✅");
-
-          // lock form again
-          fieldset.disabled = true;
-          editing = false;
-          editBtn.textContent = "Edit Information";
-        } catch (err) {
-          alert(err.message || "Something went wrong ❌");
-        } finally {
-          saveBtn.disabled = false;
-          saveBtn.textContent = "Save Changes";
-        }
-      });
-    </script>
+    <script src="/js/user-profile.js"></script>
   </body>
 </html>

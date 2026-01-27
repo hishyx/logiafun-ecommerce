@@ -57,7 +57,7 @@ export const authenticateUser = async (body) => {
     throw new Error(`This account is ${user.status} please contact your admin`);
   }
 
-  const isMatch = bcrypt.compare(body.password, user.password);
+  const isMatch = await bcrypt.compare(body.password, user.password);
 
   if (!isMatch) {
     throw new Error("Invalid email or password");
