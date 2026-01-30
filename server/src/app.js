@@ -41,4 +41,8 @@ app.set("views", path.join(__dirname, "views"));
 app.use("/", authRoute);
 app.use("/", userRoute);
 
+app.use((req, res) => {
+  res.status(404).render("404-not-found");
+});
+
 export default app;

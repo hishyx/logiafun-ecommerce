@@ -1,6 +1,5 @@
 import bcrypt from "bcrypt";
 import User from "../models/user.model.js";
-import TempUser from "../models/tempUser.model.js";
 
 export const createTempUserForSignup = async (body) => {
   const { name, email, phone, password, confirm_password } = body;
@@ -21,25 +20,14 @@ export const createTempUserForSignup = async (body) => {
 
   const hash = await bcrypt.hash(password, 10);
 
-  // normalize email first
-  const normalizedEmail = email.toLowerCase().trim();
-
-  // block duplicate signup in progress
-  const existingTemp = await TempUser.findOne({ email: normalizedEmail });
-
-  if (existingTemp) {
-    return existingTemp;
-  }
-
+  const normalizedEmail = email.trim();
   // create new temp user
-  const tempUser = await TempUser.create({
+  return {
     name,
     email: normalizedEmail,
     phone,
     password: hash,
-  });
-
-  return tempUser;
+  };
 };
 
 export const authenticateUser = async (body) => {

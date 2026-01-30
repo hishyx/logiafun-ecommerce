@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="/css/home.css" />
     <link rel="stylesheet" href="/css/profile.css" />
   </head>
-  <body>
+<body>
     <!-- Header -->
     <%- include('../partials/header.ejs')%>
 
@@ -152,19 +152,19 @@
                 </div>
               </div>
 
+
               <div class="form-row">
                 <div class="form-group" style="max-width: 50%">
                   <label>Password</label>
                   <div class="input-with-button">
-                    <input type="password" value="********" disabled />
-                    <button
-                      type="button"
-                      class="btn btn-sm btn-outline"
-                      id="changePasswordBtn"
-                      disabled
-                    >
-                      Change
-                    </button>
+              <button
+  type="button"
+  class="btn btn-sm btn-outline open-password-modal"
+  disabled
+>
+  <%= passExist ? "Change" : "Set password" %>
+</button>
+
                   </div>
                 </div>
               </div>
@@ -178,116 +178,134 @@
       </div>
     </main>
 
-    <!-- Email Change Modal -->
-    <div class="modal-overlay" id="emailModal">
-      <div class="modal-content">
-        <button class="modal-close" id="closeEmailModal">&times;</button>
+<div class="modal-overlay" id="emailModal">
+  <div class="modal-content">
+    <button class="modal-close" id="closeEmailModal" type="button">&times;</button>
 
-        <!-- Step 1: New Email -->
-        <div id="emailStep1">
-          <h3>Change Email Address</h3>
-          <p style="color: var(--text-muted); margin-bottom: 1.5rem">
-            Enter your new email address. We'll send a verification code.
-          </p>
-          <div class="form-group">
-            <label>New Email Address</label>
-            <input
-              type="email"
-              id="newEmailInput"
-              placeholder="name@example.com"
-            />
-          </div>
-          <button class="btn btn-primary" style="width: 100%" id="sendOtpBtn">
-            Proceed
-          </button>
+    <% if(passExist) { %>
+      <div id="emailStep1">
+        <h3>Change Email Address</h3>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem">
+          Enter your new email address. We'll send a verification code.
+        </p>
+        <div class="form-group">
+          <label>New Email Address</label>
+          <input
+            type="email"
+            id="newEmailInput"
+            placeholder="name@example.com"
+          />
         </div>
-
-        <!-- Step 2: OTP -->
-        <div id="emailStep2" style="display: none">
-          <h3>Verify Email</h3>
-          <p style="color: var(--text-muted); margin-bottom: 1.5rem">
-            Enter the 6-digit code sent to
-            <strong id="displayNewEmail"></strong>
-          </p>
-          <div class="form-group">
-            <label>Verification Code</label>
-            <div class="otp-input-container">
-              <input type="text" maxlength="1" class="otp-digit" />
-              <input type="text" maxlength="1" class="otp-digit" />
-              <input type="text" maxlength="1" class="otp-digit" />
-              <input type="text" maxlength="1" class="otp-digit" />
-              <input type="text" maxlength="1" class="otp-digit" />
-              <input type="text" maxlength="1" class="otp-digit" />
-            </div>
-          </div>
-          <button class="btn btn-primary" style="width: 100%" id="verifyOtpBtn">
-            Verify & Update
-          </button>
-          <button class="btn btn-link" id="resendOtpBtn">Resend code</button>
-          <button
-            class="btn btn-link"
-            style="width: 100%; margin-top: 1rem"
-            id="backToEmailBtn"
-          >
-            Back to Email
-          </button>
-        </div>
+        <button class="btn btn-primary" style="width: 100%" id="sendOtpBtn">
+          Proceed
+        </button>
       </div>
-    </div>
+
+      <div id="emailStep2" style="display: none">
+        <h3>Verify Email</h3>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem">
+          Enter the 6-digit code sent to
+          <strong id="displayNewEmail"></strong>
+        </p>
+        <div class="form-group">
+          <label>Verification Code</label>
+          <div class="otp-input-container">
+            <input type="text" maxlength="1" class="otp-digit" />
+            <input type="text" maxlength="1" class="otp-digit" />
+            <input type="text" maxlength="1" class="otp-digit" />
+            <input type="text" maxlength="1" class="otp-digit" />
+            <input type="text" maxlength="1" class="otp-digit" />
+            <input type="text" maxlength="1" class="otp-digit" />
+          </div>
+        </div>
+        <button class="btn btn-primary" style="width: 100%" id="verifyOtpBtn">
+          Verify & Update
+        </button>
+        <button class="btn btn-link" id="resendOtpBtn">Resend code</button>
+        <button
+          class="btn btn-link"
+          style="width: 100%; margin-top: 1rem"
+          id="backToEmailBtn"
+        >
+          Back to Email
+        </button>
+      </div>
+
+    <% } else { %>
+      <div style="text-align: center; padding: 20px 0;">
+        <h3 style="color: #dc3545;">Security Action Required</h3>
+        <p style="color: var(--text-muted); margin: 1rem 0 2rem">
+          For your security, you must set an account password before you can change your email address.
+        </p>
+        <button class="btn btn-primary" style="width: 100%" id="triggerPasswordFromEmail">
+          Set Password Now
+        </button>
+      </div>
+    <% } %>
+  </div>
+</div>
 
     <!-- Password Change Modal -->
-    <div class="modal-overlay" id="passwordModal">
-      <div class="modal-content">
-        <button class="modal-close" id="closePasswordModal">&times;</button>
-        <h3>Change Password</h3>
-        <p style="color: var(--text-muted); margin-bottom: 1.5rem">
-          Update your password to keep your account secure.
-        </p>
+   <div class="modal-overlay" id="passwordModal">
+  <div class="modal-content">
+    <button class="modal-close" id="closePasswordModal" type="button">&times;</button>
+    
+    <h3><%= passExist ? 'Change Password' : 'Set Your Password' %></h3>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem">
+      <%= passExist ? 'Update your password to keep your account secure.' : 'Create a password for your account to enable email login.' %>
+    </p>
 
-        <form id="passwordChangeForm">
-          <div class="form-group">
-            <label>Current Password</label>
-            <input
-              type="password"
-              name="currentPassword"
-              placeholder="••••••••"
-              required
-            />
-          </div>
-
-          <div class="form-group">
-            <label>New Password</label>
-            <input
-              type="password"
-              name="newPassword"
-              placeholder="Min 8 characters"
-              required
-              minlength="8"
-            />
-          </div>
-
-          <div class="form-group">
-            <label>Confirm New Password</label>
-            <input
-              type="password"
-              name="confirmPassword"
-              placeholder="Confirm new password"
-              required
-              minlength="8"
-            />
-          </div>
-
-          <small
-            id="modalPasswordError"
-            style="color: red; display: block; margin-bottom: 1rem"
-          ></small>
-
-          <button type="submit" class="btn btn-primary" style="width: 100%">
-            Update Password
-          </button>
-        </form>
+    <form id="passwordChangeForm">
+      <div class="form-group">
+        <% if(passExist) { %>
+          <label>Current Password</label>
+          <input
+            type="password"
+            name="currentPassword"
+            placeholder="••••••••"
+            required
+          />
+        <% } else { %>
+          <input
+            type="hidden"
+            name="currentPassword"
+            value="isGoogleUser" 
+          />
+        <% } %>
       </div>
-    </div>
+
+      <div class="form-group">
+        <label>New Password</label>
+        <input
+          type="password"
+          id="newPassword"
+          name="newPassword"
+          placeholder="Min 8 characters"
+          required
+          minlength="8"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Confirm New Password</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          name="confirmPassword"
+          placeholder="Confirm new password"
+          required
+          minlength="8"
+        />
+      </div>
+
+      <small id="modalPasswordError" style="color: red; display: block; margin-bottom: 1rem"></small>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%">
+        <%= passExist ? 'Update Password' : 'Set Password' %>
+      </button>
+    </form>
+  </div>
+</div>
 
     <!-- Footer -->
     <%- include('../partials/footer') %>

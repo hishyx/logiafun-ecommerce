@@ -23,13 +23,13 @@ export const signupPage = (req, res) => {
 
 export const verifyOTPPage = async (req, res) => {
   try {
-    const tempUserId = req.session.tempUserId;
+    const otpId = req.session.OTPId;
 
-    if (!tempUserId) {
+    if (!otpId) {
       throw new Error("Signup session expired. Please signup again.");
     }
 
-    const resendCooldown = await getRemainingCooldown(tempUserId, "signup");
+    const resendCooldown = await getRemainingCooldown(otpId, "signup");
 
     return res.render("auth/verify-otp", {
       error: req.flash("error"),
@@ -46,12 +46,17 @@ export const verifyOTPPage = async (req, res) => {
 
 export const signupUser = async (req, res) => {
   try {
-    const tempUser = await createTempUserForSignup(req.body);
+    req.session.tempUser = req.session.tempUser
+      ? req.session.tempUser
+      : await createTempUserForSignup(req.body);
 
-    // store temp user id in session for verification binding
-    req.session.tempUserId = tempUser._id.toString();
+    const otpDoc = await createAndSendSignupOTP(
+      req.session.OTPId,
+      req.session.tempUser.email,
+      false,
+    );
 
-    await createAndSendSignupOTP(tempUser._id, false);
+    req.session.OTPId = otpDoc._id;
 
     return res.redirect("/auth/signup/verify-otp");
   } catch (err) {
@@ -61,7 +66,7 @@ export const signupUser = async (req, res) => {
   }
 };
 
-export const loginUser = async (req, res) => {
+export const loginUser = async (req, res, next) => {
   try {
     const user = await authenticateUser(req.body);
 
@@ -77,16 +82,19 @@ export const loginUser = async (req, res) => {
 
 export const verifyUserOTP = async (req, res, next) => {
   try {
-    const tempUserId = req.session.tempUserId;
+    const otpId = req.session.OTPId; // <-- read once
 
-    if (!tempUserId) {
+    if (!otpId) {
       throw new Error("Signup session expired. Please signup again.");
     }
 
-    const user = await verifySignupOTP(tempUserId, req.body.otp);
+    const pendingUser = req.session.tempUser;
+
+    const user = await verifySignupOTP(otpId, req.body.otp, pendingUser);
 
     // cleanup session
-    delete req.session.tempUserId;
+    delete req.session.OTPId;
+    delete req.session.tempUser;
 
     req.login(user, (err) => {
       if (err) return next(err);
@@ -101,9 +109,17 @@ export const verifyUserOTP = async (req, res, next) => {
 
 export const resendSignupOTP = async (req, res) => {
   try {
-    const { tempUserId } = req.session;
+    const otpId = req.session.OTPId;
+    const pendingUser = req.session.tempUser;
 
-    const otp = await createAndSendSignupOTP(tempUserId, true);
+    if (!otpId || !pendingUser) {
+      throw new Error("Signup session expired. Please signup again.");
+    }
+
+    const otp = await createAndSendSignupOTP(otpId, pendingUser.email, true);
+
+    // make sure session keeps the latest otp id (in case it was created fresh)
+    req.session.OTPId = otp._id;
 
     return res.json({ otpLastResend: otp.lastResentAt });
   } catch (err) {
@@ -164,7 +180,6 @@ export const verifyForgotPassword = async (req, res) => {
     req.session.forgotToken = safeToken;
     res.redirect(`/auth/reset-password?token=${safeToken}`);
   } catch (err) {
-    console.log(`${err} from fogotpaasscontroller`);
     req.flash("error", err.message);
     res.redirect("/auth/forgot-password/verify-otp");
   }
@@ -199,7 +214,7 @@ export const passwordResetSuccessPage = (req, res) => {
   });
 };
 
-export const logoutUser = (req, res) => {
+export const logoutUser = (req, res, next) => {
   req.logout((err) => {
     if (err) return next(err);
     req.session.destroy(() => {

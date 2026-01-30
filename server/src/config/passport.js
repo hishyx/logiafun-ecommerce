@@ -32,7 +32,8 @@ passport.serializeUser((user, done) => {
 // Use the ID to get the full user back from MongoDB on every request
 passport.deserializeUser(async (id, done) => {
   try {
-    const user = await User.findById(id);
+    const user = await User.findById(id).select("-password -googleId"); // 👈 hide auth fields
+
     done(null, user);
   } catch (err) {
     done(err, null);

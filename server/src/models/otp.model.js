@@ -4,7 +4,7 @@ const OTPSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      required: true,
+      required: false,
       ref: "TempUser",
     },
 
@@ -42,7 +42,13 @@ const OTPSchema = new mongoose.Schema(
 );
 
 // Prevent duplicate OTPs for same temp user + purpose
-OTPSchema.index({ userId: 1, purpose: 1 }, { unique: true });
+OTPSchema.index(
+  { userId: 1, purpose: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { userId: { $exists: true } },
+  },
+);
 
 const OTP = mongoose.model("OTP", OTPSchema);
 

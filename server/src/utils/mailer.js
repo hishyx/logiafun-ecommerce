@@ -1,5 +1,4 @@
 import nodemailer from "nodemailer";
-import TempUser from "../models/tempUser.model.js";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -100,14 +99,12 @@ const sendMail = async (email, otp) => {
   });
 };
 
-export const sendMailToTempUser = async (tempUserId, otp) => {
-  const tempUser = await TempUser.findById(tempUserId);
-
-  if (!tempUser) {
-    throw new Error("Temp user not found while sending OTP");
+export const sendMailToTempUser = async (email, otp) => {
+  if (!email) {
+    throw new Error("email not found while sending OTP");
   }
 
-  await sendMail(tempUser.email, otp);
+  await sendMail(email, otp);
 };
 
 export const sendMailToNewEmail = async (email, otp) => {

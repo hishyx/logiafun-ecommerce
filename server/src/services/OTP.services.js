@@ -5,7 +5,6 @@ import {
   sendMailToNewEmail,
   sendMailToForgotPasswordEmail,
 } from "../utils/mailer.js";
-import TempUser from "../models/tempUser.model.js";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
 
@@ -13,13 +12,10 @@ const OTP_EXPIRY_MS = 2 * 60 * 1000; // 5 minutes
 const RESEND_COOLDOWN_MS = 60 * 1000; // 1 minute
 const MAX_ATTEMPTS = 5;
 
-export const createAndSendSignupOTP = async (tempUserId, isResend) => {
+export const createAndSendSignupOTP = async (otpId, email, isResend) => {
   const now = new Date();
 
-  const existing = await OTP.findOne({
-    userId: tempUserId,
-    purpose: "signup",
-  });
+  const existing = otpId ? await OTP.findById(otpId) : null;
 
   if (
     isResend &&
@@ -33,31 +29,38 @@ export const createAndSendSignupOTP = async (tempUserId, isResend) => {
   const otp = crypto.randomInt(100000, 999999).toString();
   const hashedOTP = await bcrypt.hash(otp, 10);
 
-  const otpDoc = await OTP.findOneAndUpdate(
-    { userId: tempUserId, purpose: "signup" },
-    {
-      $setOnInsert: {
-        userId: tempUserId,
-        purpose: "signup",
-        attempts: 0,
-      },
-      $set: {
-        OTP: hashedOTP,
-        expiresAt: new Date(Date.now() + OTP_EXPIRY_MS),
-        lastResentAt: now,
-      },
-    },
-    { upsert: true, new: true },
-  );
+  let otpDoc;
 
-  await sendMailToTempUser(tempUserId, otp);
+  if (existing) {
+    otpDoc = await OTP.findByIdAndUpdate(
+      existing._id,
+      {
+        $set: {
+          OTP: hashedOTP,
+          expiresAt: new Date(Date.now() + OTP_EXPIRY_MS),
+          lastResentAt: now,
+        },
+      },
+      { new: true },
+    );
+  } else {
+    otpDoc = await OTP.create({
+      purpose: "signup",
+      OTP: hashedOTP,
+      expiresAt: new Date(Date.now() + OTP_EXPIRY_MS),
+      lastResentAt: now,
+      attempts: 0,
+    });
+  }
+
+  await sendMailToTempUser(email, otp);
 
   return otpDoc;
 };
 
-export const verifySignupOTP = async (tempUserId, inputOtp) => {
+export const verifySignupOTP = async (otpId, inputOtp, pendingUser) => {
   const otpDoc = await OTP.findOne({
-    userId: tempUserId,
+    _id: otpId,
     purpose: "signup",
     expiresAt: { $gt: new Date() },
   });
@@ -76,38 +79,34 @@ export const verifySignupOTP = async (tempUserId, inputOtp) => {
 
   if (!isValid) {
     await OTP.updateOne({ _id: otpDoc._id }, { $inc: { attempts: 1 } });
-
     throw new Error("Invalid OTP");
   }
 
-  // OTP is valid → create real user
-  const tempUser = await TempUser.findById(tempUserId);
-
-  if (!tempUser) {
+  // OTP is valid → create real user from session data
+  if (!pendingUser) {
     throw new Error("Signup session expired");
   }
 
   const user = await User.create({
-    name: tempUser.name,
-    email: tempUser.email,
-    phone: tempUser.phone,
-    password: tempUser.password,
+    name: pendingUser.name,
+    email: pendingUser.email,
+    phone: pendingUser.phone,
+    password: pendingUser.password,
     profileImage: "/images/profile.jpg",
     isVerified: true,
   });
 
   // cleanup
-  await TempUser.deleteOne({ _id: tempUserId });
   await OTP.deleteOne({ _id: otpDoc._id });
 
   return user;
 };
 
-export const getRemainingCooldown = async (tempUserId, purpose) => {
-  const otp = await OTP.findOne({
-    userId: tempUserId,
-    purpose,
-  });
+export const getRemainingCooldown = async (id, purpose) => {
+  const otp =
+    purpose === "signup"
+      ? await OTP.findOne({ _id: id, purpose })
+      : await OTP.findOne({ userId: id, purpose });
 
   const COOLDOWN = 60;
 
@@ -199,9 +198,14 @@ export const verifyEmailChangeOTP = async (userId, inputOtp, tempNewMail) => {
 
   // OTP is valid → change user email
 
-  await User.findByIdAndUpdate(otpDoc.userId, {
-    email: tempNewMail,
-  });
+  await User.findByIdAndUpdate(
+    otpDoc.userId,
+    {
+      email: tempNewMail,
+      $unset: { googleId: 1 },
+    },
+    { new: true },
+  );
 
   // cleanup
   await OTP.deleteOne({ _id: otpDoc._id });

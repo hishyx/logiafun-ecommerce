@@ -525,7 +525,8 @@ fieldset {
   box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
 }
 
-#changeEmailBtn:disabled {
+#changeEmailBtn:disabled,
+#changePasswordBtn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   background-color: #e5e7eb; /* light gray */

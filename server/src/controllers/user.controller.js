@@ -2,19 +2,37 @@ import { updateUser } from "../services/user.services.js";
 import {
   createAndSendEmailChangeOTP,
   verifyEmailChangeOTP,
-  getRemainingCooldown,
 } from "../services/OTP.services.js";
 
+import bcrypt from "bcrypt";
+
+import User from "../models/user.model.js";
+
 export const homePage = (req, res) => {
+  console.log(req.user);
   res.render("user/home.ejs", {
     user: req.user,
   });
 };
 
 export const profilePage = async (req, res) => {
-  res.render("user/profile", {
-    user: req.user,
-  });
+  try {
+    const authInfo = await User.findById(req.user._id).select(
+      "password googleId",
+    );
+
+    const passExist = !!authInfo.password;
+    const hasGoogle = !!authInfo.googleId;
+
+    res.render("user/profile", {
+      user: req.user, // safe object from passport
+      passExist,
+      hasGoogle,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Something went wrong");
+  }
 };
 
 export const addressPage = (req, res) => {
