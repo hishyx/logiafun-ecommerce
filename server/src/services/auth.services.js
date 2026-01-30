@@ -95,3 +95,10 @@ export const googleUserExist = async (googleUser) => {
 
   return newUser;
 };
+
+export const setNewPassword = async (password, userId) => {
+  console.log("New pass set forgot reached");
+  await User.findByIdAndUpdate(userId, {
+    password: await bcrypt.hash(password, 10),
+  });
+};

@@ -11,10 +11,20 @@ import {
   verifyUserOTP,
   resendSignupOTP,
   logoutUser,
+  forgotPasswordEmailPage,
+  forgotPasswordOTPSend,
+  forgotPasswordOTPPage,
+  verifyForgotPassword,
+  newPasswordPage,
+  newPasswordSubmit,
+  passwordResetSuccessPage,
 } from "../controllers/auth.controller.js";
 
 //Importing middlewares
-import { isUserGuest } from "../middlewares/auth.middleware.js";
+import {
+  isUserGuest,
+  safeTokenMatches,
+} from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
@@ -52,6 +62,23 @@ router
   .post(verifyUserOTP);
 
 router.post("/auth/signup/resend-otp", resendSignupOTP);
+
+router
+  .route("/auth/forgot-password")
+  .get(isUserGuest, forgotPasswordEmailPage)
+  .post(forgotPasswordOTPSend);
+
+router
+  .route("/auth/forgot-password/verify-otp")
+  .get(forgotPasswordOTPPage)
+  .post(verifyForgotPassword);
+
+router
+  .route("/auth/reset-password")
+  .get(safeTokenMatches, newPasswordPage)
+  .post(newPasswordSubmit);
+
+router.get("/auth/reset-password/success", passwordResetSuccessPage);
 
 router.post("/user/logout", logoutUser);
 

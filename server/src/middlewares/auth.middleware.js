@@ -69,3 +69,13 @@ export const checkAdminStatus = async (req, res, next) => {
     console.log(err);
   }
 };
+
+export const safeTokenMatches = (req, res, next) => {
+  const safeUser = req.query.token || "";
+
+  if (safeUser != req.session.forgotToken) {
+    return res.redirect("/auth/login");
+  }
+
+  next();
+};

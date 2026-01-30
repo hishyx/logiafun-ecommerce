@@ -1,6 +1,10 @@
 import OTP from "../models/otp.model.js";
 import User from "../models/user.model.js";
-import { sendMailToTempUser, sendMailToNewEmail } from "../utils/mailer.js";
+import {
+  sendMailToTempUser,
+  sendMailToNewEmail,
+  sendMailToForgotPasswordEmail,
+} from "../utils/mailer.js";
 import TempUser from "../models/tempUser.model.js";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
@@ -201,4 +205,82 @@ export const verifyEmailChangeOTP = async (userId, inputOtp, tempNewMail) => {
 
   // cleanup
   await OTP.deleteOne({ _id: otpDoc._id });
+};
+
+export const createAndSendForgotPasswordOTP = async (email, isResend) => {
+  const user = await User.findOne({ email });
+
+  if (!user) throw new Error("User not found");
+
+  const userId = user._id;
+
+  const now = new Date();
+
+  const existing = await OTP.findOne({
+    userId,
+    purpose: "forgot_password",
+  });
+
+  if (
+    isResend &&
+    existing &&
+    existing.lastResentAt &&
+    now - existing.lastResentAt < RESEND_COOLDOWN_MS
+  ) {
+    throw new Error("Please wait before requesting another OTP");
+  }
+
+  const otp = crypto.randomInt(100000, 999999).toString();
+  const hashedOTP = await bcrypt.hash(otp, 10);
+
+  const otpDoc = await OTP.findOneAndUpdate(
+    { userId: userId, purpose: "forgot_password" },
+    {
+      $setOnInsert: {
+        userId: userId,
+        purpose: "forgot_password",
+        attempts: 0,
+      },
+      $set: {
+        OTP: hashedOTP,
+        expiresAt: new Date(Date.now() + OTP_EXPIRY_MS),
+        lastResentAt: now,
+      },
+    },
+    { upsert: true, new: true },
+  );
+
+  await sendMailToForgotPasswordEmail(email, otp);
+
+  return otpDoc;
+};
+
+export const verifyForgotPasswordOTP = async (userId, inputOtp) => {
+  const otpDoc = await OTP.findOne({
+    userId,
+    purpose: "forgot_password",
+    expiresAt: { $gt: new Date() },
+  });
+
+  if (!otpDoc) {
+    throw new Error("OTP expired or not found");
+  }
+
+  // check brute force attempts
+  if (otpDoc.attempts >= MAX_ATTEMPTS) {
+    await OTP.deleteOne({ _id: otpDoc._id });
+    throw new Error("Too many attempts. Please try again.");
+  }
+
+  const isValid = await bcrypt.compare(inputOtp, otpDoc.OTP);
+
+  if (!isValid) {
+    await OTP.updateOne({ _id: otpDoc._id }, { $inc: { attempts: 1 } });
+
+    throw new Error("Invalid OTP");
+  }
+
+  //Generate a random toke string
+
+  return crypto.randomBytes(64).toString("base64url");
 };

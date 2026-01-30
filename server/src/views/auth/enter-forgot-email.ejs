@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Forgot Password - LogiaFun</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/login-signup.css" />
+  </head>
+  <body>
+    <div class="form-section">
+      <div class="logo-container">
+        <a href="/home" class="logo">logia<span>Fun</span></a>
+      </div>
+
+      <div class="form-container">
+        <h1>FORGOT PASSWORD</h1>
+        <p class="subtitle">
+          Enter your email address and we will send you a link to reset your
+          password.
+        </p>
+
+        <form action="/auth/forgot-password" method="POST">
+          <div class="input-group">
+            <label for="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="name@example.com"
+              required
+              autofocus
+            />
+          </div>
+
+          <button type="submit" class="btn-primary">Send Reset Link</button>
+
+          <div class="footer-text">
+            <a href="login.html">Back to Login</a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="image-section"></div>
+  </body>
+</html>

@@ -17,7 +17,7 @@ const router = express.Router();
 
 router.use(isAuth);
 router.use(checkUserStatus);
-
+router.get("/", (req, res) => res.redirect("/home"));
 router.route("/home").get(homePage);
 router.route("/user/profile").get(profilePage).patch(editProfile);
 router.route("/user/addresses").get(addressPage);
