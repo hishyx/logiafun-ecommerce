@@ -152,44 +152,22 @@
                 </div>
               </div>
 
-              <div
-                class="profile-header"
-                style="margin-top: 3rem; margin-bottom: 1.5rem"
-              >
-                <h3>Password Change</h3>
-              </div>
-
-              <div class="form-group">
-                <label>Current Password</label>
-                <input
-                  type="password"
-                  placeholder="••••••••"
-                  name="currentPassword"
-                />
-              </div>
-
               <div class="form-row">
-                <div class="form-group">
-                  <label>New Password</label>
-                  <input
-                    type="password"
-                    placeholder="Min 8 characters"
-                    name="newPassword"
-                  />
-                </div>
-                <div class="form-group">
-                  <label>Confirm New Password</label>
-                  <input
-                    type="password"
-                    placeholder="Confirm new password"
-                    name="confirmPassword"
-                  />
+                <div class="form-group" style="max-width: 50%">
+                  <label>Password</label>
+                  <div class="input-with-button">
+                    <input type="password" value="********" disabled />
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-outline"
+                      id="changePasswordBtn"
+                      disabled
+                    >
+                      Change
+                    </button>
+                  </div>
                 </div>
               </div>
-              <small
-                id="passwordError"
-                style="color: red; display: block"
-              ></small>
 
               <button type="submit" class="btn btn-primary btn-save">
                 Save Changes
@@ -254,6 +232,60 @@
             Back to Email
           </button>
         </div>
+      </div>
+    </div>
+
+    <!-- Password Change Modal -->
+    <div class="modal-overlay" id="passwordModal">
+      <div class="modal-content">
+        <button class="modal-close" id="closePasswordModal">&times;</button>
+        <h3>Change Password</h3>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem">
+          Update your password to keep your account secure.
+        </p>
+
+        <form id="passwordChangeForm">
+          <div class="form-group">
+            <label>Current Password</label>
+            <input
+              type="password"
+              name="currentPassword"
+              placeholder="••••••••"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label>New Password</label>
+            <input
+              type="password"
+              name="newPassword"
+              placeholder="Min 8 characters"
+              required
+              minlength="8"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Confirm New Password</label>
+            <input
+              type="password"
+              name="confirmPassword"
+              placeholder="Confirm new password"
+              required
+              minlength="8"
+            />
+          </div>
+
+          <small
+            id="modalPasswordError"
+            style="color: red; display: block; margin-bottom: 1rem"
+          ></small>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%">
+            Update Password
+          </button>
+        </form>
       </div>
     </div>
 

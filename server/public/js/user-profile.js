@@ -30,6 +30,7 @@ const fieldset = document.getElementById("profileFieldset");
 const form = document.querySelector(".profile-form");
 const saveBtn = document.querySelector(".btn-save");
 const changeEmailBtn = document.getElementById("changeEmailBtn");
+const changePasswordButton = document.getElementById("changePasswordBtn");
 const errorBox = document.getElementById("passwordError");
 
 function showError(msg) {
@@ -45,24 +46,14 @@ editBtn.addEventListener("click", () => {
 
   form.querySelector('[name="email"]').disabled = true;
   changeEmailBtn.disabled = !editing;
+  changePasswordButton.disabled = !editing;
 });
 
 //Profile Save
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const currentPassword = form.currentPassword.value.trim();
-  const newPassword = form.newPassword.value.trim();
-  const confirmPassword = form.confirmPassword.value.trim();
-
-  if (newPassword || confirmPassword || currentPassword) {
-    if (!currentPassword)
-      return showError("Please enter your current password");
-    if (newPassword.length < 8)
-      return showError("New password must be at least 8 characters");
-    if (newPassword !== confirmPassword)
-      return showError("Passwords do not match");
-  }
+  // Password validation removed from main profile update
 
   saveBtn.disabled = true;
   saveBtn.textContent = "Saving...";
@@ -242,4 +233,78 @@ verifyOtpBtn.addEventListener("click", async () => {
 backToEmailBtn.addEventListener("click", () => {
   emailStep1.style.display = "block";
   emailStep2.style.display = "none";
+});
+
+// Password Change Modal
+const passwordModal = document.getElementById("passwordModal");
+const closePasswordModal = document.getElementById("closePasswordModal");
+const changePasswordBtn = document.getElementById("changePasswordBtn");
+const passwordChangeForm = document.getElementById("passwordChangeForm");
+const modalPasswordError = document.getElementById("modalPasswordError");
+
+if (changePasswordBtn) {
+  changePasswordBtn.addEventListener("click", () => {
+    passwordModal.classList.add("active");
+    passwordChangeForm.reset();
+    modalPasswordError.textContent = "";
+  });
+}
+
+if (closePasswordModal) {
+  closePasswordModal.addEventListener("click", () => {
+    passwordModal.classList.remove("active");
+  });
+}
+
+passwordModal.addEventListener("click", (e) => {
+  if (e.target === passwordModal) passwordModal.classList.remove("active");
+});
+
+passwordChangeForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const currentPassword = passwordChangeForm.currentPassword.value.trim();
+  const newPassword = passwordChangeForm.newPassword.value.trim();
+  const confirmPassword = passwordChangeForm.confirmPassword.value.trim();
+
+  modalPasswordError.textContent = "";
+
+  if (newPassword.length < 8) {
+    modalPasswordError.textContent =
+      "New password must be at least 8 characters";
+    return;
+  }
+
+  if (newPassword !== confirmPassword) {
+    modalPasswordError.textContent = "Passwords do not match";
+    return;
+  }
+
+  const submitBtn = passwordChangeForm.querySelector('button[type="submit"]');
+  submitBtn.disabled = true;
+  submitBtn.textContent = "Updating...";
+
+  try {
+    const res = await fetch("/user/profile", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        currentPassword,
+        newPassword,
+        confirmPassword,
+      }),
+    });
+
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.message);
+
+    alert("Password updated successfully ✅");
+    passwordModal.classList.remove("active");
+    passwordChangeForm.reset();
+  } catch (err) {
+    modalPasswordError.textContent = err.message || "Failed to update password";
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Update Password";
+  }
 });
