@@ -524,12 +524,3 @@ fieldset {
   background: var(--white);
   box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
 }
-
-#changeEmailBtn:disabled,
-#changePasswordBtn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  background-color: #e5e7eb; /* light gray */
-  color: #9ca3af; /* muted text */
-  border-color: #d1d5db;
-}

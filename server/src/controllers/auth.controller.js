@@ -11,6 +11,8 @@ import {
   verifyForgotPasswordOTP,
 } from "../services/OTP.services.js";
 
+import User from "../models/user.model.js";
+
 //Public Pages
 
 export const loginPage = (req, res) => {
@@ -26,7 +28,7 @@ export const verifyOTPPage = async (req, res) => {
     const otpId = req.session.OTPId;
 
     if (!otpId) {
-      throw new Error("Signup session expired. Please signup again.");
+      throw new Error("Session expired. Please try again.");
     }
 
     const resendCooldown = await getRemainingCooldown(otpId, "signup");
@@ -75,6 +77,7 @@ export const loginUser = async (req, res, next) => {
       return res.redirect("/home"); // 3. Redirect now that req.user is active
     });
   } catch (err) {
+    console.log(err);
     req.flash("error", err.message);
     res.redirect("/auth/login");
   }
@@ -85,7 +88,7 @@ export const verifyUserOTP = async (req, res, next) => {
     const otpId = req.session.OTPId; // <-- read once
 
     if (!otpId) {
-      throw new Error("Signup session expired. Please signup again.");
+      throw new Error("Session expired. Please try again.");
     }
 
     const pendingUser = req.session.tempUser;
@@ -113,7 +116,7 @@ export const resendSignupOTP = async (req, res) => {
     const pendingUser = req.session.tempUser;
 
     if (!otpId || !pendingUser) {
-      throw new Error("Signup session expired. Please signup again.");
+      throw new Error("Session expired. Please try again.");
     }
 
     const otp = await createAndSendSignupOTP(otpId, pendingUser.email, true);
@@ -138,13 +141,17 @@ export const forgotPasswordOTPPage = async (req, res) => {
     const tempUserId = req.session.tempUserId;
 
     if (!tempUserId) {
-      throw new Error("Signup session expired. Please signup again.");
+      throw new Error("Session expired. Please try again.");
     }
+
+    console.log("tempUserID : ", tempUserId);
 
     const resendCooldown = await getRemainingCooldown(
       tempUserId,
-      "password_reset",
+      "forgot_password",
     );
+
+    console.log("resendCooldown : ", resendCooldown);
 
     return res.render("auth/verify-forgot-pass-otp", {
       error: req.flash("error"),
@@ -153,7 +160,7 @@ export const forgotPasswordOTPPage = async (req, res) => {
   } catch (err) {
     console.error(err);
     req.flash("error", err.message);
-    return res.redirect("/auth/signup");
+    return res.redirect("/auth/login");
   }
 };
 
@@ -172,6 +179,10 @@ export const forgotPasswordOTPSend = async (req, res) => {
 
 export const verifyForgotPassword = async (req, res) => {
   try {
+    if (!req.session.tempUserId) {
+      throw new Error("Session expired. Please try again.");
+    }
+
     const safeToken = await verifyForgotPasswordOTP(
       req.session.tempUserId,
       req.body.userOTP,
@@ -200,6 +211,28 @@ export const newPasswordSubmit = async (req, res) => {
   } catch (err) {
     req.flash("error", err.message);
     console.log(err);
+  }
+};
+
+export const resendForgotPassOTP = async (req, res) => {
+  try {
+    const tempUserId = req.session.tempUserId;
+
+    console.log(tempUserId);
+    if (!tempUserId) {
+      throw new Error("Session expired. Please try again.");
+    }
+
+    const user = await User.findById(tempUserId);
+    if (!user) throw new Error("User not found");
+
+    const otp = await createAndSendForgotPasswordOTP(user.email, true);
+
+    return res.json({ otpLastResend: otp.lastResentAt });
+  } catch (err) {
+    console.error(err);
+    req.flash("error", err.message);
+    return res.redirect("/auth/login");
   }
 };
 

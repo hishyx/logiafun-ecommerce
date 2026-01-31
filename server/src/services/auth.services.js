@@ -31,9 +31,12 @@ export const createTempUserForSignup = async (body) => {
 };
 
 export const authenticateUser = async (body) => {
-  console.log("EMAIL RECEIVED:", body.email);
-
   const user = await User.findOne({ email: body.email });
+
+  if (!user.password)
+    throw new Error(
+      "This account was created using Google. Please sign in with Google instead.",
+    );
 
   if (!user) throw new Error("Account doesn't exist");
 
@@ -44,6 +47,9 @@ export const authenticateUser = async (body) => {
   if (user.status !== "active") {
     throw new Error(`This account is ${user.status} please contact your admin`);
   }
+
+  console.log(`body.password is ${body.password}`);
+  console.log(`user.password is ${user.password}`);
 
   const isMatch = await bcrypt.compare(body.password, user.password);
 

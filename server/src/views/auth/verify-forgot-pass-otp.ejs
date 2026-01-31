@@ -412,7 +412,7 @@
         resendBtn.textContent = "Sending...";
 
         try {
-          const res = await fetch("/auth/signup/resend-otp", {
+          const res = await fetch("/auth/forgot-password/resend-otp", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
           });

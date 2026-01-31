@@ -40,6 +40,7 @@ function showError(msg) {
 let editing = false;
 
 editBtn.addEventListener("click", () => {
+  console.log("Edit button clicked");
   editing = !editing;
   fieldset.disabled = !editing;
   editBtn.textContent = editing ? "Cancel" : "Edit Information";
@@ -98,6 +99,7 @@ const otpInputs = document.querySelectorAll(".otp-digit");
 const resendOtpBtn = document.getElementById("resendOtpBtn");
 
 changeEmailBtn.addEventListener("click", () => {
+  console.log("Change email button clicked");
   emailModal.classList.add("active");
   resetModal();
 });
@@ -111,68 +113,72 @@ emailModal.addEventListener("click", (e) => {
 });
 
 function resetModal() {
-  emailStep1.style.display = "block";
-  emailStep2.style.display = "none";
-  newEmailInput.value = "";
-  otpInputs.forEach((i) => (i.value = ""));
+  if (emailStep1) emailStep1.style.display = "block";
+  if (emailStep2) emailStep2.style.display = "none";
+  if (newEmailInput) newEmailInput.value = "";
+  if (otpInputs) otpInputs.forEach((i) => (i.value = ""));
 }
 
 //Send OTP
-sendOtpBtn.addEventListener("click", async () => {
-  const newEmail = newEmailInput.value.trim();
+if (sendOtpBtn) {
+  sendOtpBtn.addEventListener("click", async () => {
+    const newEmail = newEmailInput.value.trim();
 
-  if (!newEmail || !newEmail.includes("@")) {
-    alert("Please enter a valid email address");
-    return;
-  }
+    if (!newEmail || !newEmail.includes("@")) {
+      alert("Please enter a valid email address");
+      return;
+    }
 
-  sendOtpBtn.disabled = true;
-  sendOtpBtn.textContent = "Sending...";
+    sendOtpBtn.disabled = true;
+    sendOtpBtn.textContent = "Sending...";
 
-  try {
-    const res = await fetch("/user/change-email", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ newEmail }),
-    });
+    try {
+      const res = await fetch("/user/change-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ newEmail }),
+      });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
 
-    displayNewEmail.textContent = newEmail;
-    emailStep1.style.display = "none";
-    emailStep2.style.display = "block";
-    otpInputs[0].focus();
+      displayNewEmail.textContent = newEmail;
+      emailStep1.style.display = "none";
+      emailStep2.style.display = "block";
+      otpInputs[0].focus();
 
-    startResendCooldown();
-  } catch (err) {
-    alert(err.message || "Failed to send OTP");
-  } finally {
-    sendOtpBtn.disabled = false;
-    sendOtpBtn.textContent = "Proceed";
-  }
-});
+      startResendCooldown();
+    } catch (err) {
+      alert(err.message || "Failed to send OTP");
+    } finally {
+      sendOtpBtn.disabled = false;
+      sendOtpBtn.textContent = "Proceed";
+    }
+  });
+}
 
 //Resend OTP
-resendOtpBtn.addEventListener("click", async () => {
-  resendOtpBtn.disabled = true;
-  resendOtpBtn.textContent = "Resending...";
+if (resendOtpBtn) {
+  resendOtpBtn.addEventListener("click", async () => {
+    resendOtpBtn.disabled = true;
+    resendOtpBtn.textContent = "Resending...";
 
-  try {
-    const res = await fetch("/user/change-email/resend", { method: "POST" });
-    const data = await res.json();
+    try {
+      const res = await fetch("/user/change-email/resend", { method: "POST" });
+      const data = await res.json();
 
-    if (!res.ok) throw new Error(data.message);
+      if (!res.ok) throw new Error(data.message);
 
-    alert("OTP resent successfully");
-    startResendCooldown();
-  } catch (err) {
-    alert(err.message || "Failed to resend OTP");
-  } finally {
-    resendOtpBtn.disabled = false;
-    resendOtpBtn.textContent = "Resend code";
-  }
-});
+      alert("OTP resent successfully");
+      startResendCooldown();
+    } catch (err) {
+      alert(err.message || "Failed to resend OTP");
+    } finally {
+      resendOtpBtn.disabled = false;
+      resendOtpBtn.textContent = "Resend code";
+    }
+  });
+}
 
 //OTP Inputs UX
 otpInputs.forEach((input, index) => {
@@ -190,50 +196,54 @@ otpInputs.forEach((input, index) => {
 });
 
 //Verify OTP
-verifyOtpBtn.addEventListener("click", async () => {
-  const otp = Array.from(otpInputs)
-    .map((i) => i.value)
-    .join("");
-  const newEmail = newEmailInput.value.trim();
+if (verifyOtpBtn) {
+  verifyOtpBtn.addEventListener("click", async () => {
+    const otp = Array.from(otpInputs)
+      .map((i) => i.value)
+      .join("");
+    const newEmail = newEmailInput.value.trim();
 
-  if (otp.length !== 6) {
-    alert("Enter the full 6-digit OTP");
-    return;
-  }
+    if (otp.length !== 6) {
+      alert("Enter the full 6-digit OTP");
+      return;
+    }
 
-  verifyOtpBtn.disabled = true;
-  verifyOtpBtn.textContent = "Verifying...";
+    verifyOtpBtn.disabled = true;
+    verifyOtpBtn.textContent = "Verifying...";
 
-  try {
-    const res = await fetch("/user/change-email", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userOTP: otp, newEmail }),
-    });
+    try {
+      const res = await fetch("/user/change-email", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userOTP: otp, newEmail }),
+      });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
 
-    alert("Email updated successfully ✅");
+      alert("Email updated successfully ✅");
 
-    document.querySelector('[name="email"]').value = newEmail;
-    document.getElementById("sidebarEmail").textContent = newEmail;
+      document.querySelector('[name="email"]').value = newEmail;
+      document.getElementById("sidebarEmail").textContent = newEmail;
 
-    emailModal.classList.remove("active");
-  } catch (err) {
-    alert(err.message || "OTP verification failed");
-  } finally {
-    verifyOtpBtn.disabled = false;
-    verifyOtpBtn.textContent = "Verify & Update";
-  }
-});
+      emailModal.classList.remove("active");
+    } catch (err) {
+      alert(err.message || "OTP verification failed");
+    } finally {
+      verifyOtpBtn.disabled = false;
+      verifyOtpBtn.textContent = "Verify & Update";
+    }
+  });
+}
 
 //Back Button
 
-backToEmailBtn.addEventListener("click", () => {
-  emailStep1.style.display = "block";
-  emailStep2.style.display = "none";
-});
+if (backToEmailBtn) {
+  backToEmailBtn.addEventListener("click", () => {
+    emailStep1.style.display = "block";
+    emailStep2.style.display = "none";
+  });
+}
 
 // Password Change Modal
 const passwordModal = document.getElementById("passwordModal");
@@ -244,6 +254,7 @@ const modalPasswordError = document.getElementById("modalPasswordError");
 
 if (changePasswordBtn) {
   changePasswordBtn.addEventListener("click", () => {
+    console.log("Change password button clicked");
     passwordModal.classList.add("active");
     passwordChangeForm.reset();
     modalPasswordError.textContent = "";
@@ -308,3 +319,17 @@ passwordChangeForm.addEventListener("submit", async (e) => {
     submitBtn.textContent = "Update Password";
   }
 });
+
+const passTriggerFromEmail = document.getElementById(
+  "triggerPasswordFromEmail",
+);
+
+if (passTriggerFromEmail) {
+  passTriggerFromEmail.addEventListener("click", () => {
+    console.log("Set password from email button clicked");
+    emailModal.classList.remove("active"); // Open password modal, ensure email modal is closed
+    passwordModal.classList.add("active");
+    passwordChangeForm.reset();
+    modalPasswordError.textContent = "";
+  });
+}

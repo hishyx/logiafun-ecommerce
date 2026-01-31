@@ -18,6 +18,7 @@ import {
   newPasswordPage,
   newPasswordSubmit,
   passwordResetSuccessPage,
+  resendForgotPassOTP,
 } from "../controllers/auth.controller.js";
 
 //Importing middlewares
@@ -77,6 +78,8 @@ router
   .route("/auth/reset-password")
   .get(safeTokenMatches, newPasswordPage)
   .post(newPasswordSubmit);
+
+router.post("/auth/forgot-password/resend-otp", resendForgotPassOTP);
 
 router.get("/auth/reset-password/success", passwordResetSuccessPage);
 
