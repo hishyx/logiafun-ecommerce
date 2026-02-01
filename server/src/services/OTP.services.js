@@ -1,10 +1,6 @@
 import OTP from "../models/otp.model.js";
 import User from "../models/user.model.js";
-import {
-  sendMailToTempUser,
-  sendMailToNewEmail,
-  sendMailToForgotPasswordEmail,
-} from "../utils/mailer.js";
+import * as mailUtil from "../utils/mailer.js";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
 
@@ -53,7 +49,7 @@ export const createAndSendSignupOTP = async (otpId, email, isResend) => {
     });
   }
 
-  await sendMailToTempUser(email, otp);
+  await mailUtil.sendMailToTempUser(email, otp);
 
   return otpDoc;
 };
@@ -163,7 +159,7 @@ export const createAndSendEmailChangeOTP = async (userId, email, isResend) => {
     { upsert: true, new: true },
   );
 
-  await sendMailToNewEmail(email, otp);
+  await mailUtil.sendMailToNewEmail(email, otp);
 
   return otpDoc;
 };
@@ -254,7 +250,7 @@ export const createAndSendForgotPasswordOTP = async (email, isResend) => {
     { upsert: true, new: true },
   );
 
-  await sendMailToForgotPasswordEmail(email, otp);
+  await mailUtil.sendMailToForgotPasswordEmail(email, otp);
 
   return otpDoc;
 };

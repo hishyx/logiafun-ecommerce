@@ -127,45 +127,75 @@
                   <line x1="5" y1="12" x2="19" y2="12"></line>
                 </svg>
               </div>
-              <span class="add-address-text">Add Address</span>
+
+      <span class="add-address-text">
+      <%= addresses && addresses.length ? "Add Address" : "Add Your First Address" %>
+             </span>
             </div>
 
-            <!-- Address Card 1 (Default) -->
-            <div class="address-card default">
-              <span class="address-type-badge">Home (Default)</span>
-              <div class="address-details">
-                <span class="address-name">Hisham</span>
-                123 Dreamy Lane, Cloud City<br />
-                Tech Park, Floor 42<br />
-                San Francisco, CA 94016<br />
-                Phone: +1 234 567 890
-              </div>
-              <div class="address-actions">
-                <button class="btn-link">Edit</button>
-                <!-- Default address usually can't be deleted without setting another one -->
-              </div>
-            </div>
+           <% if (addresses && addresses.length) { %>
 
-            <!-- Address Card 2 -->
-            <div class="address-card">
-              <span class="address-type-badge">Office</span>
-              <div class="address-details">
-                <span class="address-name">Hisham Work</span>
-                456 Innovation Blvd<br />
-                Startupland, Suite 101<br />
-                New York, NY 10001<br />
-                Phone: +1 987 654 321
-              </div>
-              <div class="address-actions">
-                <button class="btn-link">Edit</button>
-                <button class="btn-link">Set as Default</button>
-                <button class="btn-link delete">Delete</button>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
+  <% addresses.forEach(address => { %>
+
+<div
+  class="address-card <%= address.isDefault ? 'default' : '' %>"
+  data-id="<%= address._id %>"
+>
+
+
+    <% if (address.isDefault) { %>
+      <span class="address-type-badge"><%= address.addressName %>(Default)</span>
+    <% } else { %>
+      <span class="address-type-badge"><%= address.addressName %></span>
+    <% } %>
+
+    <div class="address-details">
+
+
+  <!-- person name -->
+  <span class="address-name"><%= address.name %></span><br>
+
+  <span class="address-street"><%= address.street %></span><br>
+
+  <span class="address-city"><%= address.city %></span> -
+  <span class="address-pincode"><%= address.pincode %></span><br>
+
+  Phone:
+  <span class="address-phone"><%= address.phone %></span>
+</div>
+
+
+
+<div class="address-actions">
+  <button class="btn-link edit-btn" data-id="<%= address._id %>">
+    Edit
+  </button>
+
+  <% if (!address.isDefault) { %>
+    <button class="btn-link default-btn" data-id="<%= address._id %>">
+      Set as Default
+    </button>
+
+    <button class="btn-link delete-btn" data-id="<%= address._id %>">
+      Delete
+    </button>
+  <% } %>
+</div>
+
+
+  </div>
+
+<% }) %>
+
+
+<% } %>
+
+
+          </div> <!-- addresses-grid -->
+        </section> <!-- profile-content -->
+      </div> <!-- profile-container -->
     </main>
+
 
     <!-- Footer -->
     <%- include('../partials/footer') %>
@@ -177,29 +207,29 @@
         <form class="profile-form" id="addAddressForm">
           <div class="form-group">
             <label>Address Name (e.g., Home, Office)</label>
-            <input type="text" placeholder="Home" required />
+            <input type="text" placeholder="Home" name="addressName" />
           </div>
           <div class="form-group">
             <label>Full Name</label>
-            <input type="text" placeholder="John Doe" required />
+            <input type="text" placeholder="John Doe" name="name" required />
           </div>
           <div class="form-group">
             <label>Street Address</label>
-            <input type="text" placeholder="123 Street Name" required />
+            <input type="text" placeholder="123 Street Name" name="street" required />
           </div>
           <div class="form-row">
             <div class="form-group">
               <label>City</label>
-              <input type="text" placeholder="City" required />
+              <input type="text" placeholder="City" name="city" required />
             </div>
             <div class="form-group">
               <label>State/Zip</label>
-              <input type="text" placeholder="State/Zip" required />
+              <input type="text" placeholder="State/Zip" name="pincode" required />
             </div>
           </div>
           <div class="form-group">
             <label>Phone Number</label>
-            <input type="tel" placeholder="+1 234 567 8900" required />
+            <input type="tel" placeholder="+1 234 567 8900" name="phone" required />
           </div>
           <button
             type="submit"
@@ -220,29 +250,29 @@
         <form class="profile-form" id="editAddressForm">
           <div class="form-group">
             <label>Address Name (e.g., Home, Office)</label>
-            <input type="text" value="Home" required />
+            <input type="text"  name="addressName" required />
           </div>
           <div class="form-group">
             <label>Full Name</label>
-            <input type="text" value="Hisham" required />
+            <input type="text"  name="name" />
           </div>
           <div class="form-group">
             <label>Street Address</label>
-            <input type="text" value="123 Dreamy Lane, Cloud City" required />
+            <input type="text" name="street" required />
           </div>
           <div class="form-row">
             <div class="form-group">
               <label>City</label>
-              <input type="text" value="San Francisco" required />
+              <input type="text" name="city" required />
             </div>
             <div class="form-group">
               <label>State/Zip</label>
-              <input type="text" value="CA 94016" required />
+              <input type="text" name="pincode" required />
             </div>
           </div>
           <div class="form-group">
             <label>Phone Number</label>
-            <input type="tel" value="+1 234 567 890" required />
+            <input type="tel" name="phone" required />
           </div>
           <button
             type="submit"
@@ -318,7 +348,9 @@
         </p>
         <div style="display: flex; gap: 1rem; justify-content: center">
           <button class="btn btn-outline" id="cancelDefaultBtn">Cancel</button>
-          <button class="btn btn-primary" id="confirmDefaultBtn">
+          <button class="btn btn-primary" id="confirmDefaultBtn" >
+            
+
             Set as Default
           </button>
         </div>

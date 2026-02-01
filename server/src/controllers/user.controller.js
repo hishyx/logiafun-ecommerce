@@ -1,4 +1,11 @@
-import { updateUser } from "../services/user.services.js";
+import {
+  updateUser,
+  getUserAddresses,
+  createNewAddress,
+  deleteOneAddress,
+  updateAddress,
+  changeDefaultAddress,
+} from "../services/user.services.js";
 import {
   createAndSendEmailChangeOTP,
   verifyEmailChangeOTP,
@@ -33,12 +40,6 @@ export const profilePage = async (req, res) => {
     console.error(err);
     res.status(500).send("Something went wrong");
   }
-};
-
-export const addressPage = (req, res) => {
-  res.render("user/addresses", {
-    user: req.user,
-  });
 };
 
 export const cartPage = (req, res) => {
@@ -117,5 +118,77 @@ export const emailChangeOTPVerification = async (req, res) => {
     res.redirect("/user/profile");
   } catch (err) {
     console.log("email change error is :" + err);
+  }
+};
+
+//Address page works
+
+export const addressPage = async (req, res) => {
+  let userAddresses = await getUserAddresses(req.user._id);
+
+  if (userAddresses && userAddresses.length) {
+    userAddresses.sort((a, b) => b.isDefault - a.isDefault);
+  }
+
+  res.render("user/addresses", {
+    user: req.user,
+    addresses: userAddresses,
+  });
+};
+
+export const addAddress = async (req, res) => {
+  try {
+    const newAddress = await createNewAddress(req.user._id, req.body);
+
+    res.status(201).json({
+      address: newAddress,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const deleteAddress = async (req, res) => {
+  try {
+    await deleteOneAddress(req.user._id, req.params.addressId);
+
+    res.status(201).json({
+      success: true,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const editAddress = async (req, res) => {
+  try {
+    const editedAddress = await updateAddress(
+      req.user._id,
+      req.params.addressId,
+      req.body,
+    );
+
+    res.status(201).json({
+      address: editedAddress,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const setDefault = async (req, res) => {
+  try {
+    const editedAddress = await changeDefaultAddress(
+      req.user._id,
+      req.params.addressId,
+    );
+
+    // res.status(201).json({
+    //   address: editedAddress,
+    // });
+
+    res.sendStatus(204);
+  } catch (err) {
+    console.log(err);
   }
 };
