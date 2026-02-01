@@ -1,66 +1,288 @@
-<head>
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css"
-  />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Arvo" />
-</head>
-<style>
-  .page_404 {
-    padding: 40px 0;
-    background: #fff;
-    font-family: "Arvo", serif;
-  }
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>404 – Page Not Found</title>
 
-  .page_404 img {
-    width: 100%;
-  }
+    <link
+      href="https://fonts.googleapis.com/css?family=Fira+Sans"
+      rel="stylesheet"
+    />
 
-  .four_zero_four_bg {
-    background-image: url(https://cdn.dribbble.com/users/285475/screenshots/2083086/dribbble_1.gif);
-    height: 400px;
-    background-position: center;
-  }
+    <style>
+      * {
+        box-sizing: border-box;
+      }
 
-  .four_zero_four_bg h1 {
-    font-size: 80px;
-  }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family: "Fira Sans", sans-serif;
+        color: #f5f6fa;
+      }
 
-  .four_zero_four_bg h3 {
-    font-size: 80px;
-  }
+      body {
+        background: linear-gradient(#0c0e10, #446182);
+        overflow: hidden;
+      }
 
-  .link_404 {
-    color: #fff !important;
-    padding: 10px 20px;
-    background: #39ac31;
-    margin: 20px 0;
-    display: inline-block;
-  }
-  .contant_box_404 {
-    margin-top: -50px;
-  }
-</style>
-<body>
-  <section class="page_404">
+      /* ===== Background ===== */
+      .background {
+        position: absolute;
+        inset: 0;
+      }
+
+      .ground {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 25vh;
+        background: #0c0e10;
+      }
+
+      /* ===== Layout ===== */
+      .container {
+        position: relative;
+        margin: 0 auto;
+        width: 85%;
+        height: 100vh;
+        padding-bottom: 25vh;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+      }
+
+      .left-section {
+        width: 40%;
+        text-align: center;
+      }
+
+      .right-section {
+        width: 50%;
+        position: relative;
+        height: 100%;
+      }
+
+      /* ===== Text ===== */
+      .heading {
+        font-size: 9em;
+        margin: 0;
+        text-shadow: 0 0 1rem #fefefe;
+        animation: glow 5s infinite;
+      }
+
+      .subheading {
+        font-size: 1.5em;
+        max-width: 480px;
+        margin: 0 auto;
+      }
+
+      /* ===== SVG ===== */
+      .svgimg {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+      }
+
+      /* Bench */
+      .bench-legs {
+        fill: #0c0e10;
+      }
+
+      .top-bench,
+      .bottom-bench {
+        fill: #5b3e2b;
+        stroke: #0c0e10;
+        stroke-width: 1px;
+      }
+
+      /* Lamp */
+      .lamp-details {
+        fill: #202425;
+      }
+
+      .lamp-accent {
+        fill: #2a2f33;
+      }
+
+      .lamp-light {
+        fill: #efefef;
+      }
+
+      .lamp-light__glow {
+        pointer-events: none;
+      }
+
+      .lamp-bottom {
+        fill: #202425; /* FIXED: SVG-safe fill */
+      }
+
+      #lamp {
+        filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.15));
+      }
+
+      /* ===== Animations ===== */
+      @keyframes glow {
+        0% {
+          text-shadow: 0 0 1rem #fefefe;
+        }
+        50% {
+          text-shadow: 0 0 1.85rem #ededed;
+        }
+        100% {
+          text-shadow: 0 0 1rem #fefefe;
+        }
+      }
+
+      /* ===== Responsive ===== */
+      @media (max-width: 770px) {
+        .container {
+          flex-direction: column;
+          padding-bottom: 0;
+        }
+
+        .ground {
+          height: 0;
+        }
+
+        .left-section,
+        .right-section {
+          width: 100%;
+        }
+
+        .heading {
+          font-size: 7em;
+        }
+
+        .svgimg {
+          position: relative;
+        }
+      }
+
+      .back-btn {
+        margin-top: 1.5rem;
+        padding: 0.6rem 2rem;
+        font-family: "Fira Sans", sans-serif;
+        font-size: 1em;
+        color: #f5f6fa;
+        background: transparent;
+        border: 2px solid rgba(245, 246, 250, 0.6);
+        border-radius: 30px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+      }
+
+      .back-btn:hover {
+        background: rgba(245, 246, 250, 0.15);
+        border-color: #f5f6fa;
+        transform: translateY(-2px);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="background">
+      <div class="ground"></div>
+    </div>
+
     <div class="container">
-      <div class="row">
-        <div class="col-sm-12">
-          <div class="col-sm-10 col-sm-offset-1 text-center">
-            <div class="four_zero_four_bg">
-              <h1 class="text-center">404</h1>
-            </div>
+      <div class="left-section">
+        <h1 class="heading">404</h1>
+        <p class="subheading">
+          Looks like the page you were looking for is no longer here.
+        </p>
+      </div>
 
-            <div class="contant_box_404">
-              <h3 class="h2">Look like you're lost</h3>
+      <button class="back-btn" onclick="history.back()">← Go Back</button>
 
-              <p>the page you are looking for not avaible!</p>
+      <div class="right-section">
+        <svg
+          class="svgimg"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="51.5 -15.288 385 505.565"
+        >
+          <g class="bench-legs">
+            <path
+              d="M202.778,391.666h11.111v98.611h-11.111V391.666z M370.833,390.277h11.111v100h-11.111V390.277z M183.333,456.944h11.111
+          v33.333h-11.111V456.944z M393.056,456.944h11.111v33.333h-11.111V456.944z"
+            />
+          </g>
+          <g class="top-bench">
+            <path
+              d="M396.527,397.917c0,1.534-1.243,2.777-2.777,2.777H190.972c-1.534,0-2.778-1.243-2.778-2.777v-8.333
+          c0-1.535,1.244-2.778,2.778-2.778H393.75c1.534,0,2.777,1.243,2.777,2.778V397.917z M400.694,414.583
+          c0,1.534-1.243,2.778-2.777,2.778H188.194c-1.534,0-2.778-1.244-2.778-2.778v-8.333c0-1.534,1.244-2.777,2.778-2.777h209.723
+          c1.534,0,2.777,1.243,2.777,2.777V414.583z M403.473,431.25c0,1.534-1.244,2.777-2.778,2.777H184.028
+          c-1.534,0-2.778-1.243-2.778-2.777v-8.333c0-1.534,1.244-2.778,2.778-2.778h216.667c1.534,0,2.778,1.244,2.778,2.778V431.25z"
+            />
+          </g>
+          <g class="bottom-bench">
+            <path
+              d="M417.361,459.027c0,0.769-1.244,1.39-2.778,1.39H170.139c-1.533,0-2.777-0.621-2.777-1.39v-4.86
+          c0-0.769,1.244-0.694,2.777-0.694h244.444c1.534,0,2.778-0.074,2.778,0.694V459.027z"
+            />
+            <path
+              d="M185.417,443.75H400c0,0,18.143,9.721,17.361,10.417l-250-0.696C167.303,451.65,185.417,443.75,185.417,443.75z"
+            />
+          </g>
+          <g id="lamp">
+            <path
+              class="lamp-details"
+              d="M125.694,421.997c0,1.257-0.73,3.697-1.633,3.697H113.44c-0.903,0-1.633-2.44-1.633-3.697V84.917
+          c0-1.257,0.73-2.278,1.633-2.278h10.621c0.903,0,1.633,1.02,1.633,2.278V421.997z"
+            />
+            <path
+              class="lamp-accent"
+              d="M128.472,93.75c0,1.534-1.244,2.778-2.778,2.778h-13.889c-1.534,0-2.778-1.244-2.778-2.778V79.861
+          c0-1.534,1.244-2.778,2.778-2.778h13.889c1.534,0,2.778,1.244,2.778,2.778V93.75z"
+            />
 
-              <a href="/home" class="link_404">Go to Home</a>
-            </div>
-          </div>
-        </div>
+            <circle class="lamp-light" cx="119.676" cy="44.22" r="40.51" />
+            <path
+              class="lamp-details"
+              d="M149.306,71.528c0,3.242-13.37,13.889-29.861,13.889S89.583,75.232,89.583,71.528c0-4.166,13.369-13.889,29.861-13.889
+          S149.306,67.362,149.306,71.528z"
+            />
+            <radialGradient
+              class="light-gradient"
+              id="SVGID_1_"
+              cx="119.676"
+              cy="44.22"
+              r="65"
+              gradientUnits="userSpaceOnUse"
+            >
+              <stop offset="0%" style="stop-color: #ffffff; stop-opacity: 1" />
+              <stop offset="50%" style="stop-color: #ededed; stop-opacity: 0.5">
+                <animate
+                  attributeName="stop-opacity"
+                  values="0.0; 0.5; 0.0"
+                  dur="5000ms"
+                  repeatCount="indefinite"
+                ></animate>
+              </stop>
+              <stop
+                offset="100%"
+                style="stop-color: #ededed; stop-opacity: 0"
+              />
+            </radialGradient>
+            <circle
+              class="lamp-light__glow"
+              fill="url(#SVGID_1_)"
+              cx="119.676"
+              cy="44.22"
+              r="65"
+            />
+            <path
+              class="lamp-bottom"
+              d="M135.417,487.781c0,1.378-1.244,2.496-2.778,2.496H106.25c-1.534,0-2.778-1.118-2.778-2.496v-74.869
+          c0-1.378,1.244-2.495,2.778-2.495h26.389c1.534,0,2.778,1.117,2.778,2.495V487.781z"
+            />
+          </g>
+        </svg>
       </div>
     </div>
-  </section>
-</body>
+  </body>
+</html>

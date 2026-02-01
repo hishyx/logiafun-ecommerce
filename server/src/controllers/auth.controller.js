@@ -2,6 +2,7 @@ import {
   createTempUserForSignup,
   authenticateUser,
   setNewPassword,
+  authenticateAdminLogin,
 } from "../services/auth.services.js";
 import {
   createAndSendSignupOTP,
@@ -254,4 +255,22 @@ export const logoutUser = (req, res, next) => {
       res.redirect("/auth/login");
     });
   });
+};
+
+export const adminLoginPage = (req, res) => {
+  res.render("auth/admin-login.ejs", { error: req.flash("error") });
+};
+
+export const loginAdmin = async (req, res) => {
+  try {
+    const admin = await authenticateAdminLogin(req.body);
+
+    req.session.admin = admin;
+
+    res.redirect("/admin/user");
+  } catch (err) {
+    console.log("error in admin login", err);
+    req.flash("error", err.message);
+    res.redirect("/admin/auth/login");
+  }
 };

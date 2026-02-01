@@ -1,6 +1,8 @@
 import User from "../models/user.model.js";
 
 export const isAuth = (req, res, next) => {
+  console.log("isAuth hit:", req.originalUrl);
+
   if (req.isAuthenticated()) {
     next();
   } else {
@@ -33,6 +35,8 @@ export const isAdminGuest = (req, res, next) => {
 };
 
 export const checkUserStatus = async (req, res, next) => {
+  console.log("isAuth hit:", req.originalUrl);
+
   try {
     const user = req.user;
 

@@ -11,6 +11,7 @@ import preventHTMLCache from "./middlewares/prevent.cache.js";
 
 import authRoute from "./routes/auth.routes.js";
 import userRoute from "./routes/user.routes.js";
+import adminRoute from "./routes/admin.routes.js";
 
 //Importing dirname
 
@@ -39,6 +40,7 @@ app.set("views", path.join(__dirname, "views"));
 // Routes
 
 app.use("/", authRoute);
+app.use("/", adminRoute);
 app.use("/", userRoute);
 
 app.use((req, res) => {

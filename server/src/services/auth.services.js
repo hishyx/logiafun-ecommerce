@@ -96,3 +96,17 @@ export const setNewPassword = async (password, userId) => {
     password: await bcrypt.hash(password, 10),
   });
 };
+
+export const authenticateAdminLogin = async (adminData) => {
+  const admin = await User.findOne({ role: "admin", email: adminData.email });
+
+  if (!admin) throw new Error("Admin not found");
+
+  const isMatch = await bcrypt.compare(adminData.password, admin.password);
+
+  if (!isMatch) throw new Error("Invalid credentials");
+
+  const { password, ...safeAdmin } = admin.toObject();
+
+  return safeAdmin;
+};

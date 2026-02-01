@@ -6,27 +6,29 @@ import * as authControllers from "../controllers/auth.controller.js";
 
 //Importing middlewares
 import {
-  isUserGuest,
   safeTokenMatches,
+  isUserGuest,
+  isAdminGuest,
 } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
+router.use("/auth", isUserGuest);
+
 router
   .route("/auth/login")
-  .get(isUserGuest, authControllers.loginPage)
+  .get(authControllers.loginPage)
   .post(authControllers.loginUser);
 
 router
   .route("/auth/signup")
-  .get(isUserGuest, authControllers.signupPage)
+  .get(authControllers.signupPage)
   .post(authControllers.signupUser);
 
 //Google related
 
 router.get(
   "/auth/google",
-  isUserGuest,
   passport.authenticate("google", {
     scope: ["profile", "email"],
   }),
@@ -34,7 +36,6 @@ router.get(
 
 router.get(
   "/auth/google/callback",
-  isUserGuest,
   passport.authenticate("google", {
     failureRedirect: "/auth/login",
   }),
@@ -48,14 +49,14 @@ router.get(
 
 router
   .route("/auth/signup/verify-otp")
-  .get(isUserGuest, authControllers.verifyOTPPage)
+  .get(authControllers.verifyOTPPage)
   .post(authControllers.verifyUserOTP);
 
 router.post("/auth/signup/resend-otp", authControllers.resendSignupOTP);
 
 router
   .route("/auth/forgot-password")
-  .get(isUserGuest, authControllers.forgotPasswordEmailPage)
+  .get(authControllers.forgotPasswordEmailPage)
   .post(authControllers.forgotPasswordOTPSend);
 
 router
@@ -79,5 +80,14 @@ router.get(
 );
 
 router.post("/user/logout", authControllers.logoutUser);
+
+//Admin auths
+
+router.use("/admin/auth", isAdminGuest);
+
+router
+  .route("/admin/auth/login")
+  .get(authControllers.adminLoginPage)
+  .post(authControllers.loginAdmin);
 
 export default router;
