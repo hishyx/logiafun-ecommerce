@@ -86,6 +86,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function closeAddModal() {
+    if (addForm) {
+      addForm.reset(); // 👈 clear all fields
+    }
     addAddressModal.classList.remove("active");
   }
 

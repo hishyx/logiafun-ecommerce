@@ -38,6 +38,7 @@ router.get(
   "/auth/google/callback",
   passport.authenticate("google", {
     failureRedirect: "/auth/login",
+    keepSessionInfo: true,
   }),
   (req, res) => {
     res.set("Cache-Control", "no-store");
@@ -80,6 +81,7 @@ router.get(
 );
 
 router.post("/user/logout", authControllers.logoutUser);
+router.post("/admin/logout", authControllers.logoutAdmin);
 
 //Admin auths
 

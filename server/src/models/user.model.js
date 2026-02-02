@@ -32,10 +32,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
-    status: {
-      type: String,
+    isBlocked: {
+      type: Boolean,
       required: true,
-      default: "active",
+      default: false,
     },
     profileImage: {
       type: String,

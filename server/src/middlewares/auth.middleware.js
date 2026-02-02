@@ -28,49 +28,55 @@ export const isUserGuest = (req, res, next) => {
 
 export const isAdminGuest = (req, res, next) => {
   if (req.session.admin) {
-    return res.redirect("/dashboard");
-  } else {
-    next();
+    return res.redirect("/admin/users");
   }
+  next();
 };
 
 export const checkUserStatus = async (req, res, next) => {
-  console.log("isAuth hit:", req.originalUrl);
+  if (!req.user) return next();
 
-  try {
-    const user = req.user;
+  // Only affect normal users
+  if (req.user.role === "user" && req.user.isBlocked) {
+    return req.logout({ keepSessionInfo: true }, (err) => {
+      if (err) return next(err);
+      req.flash("error", "User is blocked please contact your admin");
 
-    if (!user) {
-      req.flash("error", "User doesn't exist");
       return res.redirect("/auth/login");
-    }
-
-    if (user.status === "blocked") {
-      req.flash("error", "User is blocked please contact admin");
-      return res.redirect("/auth/login");
-    }
-
-    next();
-  } catch (err) {
-    console.log(err);
+    });
   }
+
+  next();
 };
 
 export const checkAdminStatus = async (req, res, next) => {
   try {
-    const isExist = await User.findOne({ email: req.session.admin.email });
-
-    if (isExist && isExist.status !== "blocked") {
-      next();
-    } else {
-      const error = !isExist ? "Admin doesn't exist" : "Admin is blocked";
-      delete req.session.admin;
-      req.flash("error", `error`);
-
-      return res.redirect(`/admin/auth/login`);
+    if (!req.session.admin?.email) {
+      return res.redirect("/admin/auth/login");
     }
+
+    const admin = await User.findOne({
+      email: req.session.admin.email,
+      role: "admin",
+    });
+
+    if (!admin) {
+      delete req.session.admin;
+      req.flash("error", "Admin doesn't exist");
+      return res.redirect("/admin/auth/login");
+    }
+
+    // to block admin when needed
+    if (admin.isBlocked) {
+      delete req.session.admin;
+      req.flash("error", "Admin is blocked");
+      return res.redirect("/admin/auth/login");
+    }
+
+    next();
   } catch (err) {
     console.log(err);
+    return res.redirect("/admin/auth/login");
   }
 };
 

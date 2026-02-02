@@ -249,11 +249,9 @@ export const passwordResetSuccessPage = (req, res) => {
 };
 
 export const logoutUser = (req, res, next) => {
-  req.logout((err) => {
+  req.logout({ keepSessionInfo: true }, (err) => {
     if (err) return next(err);
-    req.session.destroy(() => {
-      res.redirect("/auth/login");
-    });
+    res.redirect("/auth/login");
   });
 };
 
@@ -266,11 +264,16 @@ export const loginAdmin = async (req, res) => {
     const admin = await authenticateAdminLogin(req.body);
 
     req.session.admin = admin;
-
-    res.redirect("/admin/user");
+    res.redirect("/admin/users");
   } catch (err) {
     console.log("error in admin login", err);
     req.flash("error", err.message);
     res.redirect("/admin/auth/login");
   }
+};
+
+export const logoutAdmin = (req, res) => {
+  console.log("reached admin logout");
+  delete req.session.admin;
+  return res.redirect("/admin/auth/login");
 };

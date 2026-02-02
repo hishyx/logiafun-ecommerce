@@ -524,3 +524,19 @@ fieldset {
   background: var(--white);
   box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.1);
 }
+
+button:disabled,
+.btn-sm:disabled,
+.btn-outline:disabled,
+.btn-save:disabled {
+  background: #e5e7eb; /* light gray */
+  color: #9ca3af; /* muted text */
+  border-color: #e5e7eb;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.btn-outline:disabled:hover {
+  background: #e5e7eb;
+  color: #9ca3af;
+}

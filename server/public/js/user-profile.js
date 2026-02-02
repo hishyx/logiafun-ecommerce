@@ -226,7 +226,8 @@ if (verifyOtpBtn) {
       document.querySelector('[name="email"]').value = newEmail;
       document.getElementById("sidebarEmail").textContent = newEmail;
 
-      emailModal.classList.remove("active");
+      // emailModal.classList.remove("active");
+      window.location.reload();
     } catch (err) {
       alert(err.message || "OTP verification failed");
     } finally {

@@ -44,7 +44,7 @@ export const authenticateUser = async (body) => {
     throw new Error("This account is not a user");
   }
 
-  if (user.status !== "active") {
+  if (user.isBlocked) {
     throw new Error(`This account is ${user.status} please contact your admin`);
   }
 

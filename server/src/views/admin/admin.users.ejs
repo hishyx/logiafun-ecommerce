@@ -1,1 +1,264 @@
-<h1>This is the admin of logiaFun</h1>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel - LogiaFun</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/css/admin/main.css" />
+  </head>
+  <body>
+    <div class="admin-container">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="logo-area">
+          <h2>LogiaFun <span class="badge">Admin</span></h2>
+        </div>
+
+        <nav class="sidebar-nav">
+          <ul>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="fa-solid fa-box"></i>
+                <span>Products</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Orders</span>
+              </a>
+            </li>
+            <li class="nav-item active">
+              <a href="#" class="nav-link">
+                <i class="fa-solid fa-users"></i>
+                <span>Users</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="fa-solid fa-image"></i>
+                <span>Banners</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <div class="sidebar-footer">
+          <form action="/admin/logout" method="POST" class="logout-form">
+            <button type="submit" class="nav-link logout logout-btn">
+              <i class="fa-solid fa-right-from-bracket"></i>
+              <span>Logout</span>
+            </button>
+          </form>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Top Bar -->
+        <header class="top-bar">
+          <div class="mobile-toggle">
+            <i class="fa-solid fa-bars"></i>
+          </div>
+          <div class="page-title">
+            <h1>User Management</h1>
+          </div>
+          <div class="user-profile">
+            <div class="notification-icon">
+              <i class="fa-regular fa-bell"></i>
+              <span class="dot"></span>
+            </div>
+            <div class="profile-info">
+              <img
+                src="https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff"
+                alt="Admin"
+              />
+              <span>Admin</span>
+            </div>
+          </div>
+        </header>
+
+        <!-- Content Body -->
+        <div class="content-body">
+          <!-- Controls Area -->
+          <div class="controls-area">
+            <div class="search-wrapper">
+              <i class="fa-solid fa-magnifying-glass search-icon"></i>
+              <input
+                type="text"
+                id="userListSearch"
+                value="<%= search %>"
+                placeholder="Search users by name or email..."
+              />
+              <button
+                id="clearSearchBtn"
+                class="action-btn clear-btn"
+                aria-label="Clear Search"
+                style="display: none"
+              >
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+
+            <div class="actions-wrapper">
+              <div class="sort-wrapper">
+                <label for="filterBy">Filter By:</label>
+<select id="filterBy">
+  <option value="all" <%= filter==="all"?"selected":"" %>>All</option>
+  <option value="active" <%= filter==="active"?"selected":"" %>>Active</option>
+  <option value="blocked" <%= filter==="blocked"?"selected":"" %>>Blocked</option>
+</select>
+              </div>
+              <div class="sort-wrapper">
+                <label for="sortBy">Sort By:</label>
+  <select id="sortBy">
+  <option value="newest" <%= sort==="latest"?"selected":"" %>>Newest First</option>
+  <option value="oldest" <%= sort==="oldest"?"selected":"" %>>Oldest First</option>
+  <option value="name_asc" <%= sort==="name_asc"?"selected":"" %>>Name (A-Z)</option>
+  <option value="name_desc" <%= sort==="name_desc"?"selected":"" %>>Name (Z-A)</option>
+</select>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- Users Table/List -->
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Email</th>
+                  <th>Joined Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+<% if(!users || users.length === 0){ %>
+
+<% } else { %>
+  <% users.forEach(u => { %>
+
+  <tr>
+    <td>
+      <div class="user-cell">
+        <div class="user-avatar">
+          <%= (u.name || "-")
+              .split(" ")
+              .map(p => p[0])
+              .join("")
+              .toUpperCase()
+              .slice(0,2) %>
+        </div>
+        <div class="user-info">
+          <span class="name"><%= u.name || "-" %></span>
+        </div>
+      </div>
+    </td>
+
+    <td><%= u.email || "-" %></td>
+
+    <td>
+      <%= u.createdAt
+          ? new Date(u.createdAt).toLocaleDateString()
+          : "-" %>
+    </td>
+
+    <td>
+      <span class="status-badge <%= u.isBlocked ? "status-blocked" : "status-active" %>">
+        <span class="status-indicator"></span>
+        <%= u.isBlocked ? "Blocked" : "Active" %>
+      </span>
+    </td>
+
+    <td>
+<button
+  type="button"
+  class="action-btn <%= u.isBlocked ? "btn-unblock" : "btn-block" %>"
+  onclick="openBlockConfirm('<%= u._id %>')"
+>
+
+        <i class="fa-solid <%= u.isBlocked ? "fa-check" : "fa-ban" %>"></i>
+        <%= u.isBlocked ? "Unblock" : "Block" %>
+      </button>
+    </td>
+  </tr>
+
+  <% }) %>
+<% } %>
+</tbody>
+
+            </table>
+          </div>
+
+          <!-- Empty State (Hidden by default) -->
+<% if (!users || users.length === 0) { %>
+  <div id="emptyState" class="empty-state">
+    <i class="fa-solid fa-users-slash"></i>
+    <h3>No users found</h3>
+    <p>Try adjusting your search or filters.</p>
+  </div>
+<% } %>
+
+
+          <!-- Pagination -->
+          <div class="pagination-area">
+            <div class="pagination-info">
+Showing
+<%= total === 0 ? 0 : ((page - 1) * limit + 1) %>
+-
+<%= Math.min(page * limit, total) %>
+of
+<%= total %>
+
+            </div>
+            <div class="pagination-controls">
+<button
+  class="page-btn"
+  <%= page === 1 ? "disabled" : "" %>
+  onclick="goToPage(<%= page - 1 %>)"
+>
+  <i class="fa-solid fa-chevron-left"></i>
+</button>
+
+              <div id="pageNumbers" class="page-numbers">
+                <button class="page-btn active"><%=page%></button>
+              </div>
+<button
+  class="page-btn"
+  <%= page === totalPages ? "disabled" : "" %>
+  onclick="goToPage(<%= page + 1 %>)"
+>
+  <i class="fa-solid fa-chevron-right"></i>
+</button>
+
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script src="/js/admin/admin.users.js"></script>
+  </body>
+</html>
