@@ -6,6 +6,7 @@
     <title>My Profile - logiaFun</title>
     <link rel="stylesheet" href="/css/home.css" />
     <link rel="stylesheet" href="/css/profile.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
   </head>
 <body>
     <!-- Header -->
@@ -16,9 +17,12 @@
         <!-- Sidebar -->
         <aside class="profile-sidebar">
           <div class="profile-user-info">
-            <div class="profile-avatar-large">H</div>
+            <div class="profile-avatar-large"><img src="<%=user.profileImage%>"></div>
             <div>
-              <div class="profile-user-name" id="sidebarName">
+              <input type="file" id="fileInput" hidden>
+
+              <label for="fileInput" class="profilePic-btn">Change photo</label>
+               <div class="profile-user-name" id="sidebarName">
                 <%=user.name%>
               </div>
               <div class="profilacce-user-email" id="sidebarEmail">
@@ -310,6 +314,22 @@
 
     <!-- Footer -->
     <%- include('../partials/footer') %>
+    <!-- Cropper Modal -->
+    <div class="modal-overlay" id="cropperModal">
+      <div class="modal-content" style="max-width: 600px; width: 95%;">
+        <button class="modal-close" id="closeCropperModal" type="button">&times;</button>
+        <h3>Crop Image</h3>
+        <div class="img-container" style="max-height: 400px; overflow: hidden; margin-bottom: 20px;">
+          <img id="imageToCrop" src="" alt="Picture to crop" style="max-width: 100%;">
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+             <button class="btn btn-outline" id="cancelCropBtn" type="button">Cancel</button>
+             <button class="btn btn-primary" id="cropImageBtn" type="button">Done</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
     <script src="/js/user-profile.js"></script>
   </body>
 </html>

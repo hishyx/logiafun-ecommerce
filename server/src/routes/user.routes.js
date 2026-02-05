@@ -4,6 +4,8 @@ import * as userControllers from "../controllers/user.controller.js";
 
 import { checkUserStatus, isAuth } from "../middlewares/auth.middleware.js";
 
+import upload from "../config/multer.js";
+
 const router = express.Router();
 
 router.use(isAuth);
@@ -36,5 +38,11 @@ router
   .patch(userControllers.editAddress);
 
 router.patch("/addresses/:addressId/default", userControllers.setDefault);
+
+router.post(
+  "/user/profile-image",
+  upload.single("image"),
+  userControllers.changeProfilePicture,
+);
 
 export default router;

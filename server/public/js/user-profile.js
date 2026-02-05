@@ -313,6 +313,7 @@ passwordChangeForm.addEventListener("submit", async (e) => {
     alert("Password updated successfully ✅");
     passwordModal.classList.remove("active");
     passwordChangeForm.reset();
+    location.reload();
   } catch (err) {
     modalPasswordError.textContent = err.message || "Failed to update password";
   } finally {
@@ -332,5 +333,118 @@ if (passTriggerFromEmail) {
     passwordModal.classList.add("active");
     passwordChangeForm.reset();
     modalPasswordError.textContent = "";
+  });
+}
+
+// Image Cropping Logic
+const fileInput = document.getElementById("fileInput");
+const cropperModal = document.getElementById("cropperModal");
+const closeCropperModalBtn = document.getElementById("closeCropperModal");
+const cancelCropBtn = document.getElementById("cancelCropBtn");
+const cropImageBtn = document.getElementById("cropImageBtn");
+const imageToCrop = document.getElementById("imageToCrop");
+const profileImage = document.querySelector(".profile-avatar-large img");
+
+let cropper;
+
+if (fileInput) {
+  fileInput.addEventListener("change", (e) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+
+      // Check if file is an image
+      if (!file.type.startsWith("image/")) {
+        alert("Please select an image file");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        imageToCrop.src = event.target.result;
+        cropperModal.classList.add("active");
+
+        // Initialize Cropper once image is loaded in modal
+        // We need a small timeout or to ensure the image is loaded in DOM
+        // but src assignment is usually sync enough for the img tag, but the load event might be better.
+        // However, CropperJS usually handles it if we pass the image element.
+        // But to be safe, we can destroy previous instance.
+
+        if (cropper) {
+          cropper.destroy();
+        }
+
+        cropper = new Cropper(imageToCrop, {
+          aspectRatio: 1, // Square crop
+          viewMode: 1,
+          autoCropArea: 1,
+          responsive: true,
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+}
+
+function closeCropper() {
+  cropperModal.classList.remove("active");
+  if (cropper) {
+    cropper.destroy();
+    cropper = null;
+  }
+  fileInput.value = ""; // Reset input so same file can be selected again
+}
+
+if (closeCropperModalBtn) {
+  closeCropperModalBtn.addEventListener("click", closeCropper);
+}
+
+if (cancelCropBtn) {
+  cancelCropBtn.addEventListener("click", closeCropper);
+}
+
+if (cropImageBtn) {
+  cropImageBtn.addEventListener("click", async () => {
+    if (!cropper) return;
+
+    const canvas = cropper.getCroppedCanvas({
+      width: 300,
+      height: 300,
+    });
+
+    canvas.toBlob(async (blob) => {
+      const formData = new FormData();
+      formData.append("image", blob, "profile.png");
+
+      try {
+        document.getElementById("cropImageBtn").textContent = "Uploading";
+        document.getElementById("cancelCropBtn").style.display = "none";
+
+        const res = await fetch("/user/profile-image", {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await res.json();
+
+        if (profileImage) {
+          profileImage.src = data.imageUrl;
+        }
+
+        closeCropper();
+      } catch (err) {
+        console.error("Upload failed", err);
+        alert("Upload failed");
+      }
+    }, "image/png");
+  });
+}
+
+// Close modal on click outside
+if (cropperModal) {
+  cropperModal.addEventListener("click", (e) => {
+    if (e.target === cropperModal) {
+      closeCropper();
+    }
   });
 }

@@ -28,9 +28,7 @@ function setupEventListeners() {
   });
 }
 
-/* -------------------------
-   URL based navigation
---------------------------*/
+//Navigation URL based
 
 function goToPage(p) {
   const params = new URLSearchParams(window.location.search);
@@ -74,29 +72,55 @@ function wireUserEvents() {
   if (filterSelect) filterSelect.addEventListener("change", onFilterChange);
 }
 
-/* -------------------------
-   Block / Unblock (AJAX)
---------------------------*/
+//Block / Unblock (AJAX)
 
-function openBlockConfirm(userId) {
-  toggleBlockUser(userId);
-}
-
-async function toggleBlockUser(userId) {
+async function toggleUser(userId, isBlocked) {
   try {
-    const response = await fetch(`/admin/users/${userId}/block`, {
+    const res = await fetch(`/admin/users/${userId}/block`, {
       method: "PATCH",
     });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.message || "Failed to update user status.");
+    if (!res.ok) {
+      alert("Request failed");
+      return;
     }
 
-    // reload page to refresh server-rendered data
-    window.location.reload();
-  } catch (error) {
-    console.error(error);
-    alert(error.message || "Something went wrong. Please try again.");
+    const data = await res.json();
+
+    if (!data.success) {
+      alert("Failed to update user");
+      return;
+    }
+
+    const statusEl = document.getElementById(`status-${userId}`);
+    const btn = document.getElementById(`btn-${userId}`);
+
+    if (!statusEl || !btn) return;
+
+    // because backend toggled it
+    const nowBlocked = !isBlocked;
+
+    if (nowBlocked) {
+      statusEl.classList.remove("status-active");
+      statusEl.classList.add("status-blocked");
+      statusEl.lastChild.textContent = "Blocked";
+
+      btn.classList.remove("btn-block");
+      btn.classList.add("btn-unblock");
+      btn.innerHTML = `<i class="fa-solid fa-check"></i> Unblock`;
+      btn.setAttribute("onclick", `toggleUser('${userId}', true)`);
+    } else {
+      statusEl.classList.remove("status-blocked");
+      statusEl.classList.add("status-active");
+      statusEl.lastChild.textContent = "Active";
+
+      btn.classList.remove("btn-unblock");
+      btn.classList.add("btn-block");
+      btn.innerHTML = `<i class="fa-solid fa-ban"></i> Block`;
+      btn.setAttribute("onclick", `toggleUser('${userId}', false)`);
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Something went wrong");
   }
 }

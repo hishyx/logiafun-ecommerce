@@ -7,7 +7,7 @@ export const adminUserListPage = async (req, res) => {
   try {
     let {
       page = 1,
-      limit = 10,
+      limit = 7,
       search = "",
       sort = "latest",
       filter = "all",

@@ -164,14 +164,18 @@
   <tr>
     <td>
       <div class="user-cell">
-        <div class="user-avatar">
-          <%= (u.name || "-")
-              .split(" ")
-              .map(p => p[0])
-              .join("")
-              .toUpperCase()
-              .slice(0,2) %>
-        </div>
+<div class="user-avatar">
+  <% if (u.profileImage) { %>
+    <img src="<%= u.profileImage %>" alt="<%= u.name %>">
+  <% } else { %>
+    <%= (u.name || "-")
+        .split(" ")
+        .map(p => p[0])
+        .join("")
+        .toUpperCase()
+        .slice(0,2) %>
+  <% } %>
+</div>
         <div class="user-info">
           <span class="name"><%= u.name || "-" %></span>
         </div>
@@ -186,19 +190,25 @@
           : "-" %>
     </td>
 
-    <td>
-      <span class="status-badge <%= u.isBlocked ? "status-blocked" : "status-active" %>">
-        <span class="status-indicator"></span>
-        <%= u.isBlocked ? "Blocked" : "Active" %>
-      </span>
-    </td>
+<td>
+  <span
+    id="status-<%= u._id %>"
+    class="status-badge <%= u.isBlocked ? "status-blocked" : "status-active" %>"
+  >
+    <span class="status-indicator"></span>
+    <%= u.isBlocked ? "Blocked" : "Active" %>
+  </span>
+</td>
+
+
 
     <td>
 <button
-  type="button"
+  id="btn-<%= u._id %>"
   class="action-btn <%= u.isBlocked ? "btn-unblock" : "btn-block" %>"
-  onclick="openBlockConfirm('<%= u._id %>')"
+  onclick="toggleUser('<%= u._id %>', <%= u.isBlocked %>)"
 >
+
 
         <i class="fa-solid <%= u.isBlocked ? "fa-check" : "fa-ban" %>"></i>
         <%= u.isBlocked ? "Unblock" : "Block" %>

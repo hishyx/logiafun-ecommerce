@@ -5,13 +5,12 @@ import {
   deleteOneAddress,
   updateAddress,
   changeDefaultAddress,
+  UploadProfilePic,
 } from "../services/user.services.js";
 import {
   createAndSendEmailChangeOTP,
   verifyEmailChangeOTP,
 } from "../services/OTP.services.js";
-
-import bcrypt from "bcrypt";
 
 import User from "../models/user.model.js";
 
@@ -190,5 +189,19 @@ export const setDefault = async (req, res) => {
     res.sendStatus(204);
   } catch (err) {
     console.log(err);
+  }
+};
+
+export const changeProfilePicture = async (req, res) => {
+  try {
+    console.log("FILE =>", req.file);
+    const uploadedUrl = await UploadProfilePic(req.file, req.user._id);
+
+    res.json({
+      imageUrl: uploadedUrl,
+    });
+  } catch (err) {
+    console.error("Cloudinary upload error:", err);
+    res.status(500).json({ message: err.message });
   }
 };

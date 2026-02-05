@@ -88,7 +88,6 @@ export const verifySignupOTP = async (otpId, inputOtp, pendingUser) => {
     email: pendingUser.email,
     phone: pendingUser.phone,
     password: pendingUser.password,
-    profileImage: "/images/profile.jpg",
     isVerified: true,
   });
 
