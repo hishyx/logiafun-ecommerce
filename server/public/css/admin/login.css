@@ -164,12 +164,25 @@ body {
 
 .input-wrapper i {
   position: absolute;
-  left: 1rem;
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-muted);
   transition: var(--transition);
   font-size: 1rem;
+}
+
+.input-wrapper i:first-child {
+  left: 1rem;
+}
+
+.input-wrapper .password-toggle-icon {
+  right: 1rem;
+  left: auto; /* Reset left property */
+  cursor: pointer;
+}
+
+.input-wrapper .password-toggle-icon:hover {
+  color: var(--primary);
 }
 
 .input-wrapper input {

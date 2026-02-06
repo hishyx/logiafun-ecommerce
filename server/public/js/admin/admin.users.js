@@ -124,3 +124,18 @@ async function toggleUser(userId, isBlocked) {
     alert("Something went wrong");
   }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const clearBtn = document.getElementById("clearSearchBtn");
+
+  if (!clearBtn) return;
+
+  clearBtn.addEventListener("click", () => {
+    const url = new URL(window.location.href);
+
+    url.searchParams.set("search", "");
+    url.searchParams.set("page", "1");
+
+    window.location.href = url.toString();
+  });
+});

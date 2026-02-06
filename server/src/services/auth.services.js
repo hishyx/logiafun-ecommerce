@@ -33,12 +33,12 @@ export const createTempUserForSignup = async (body) => {
 export const authenticateUser = async (body) => {
   const user = await User.findOne({ email: body.email });
 
+  if (!user) throw new Error("Account doesn't exist");
+
   if (!user.password)
     throw new Error(
       "This account was created using Google. Please sign in with Google instead.",
     );
-
-  if (!user) throw new Error("Account doesn't exist");
 
   if (user.role !== "user") {
     throw new Error("This account is not a user");
@@ -83,7 +83,7 @@ export const googleUserExist = async (googleUser) => {
     name: googleUser.displayName,
     googleId: googleUser.id,
     email: googleUser.emails[0].value,
-    profileImage: googleUser.photos[0].value,
+    profileImage: googleUser.photos?.[0]?.value ?? null,
     isVerified: true,
   });
 

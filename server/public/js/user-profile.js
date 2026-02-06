@@ -1,450 +1,477 @@
-//Otp timer and all
+document.addEventListener("DOMContentLoaded", () => {
+  // Elements
+  const editBtn = document.getElementById("editInfoButton");
+  const fieldset = document.getElementById("profileFieldset");
+  const form = document.querySelector(".profile-form");
+  const saveBtn = document.querySelector(".btn-save");
+  const changeEmailBtn = document.getElementById("changeEmailBtn");
+  const changePasswordButton = document.getElementById("changePasswordBtn");
+  const errorBox = document.getElementById("passwordError");
 
-let resendCooldown = 60; // seconds
-let resendInterval = null;
+  // --- Profile Editing ---
+  let editing = false;
 
-function startResendCooldown() {
-  let remaining = resendCooldown;
+  if (editBtn) {
+    editBtn.addEventListener("click", () => {
+      editing = !editing;
 
-  resendOtpBtn.disabled = true;
-  resendOtpBtn.textContent = `Resend in ${remaining}s`;
+      if (fieldset) fieldset.disabled = !editing;
+      editBtn.textContent = editing ? "Cancel" : "Edit Information";
 
-  resendInterval = setInterval(() => {
-    remaining--;
+      if (form) {
+        const emailInput = form.querySelector('[name="email"]');
+        if (emailInput) emailInput.disabled = true; // Always keep email disabled
+      }
 
-    if (remaining <= 0) {
-      clearInterval(resendInterval);
-      resendInterval = null;
-      resendOtpBtn.disabled = false;
-      resendOtpBtn.textContent = "Resend code";
-    } else {
-      resendOtpBtn.textContent = `Resend in ${remaining}s`;
-    }
-  }, 1000);
-}
-
-//  Profile Editing
-
-const editBtn = document.getElementById("editInfoButton");
-const fieldset = document.getElementById("profileFieldset");
-const form = document.querySelector(".profile-form");
-const saveBtn = document.querySelector(".btn-save");
-const changeEmailBtn = document.getElementById("changeEmailBtn");
-const changePasswordButton = document.getElementById("changePasswordBtn");
-const errorBox = document.getElementById("passwordError");
-
-function showError(msg) {
-  errorBox.textContent = msg;
-}
-
-let editing = false;
-
-editBtn.addEventListener("click", () => {
-  console.log("Edit button clicked");
-  editing = !editing;
-  fieldset.disabled = !editing;
-  editBtn.textContent = editing ? "Cancel" : "Edit Information";
-
-  form.querySelector('[name="email"]').disabled = true;
-  changeEmailBtn.disabled = !editing;
-  changePasswordButton.disabled = !editing;
-});
-
-//Profile Save
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  // Password validation removed from main profile update
-
-  saveBtn.disabled = true;
-  saveBtn.textContent = "Saving...";
-
-  const formData = new FormData(form);
-  const data = Object.fromEntries(formData.entries());
-
-  try {
-    const res = await fetch("/user/profile", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      if (changeEmailBtn) changeEmailBtn.disabled = !editing;
+      if (changePasswordButton) changePasswordButton.disabled = !editing;
     });
-
-    const result = await res.json();
-    if (!res.ok) throw new Error(result.message);
-
-    alert("Profile updated successfully ✅");
-
-    fieldset.disabled = true;
-    editing = false;
-    editBtn.textContent = "Edit Information";
-  } catch (err) {
-    alert(err.message || "Update failed");
-  } finally {
-    saveBtn.disabled = false;
-    saveBtn.textContent = "Save Changes";
   }
-});
 
-//Email Change Modal
-const emailModal = document.getElementById("emailModal");
-const closeEmailModal = document.getElementById("closeEmailModal");
-const emailStep1 = document.getElementById("emailStep1");
-const emailStep2 = document.getElementById("emailStep2");
-const newEmailInput = document.getElementById("newEmailInput");
-const sendOtpBtn = document.getElementById("sendOtpBtn");
-const verifyOtpBtn = document.getElementById("verifyOtpBtn");
-const backToEmailBtn = document.getElementById("backToEmailBtn");
-const displayNewEmail = document.getElementById("displayNewEmail");
-const otpInputs = document.querySelectorAll(".otp-digit");
-const resendOtpBtn = document.getElementById("resendOtpBtn");
+  // --- Profile Save ---
+  if (form) {
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-changeEmailBtn.addEventListener("click", () => {
-  console.log("Change email button clicked");
-  emailModal.classList.add("active");
-  resetModal();
-});
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.textContent = "Saving...";
+      }
 
-closeEmailModal.addEventListener("click", () => {
-  emailModal.classList.remove("active");
-});
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
 
-emailModal.addEventListener("click", (e) => {
-  if (e.target === emailModal) emailModal.classList.remove("active");
-});
+      try {
+        const res = await fetch("/user/profile", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
 
-function resetModal() {
-  if (emailStep1) emailStep1.style.display = "block";
-  if (emailStep2) emailStep2.style.display = "none";
-  if (newEmailInput) newEmailInput.value = "";
-  if (otpInputs) otpInputs.forEach((i) => (i.value = ""));
-}
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.message);
 
-//Send OTP
-if (sendOtpBtn) {
-  sendOtpBtn.addEventListener("click", async () => {
-    const newEmail = newEmailInput.value.trim();
+        showToast("Profile updated successfully", "success");
 
-    if (!newEmail || !newEmail.includes("@")) {
-      alert("Please enter a valid email address");
-      return;
-    }
+        if (fieldset) fieldset.disabled = true;
+        editing = false;
+        if (editBtn) editBtn.textContent = "Edit Information";
 
-    sendOtpBtn.disabled = true;
-    sendOtpBtn.textContent = "Sending...";
+        // Re-disable conditionally disabled buttons
+        if (changeEmailBtn) changeEmailBtn.disabled = true;
+        if (changePasswordButton) changePasswordButton.disabled = true;
+      } catch (err) {
+        showToast(err.message || "Update failed", "error");
+      } finally {
+        if (saveBtn) {
+          saveBtn.disabled = false;
+          saveBtn.textContent = "Save Changes";
+        }
+      }
+    });
+  }
 
-    try {
-      const res = await fetch("/user/change-email", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ newEmail }),
-      });
+  // --- Email Change Modal & Logic ---
+  const emailModal = document.getElementById("emailModal");
+  const closeEmailModal = document.getElementById("closeEmailModal");
+  const emailStep1 = document.getElementById("emailStep1");
+  const emailStep2 = document.getElementById("emailStep2");
+  const newEmailInput = document.getElementById("newEmailInput");
+  const sendOtpBtn = document.getElementById("sendOtpBtn");
+  const verifyOtpBtn = document.getElementById("verifyOtpBtn");
+  const backToEmailBtn = document.getElementById("backToEmailBtn");
+  const displayNewEmail = document.getElementById("displayNewEmail");
+  const otpInputs = document.querySelectorAll(".otp-digit");
+  const resendOtpBtn = document.getElementById("resendOtpBtn");
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
+  if (changeEmailBtn) {
+    changeEmailBtn.addEventListener("click", () => {
+      if (emailModal) {
+        emailModal.classList.add("active");
+        resetEmailModal();
+      }
+    });
+  }
 
-      displayNewEmail.textContent = newEmail;
-      emailStep1.style.display = "none";
-      emailStep2.style.display = "block";
-      otpInputs[0].focus();
+  if (closeEmailModal && emailModal) {
+    closeEmailModal.addEventListener("click", () => {
+      emailModal.classList.remove("active");
+    });
+  }
 
-      startResendCooldown();
-    } catch (err) {
-      alert(err.message || "Failed to send OTP");
-    } finally {
-      sendOtpBtn.disabled = false;
-      sendOtpBtn.textContent = "Proceed";
-    }
-  });
-}
+  if (emailModal) {
+    emailModal.addEventListener("click", (e) => {
+      if (e.target === emailModal) emailModal.classList.remove("active");
+    });
+  }
 
-//Resend OTP
-if (resendOtpBtn) {
-  resendOtpBtn.addEventListener("click", async () => {
+  function resetEmailModal() {
+    if (emailStep1) emailStep1.style.display = "block";
+    if (emailStep2) emailStep2.style.display = "none";
+    if (newEmailInput) newEmailInput.value = "";
+    if (otpInputs) otpInputs.forEach((i) => (i.value = ""));
+  }
+
+  // OTP Timer Logic
+  let resendCooldown = 60;
+  let resendInterval = null;
+
+  function startResendCooldown() {
+    if (!resendOtpBtn) return;
+
+    let remaining = resendCooldown;
     resendOtpBtn.disabled = true;
-    resendOtpBtn.textContent = "Resending...";
+    resendOtpBtn.textContent = `Resend in ${remaining}s`;
 
-    try {
-      const res = await fetch("/user/change-email/resend", { method: "POST" });
-      const data = await res.json();
+    if (resendInterval) clearInterval(resendInterval);
 
-      if (!res.ok) throw new Error(data.message);
-
-      alert("OTP resent successfully");
-      startResendCooldown();
-    } catch (err) {
-      alert(err.message || "Failed to resend OTP");
-    } finally {
-      resendOtpBtn.disabled = false;
-      resendOtpBtn.textContent = "Resend code";
-    }
-  });
-}
-
-//OTP Inputs UX
-otpInputs.forEach((input, index) => {
-  input.addEventListener("input", () => {
-    if (input.value && index < otpInputs.length - 1) {
-      otpInputs[index + 1].focus();
-    }
-  });
-
-  input.addEventListener("keydown", (e) => {
-    if (e.key === "Backspace" && !input.value && index > 0) {
-      otpInputs[index - 1].focus();
-    }
-  });
-});
-
-//Verify OTP
-if (verifyOtpBtn) {
-  verifyOtpBtn.addEventListener("click", async () => {
-    const otp = Array.from(otpInputs)
-      .map((i) => i.value)
-      .join("");
-    const newEmail = newEmailInput.value.trim();
-
-    if (otp.length !== 6) {
-      alert("Enter the full 6-digit OTP");
-      return;
-    }
-
-    verifyOtpBtn.disabled = true;
-    verifyOtpBtn.textContent = "Verifying...";
-
-    try {
-      const res = await fetch("/user/change-email", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userOTP: otp, newEmail }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message);
-
-      alert("Email updated successfully ✅");
-
-      document.querySelector('[name="email"]').value = newEmail;
-      document.getElementById("sidebarEmail").textContent = newEmail;
-
-      // emailModal.classList.remove("active");
-      window.location.reload();
-    } catch (err) {
-      alert(err.message || "OTP verification failed");
-    } finally {
-      verifyOtpBtn.disabled = false;
-      verifyOtpBtn.textContent = "Verify & Update";
-    }
-  });
-}
-
-//Back Button
-
-if (backToEmailBtn) {
-  backToEmailBtn.addEventListener("click", () => {
-    emailStep1.style.display = "block";
-    emailStep2.style.display = "none";
-  });
-}
-
-// Password Change Modal
-const passwordModal = document.getElementById("passwordModal");
-const closePasswordModal = document.getElementById("closePasswordModal");
-const changePasswordBtn = document.getElementById("changePasswordBtn");
-const passwordChangeForm = document.getElementById("passwordChangeForm");
-const modalPasswordError = document.getElementById("modalPasswordError");
-
-if (changePasswordBtn) {
-  changePasswordBtn.addEventListener("click", () => {
-    console.log("Change password button clicked");
-    passwordModal.classList.add("active");
-    passwordChangeForm.reset();
-    modalPasswordError.textContent = "";
-  });
-}
-
-if (closePasswordModal) {
-  closePasswordModal.addEventListener("click", () => {
-    passwordModal.classList.remove("active");
-  });
-}
-
-passwordModal.addEventListener("click", (e) => {
-  if (e.target === passwordModal) passwordModal.classList.remove("active");
-});
-
-passwordChangeForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const currentPassword = passwordChangeForm.currentPassword.value.trim();
-  const newPassword = passwordChangeForm.newPassword.value.trim();
-  const confirmPassword = passwordChangeForm.confirmPassword.value.trim();
-
-  modalPasswordError.textContent = "";
-
-  if (newPassword.length < 8) {
-    modalPasswordError.textContent =
-      "New password must be at least 8 characters";
-    return;
+    resendInterval = setInterval(() => {
+      remaining--;
+      if (remaining <= 0) {
+        clearInterval(resendInterval);
+        resendInterval = null;
+        resendOtpBtn.disabled = false;
+        resendOtpBtn.textContent = "Resend code";
+      } else {
+        resendOtpBtn.textContent = `Resend in ${remaining}s`;
+      }
+    }, 1000);
   }
 
-  if (newPassword !== confirmPassword) {
-    modalPasswordError.textContent = "Passwords do not match";
-    return;
-  }
+  if (sendOtpBtn) {
+    sendOtpBtn.addEventListener("click", async () => {
+      const newEmail = newEmailInput ? newEmailInput.value.trim() : "";
 
-  const submitBtn = passwordChangeForm.querySelector('button[type="submit"]');
-  submitBtn.disabled = true;
-  submitBtn.textContent = "Updating...";
-
-  try {
-    const res = await fetch("/user/profile", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        currentPassword,
-        newPassword,
-        confirmPassword,
-      }),
-    });
-
-    const result = await res.json();
-    if (!res.ok) throw new Error(result.message);
-
-    alert("Password updated successfully ✅");
-    passwordModal.classList.remove("active");
-    passwordChangeForm.reset();
-    location.reload();
-  } catch (err) {
-    modalPasswordError.textContent = err.message || "Failed to update password";
-  } finally {
-    submitBtn.disabled = false;
-    submitBtn.textContent = "Update Password";
-  }
-});
-
-const passTriggerFromEmail = document.getElementById(
-  "triggerPasswordFromEmail",
-);
-
-if (passTriggerFromEmail) {
-  passTriggerFromEmail.addEventListener("click", () => {
-    console.log("Set password from email button clicked");
-    emailModal.classList.remove("active"); // Open password modal, ensure email modal is closed
-    passwordModal.classList.add("active");
-    passwordChangeForm.reset();
-    modalPasswordError.textContent = "";
-  });
-}
-
-// Image Cropping Logic
-const fileInput = document.getElementById("fileInput");
-const cropperModal = document.getElementById("cropperModal");
-const closeCropperModalBtn = document.getElementById("closeCropperModal");
-const cancelCropBtn = document.getElementById("cancelCropBtn");
-const cropImageBtn = document.getElementById("cropImageBtn");
-const imageToCrop = document.getElementById("imageToCrop");
-const profileImage = document.querySelector(".profile-avatar-large img");
-
-let cropper;
-
-if (fileInput) {
-  fileInput.addEventListener("change", (e) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      const file = files[0];
-
-      // Check if file is an image
-      if (!file.type.startsWith("image/")) {
-        alert("Please select an image file");
+      if (!newEmail || !newEmail.includes("@")) {
+        showToast("Please enter a valid email", "error");
         return;
       }
 
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        imageToCrop.src = event.target.result;
-        cropperModal.classList.add("active");
-
-        // Initialize Cropper once image is loaded in modal
-        // We need a small timeout or to ensure the image is loaded in DOM
-        // but src assignment is usually sync enough for the img tag, but the load event might be better.
-        // However, CropperJS usually handles it if we pass the image element.
-        // But to be safe, we can destroy previous instance.
-
-        if (cropper) {
-          cropper.destroy();
-        }
-
-        cropper = new Cropper(imageToCrop, {
-          aspectRatio: 1, // Square crop
-          viewMode: 1,
-          autoCropArea: 1,
-          responsive: true,
-        });
-      };
-      reader.readAsDataURL(file);
-    }
-  });
-}
-
-function closeCropper() {
-  cropperModal.classList.remove("active");
-  if (cropper) {
-    cropper.destroy();
-    cropper = null;
-  }
-  fileInput.value = ""; // Reset input so same file can be selected again
-}
-
-if (closeCropperModalBtn) {
-  closeCropperModalBtn.addEventListener("click", closeCropper);
-}
-
-if (cancelCropBtn) {
-  cancelCropBtn.addEventListener("click", closeCropper);
-}
-
-if (cropImageBtn) {
-  cropImageBtn.addEventListener("click", async () => {
-    if (!cropper) return;
-
-    const canvas = cropper.getCroppedCanvas({
-      width: 300,
-      height: 300,
-    });
-
-    canvas.toBlob(async (blob) => {
-      const formData = new FormData();
-      formData.append("image", blob, "profile.png");
+      sendOtpBtn.disabled = true;
+      sendOtpBtn.textContent = "Sending...";
 
       try {
-        document.getElementById("cropImageBtn").textContent = "Uploading";
-        document.getElementById("cancelCropBtn").style.display = "none";
-
-        const res = await fetch("/user/profile-image", {
+        const res = await fetch("/user/change-email", {
           method: "POST",
-          body: formData,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ newEmail }),
         });
 
         const data = await res.json();
+        if (!res.ok) throw new Error(data.message);
 
-        if (profileImage) {
-          profileImage.src = data.imageUrl;
+        if (displayNewEmail) displayNewEmail.textContent = newEmail;
+        if (emailStep1) emailStep1.style.display = "none";
+        if (emailStep2) emailStep2.style.display = "block";
+        if (otpInputs.length > 0) otpInputs[0].focus();
+
+        startResendCooldown();
+      } catch (err) {
+        showToast(err.message || "Failed to send OTP", "error");
+      } finally {
+        sendOtpBtn.disabled = false;
+        sendOtpBtn.textContent = "Proceed";
+      }
+    });
+  }
+
+  if (resendOtpBtn) {
+    resendOtpBtn.addEventListener("click", async () => {
+      resendOtpBtn.disabled = true;
+      resendOtpBtn.textContent = "Resending...";
+
+      try {
+        const res = await fetch("/user/change-email/resend", {
+          method: "POST",
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message);
+        showToast("OTP resent successfully", "success");
+        startResendCooldown();
+      } catch (err) {
+        showToast(err.message || "Failed to resend OTP", "error");
+      } finally {
+        resendOtpBtn.disabled = false;
+        resendOtpBtn.textContent = "Resend code";
+      }
+    });
+  }
+
+  // OTP Inputs Navigation
+  if (otpInputs) {
+    otpInputs.forEach((input, index) => {
+      input.addEventListener("input", () => {
+        if (input.value && index < otpInputs.length - 1) {
+          otpInputs[index + 1].focus();
+        }
+      });
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Backspace" && !input.value && index > 0) {
+          otpInputs[index - 1].focus();
+        }
+      });
+    });
+  }
+
+  if (verifyOtpBtn) {
+    verifyOtpBtn.addEventListener("click", async () => {
+      const otp = Array.from(otpInputs)
+        .map((i) => i.value)
+        .join("");
+      const newEmail = newEmailInput ? newEmailInput.value.trim() : "";
+
+      if (otp.length !== 6) {
+        showToast("Enter the full 6-digit OTP", "error");
+        return;
+      }
+
+      verifyOtpBtn.disabled = true;
+      verifyOtpBtn.textContent = "Verifying...";
+
+      try {
+        const res = await fetch("/user/change-email", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userOTP: otp, newEmail }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message);
+
+        showToast("Email updated successfully", "success");
+        window.location.reload();
+      } catch (err) {
+        showToast(err.message || "OTP verification failed", "error");
+      } finally {
+        verifyOtpBtn.disabled = false;
+        verifyOtpBtn.textContent = "Verify & Update";
+      }
+    });
+  }
+
+  if (backToEmailBtn) {
+    backToEmailBtn.addEventListener("click", () => {
+      if (emailStep1) emailStep1.style.display = "block";
+      if (emailStep2) emailStep2.style.display = "none";
+    });
+  }
+
+  // --- Password Change Modal ---
+  const passwordModal = document.getElementById("passwordModal");
+  const closePasswordModal = document.getElementById("closePasswordModal");
+  const passwordChangeForm = document.getElementById("passwordChangeForm");
+  const modalPasswordError = document.getElementById("modalPasswordError");
+
+  if (changePasswordBtn) {
+    changePasswordBtn.addEventListener("click", () => {
+      if (passwordModal) {
+        passwordModal.classList.add("active");
+        if (passwordChangeForm) passwordChangeForm.reset();
+        if (modalPasswordError) modalPasswordError.textContent = "";
+      }
+    });
+  }
+
+  if (closePasswordModal && passwordModal) {
+    closePasswordModal.addEventListener("click", () => {
+      passwordModal.classList.remove("active");
+    });
+  }
+
+  if (passwordModal) {
+    passwordModal.addEventListener("click", (e) => {
+      if (e.target === passwordModal) passwordModal.classList.remove("active");
+    });
+  }
+
+  if (passwordChangeForm) {
+    passwordChangeForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const currentPassword = passwordChangeForm.currentPassword.value.trim();
+      const newPassword = passwordChangeForm.newPassword.value.trim();
+      const confirmPassword = passwordChangeForm.confirmPassword.value.trim();
+
+      if (modalPasswordError) modalPasswordError.textContent = "";
+
+      if (newPassword.length < 8) {
+        if (modalPasswordError)
+          modalPasswordError.textContent =
+            "New password must be at least 8 characters";
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        if (modalPasswordError)
+          modalPasswordError.textContent = "Passwords do not match";
+        return;
+      }
+
+      const submitBtn = passwordChangeForm.querySelector(
+        'button[type="submit"]',
+      );
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Updating...";
+      }
+
+      try {
+        const res = await fetch("/user/profile", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            currentPassword,
+            newPassword,
+            confirmPassword,
+          }),
+        });
+
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.message);
+
+        showToast("Profile updated successfully", "success");
+        if (passwordModal) passwordModal.classList.remove("active");
+        passwordChangeForm.reset();
+        location.reload();
+      } catch (err) {
+        if (modalPasswordError)
+          modalPasswordError.textContent =
+            err.message || "Failed to update password";
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Update Password";
+        }
+      }
+    });
+  }
+
+  // --- Image Cropping Logic ---
+  const fileInput = document.getElementById("fileInput");
+  const cropperModal = document.getElementById("cropperModal");
+  const closeCropperModalBtn = document.getElementById("closeCropperModal");
+  const cancelCropBtn = document.getElementById("cancelCropBtn");
+  const cropImageBtn = document.getElementById("cropImageBtn");
+  const imageToCrop = document.getElementById("imageToCrop");
+  const profileImage = document.querySelector(".profile-avatar-large img");
+
+  let cropper;
+
+  if (fileInput) {
+    fileInput.addEventListener("change", (e) => {
+      const files = e.target.files;
+      if (files && files.length > 0) {
+        const file = files[0];
+
+        if (!file.type.startsWith("image/")) {
+          showToast("Please select an image file", "error");
+          return;
         }
 
-        closeCropper();
-      } catch (err) {
-        console.error("Upload failed", err);
-        alert("Upload failed");
-      }
-    }, "image/png");
-  });
-}
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          if (imageToCrop) {
+            imageToCrop.src = event.target.result;
+            if (cropperModal) cropperModal.classList.add("active");
 
-// Close modal on click outside
-if (cropperModal) {
-  cropperModal.addEventListener("click", (e) => {
-    if (e.target === cropperModal) {
-      closeCropper();
+            if (cropper) {
+              cropper.destroy();
+            }
+
+            cropper = new Cropper(imageToCrop, {
+              aspectRatio: 1,
+              viewMode: 1,
+              autoCropArea: 1,
+              responsive: true,
+            });
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  function closeCropper() {
+    if (cropperModal) cropperModal.classList.remove("active");
+    if (cropper) {
+      cropper.destroy();
+      cropper = null;
     }
-  });
-}
+    if (fileInput) fileInput.value = "";
+  }
+
+  if (closeCropperModalBtn) {
+    closeCropperModalBtn.addEventListener("click", closeCropper);
+  }
+
+  if (cancelCropBtn) {
+    cancelCropBtn.addEventListener("click", closeCropper);
+  }
+
+  if (cropImageBtn) {
+    cropImageBtn.addEventListener("click", async () => {
+      if (!cropper) return;
+
+      const canvas = cropper.getCroppedCanvas({
+        width: 300,
+        height: 300,
+      });
+
+      canvas.toBlob(async (blob) => {
+        const formData = new FormData();
+        formData.append("image", blob, "profile.png");
+
+        try {
+          cropImageBtn.textContent = "Uploading";
+          if (cancelCropBtn) cancelCropBtn.style.display = "none";
+
+          const res = await fetch("/user/profile-image", {
+            method: "POST",
+            body: formData,
+          });
+
+          const data = await res.json();
+
+          if (profileImage) {
+            profileImage.src = data.imageUrl;
+          }
+
+          showToast("Photo updated", "success");
+          closeCropper();
+        } catch (err) {
+          console.error("Upload failed", err);
+          showToast("Upload failed", "error");
+        } finally {
+          if (cropImageBtn) cropImageBtn.textContent = "Done";
+          if (cancelCropBtn) cancelCropBtn.style.display = "inline-block";
+        }
+      }, "image/png");
+    });
+  }
+
+  if (cropperModal) {
+    cropperModal.addEventListener("click", (e) => {
+      if (e.target === cropperModal) {
+        closeCropper();
+      }
+    });
+  }
+
+  // --- Helpers ---
+  function showToast(message, type = "success") {
+    if (typeof Swal !== "undefined") {
+      Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: type,
+        title: message,
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+      });
+    } else {
+      // Fallback if sweetalert is missing
+      alert(message);
+    }
+  }
+});

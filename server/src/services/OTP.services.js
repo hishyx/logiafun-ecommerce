@@ -118,6 +118,16 @@ export const getRemainingCooldown = async (id, purpose) => {
 };
 
 export const createAndSendEmailChangeOTP = async (userId, email, isResend) => {
+  const user = await User.findById(userId);
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  if (user.googleId) {
+    throw new Error("Google user can't change email");
+  }
+
   const emailExist = await User.findOne({ email });
 
   if (emailExist) throw new Error("User with same email already exists");

@@ -23,17 +23,13 @@ export const homePage = (req, res) => {
 
 export const profilePage = async (req, res) => {
   try {
-    const authInfo = await User.findById(req.user._id).select(
-      "password googleId",
-    );
+    const authInfo = await User.findById(req.user._id).select("googleId");
 
-    const passExist = !!authInfo.password;
-    const hasGoogle = !!authInfo.googleId;
+    const isGoogle = !!authInfo.googleId;
 
     res.render("user/profile", {
       user: req.user, // safe object from passport
-      passExist,
-      hasGoogle,
+      isGoogle,
     });
   } catch (err) {
     console.error(err);
@@ -116,7 +112,7 @@ export const emailChangeOTPVerification = async (req, res) => {
     delete req.session.newEmail;
     res.redirect("/user/profile");
   } catch (err) {
-    console.log("email change error is :" + err);
+    res.status(400).json({ message: err.message });
   }
 };
 
@@ -205,3 +201,7 @@ export const changeProfilePicture = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+// getdefaultadress=()=>{
+//   const addresses=await Addresses.find({isDefault:true})
+// }

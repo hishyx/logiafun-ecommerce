@@ -55,6 +55,10 @@
                 placeholder="••••••••"
                 required
               />
+              <i
+                class="fa-solid fa-eye password-toggle-icon"
+                id="togglePassword"
+              ></i>
             </div>
           </div>
 
@@ -79,5 +83,35 @@
         </div>
       </div>
     </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const toggleIcons = document.querySelectorAll(".password-toggle-icon");
+
+        toggleIcons.forEach((icon) => {
+          icon.addEventListener("click", function () {
+            const wrapper = this.closest(".input-wrapper");
+            if (!wrapper) return;
+
+            const passwordInput = wrapper.querySelector("input");
+            if (!passwordInput) return;
+
+            const type =
+              passwordInput.getAttribute("type") === "password"
+                ? "text"
+                : "password";
+            passwordInput.setAttribute("type", type);
+
+            // Toggle FontAwesome classes
+            if (type === "text") {
+              this.classList.remove("fa-eye");
+              this.classList.add("fa-eye-slash");
+            } else {
+              this.classList.remove("fa-eye-slash");
+              this.classList.add("fa-eye");
+            }
+          });
+        });
+      });
+    </script>
   </body>
 </html>

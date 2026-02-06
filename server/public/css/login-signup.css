@@ -139,6 +139,27 @@ body {
   color: #cbd5e1;
 }
 
+.password-wrapper {
+  position: relative;
+}
+
+.password-toggle-icon {
+  position: absolute;
+  right: 1.1rem; /* Matches input padding */
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.password-toggle-icon:hover {
+  color: var(--primary);
+}
+
 /* --- Actions (Checkbox / Forgot Password) --- */
 .form-actions {
   display: flex;

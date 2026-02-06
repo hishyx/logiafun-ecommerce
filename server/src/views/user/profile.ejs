@@ -135,6 +135,7 @@
                   <label>Email Address</label>
                   <div class="input-with-button">
                     <input type="email" value="<%=user.email%>" name="email" />
+                    <%if(!isGoogle){ %>
                     <button
                       type="button"
                       class="btn btn-sm btn-outline"
@@ -143,6 +144,7 @@
                     >
                       Change
                     </button>
+                    <%} %>
                   </div>
                 </div>
                 <div class="form-group">
@@ -156,7 +158,7 @@
                 </div>
               </div>
 
-
+                    <%if(!isGoogle){ %>
               <div class="form-row">
                 <div class="form-group" style="max-width: 50%">
                   <label>Password</label>
@@ -167,12 +169,14 @@
   disabled
   id="changePasswordBtn"
 >
-  <%= passExist ? "Change" : "Set password" %>
+  Change password
 </button>
 
                   </div>
                 </div>
               </div>
+                    <%} %>
+
 
               <button type="submit" class="btn btn-primary btn-save">
                 Save Changes
@@ -186,8 +190,6 @@
 <div class="modal-overlay" id="emailModal">
   <div class="modal-content">
     <button class="modal-close" id="closeEmailModal" type="button">&times;</button>
-
-    <% if(passExist) { %>
       <div id="emailStep1">
         <h3>Change Email Address</h3>
         <p style="color: var(--text-muted); margin-bottom: 1.5rem">
@@ -236,17 +238,6 @@
         </button>
       </div>
 
-    <% } else { %>
-      <div style="text-align: center; padding: 20px 0;">
-        <h3 style="color: #dc3545;">Security Action Required</h3>
-        <p style="color: var(--text-muted); margin: 1rem 0 2rem">
-          For your security, you must set an account password before you can change your email address.
-        </p>
-        <button class="btn btn-primary" style="width: 100%" id="triggerPasswordFromEmail">
-          Set Password Now
-        </button>
-      </div>
-    <% } %>
   </div>
 </div>
 
@@ -255,14 +246,14 @@
   <div class="modal-content">
     <button class="modal-close" id="closePasswordModal" type="button">&times;</button>
     
-    <h3><%= passExist ? 'Change Password' : 'Set Your Password' %></h3>
+    <h3>Change Password</h3>
     <p style="color: var(--text-muted); margin-bottom: 1.5rem">
-      <%= passExist ? 'Update your password to keep your account secure.' : 'Create a password for your account to enable email login.' %>
+     Create a password for your account to enable email login
     </p>
 
     <form id="passwordChangeForm">
       <div class="form-group">
-        <% if(passExist) { %>
+
           <label>Current Password</label>
           <input
             type="password"
@@ -270,13 +261,6 @@
             placeholder="••••••••"
             required
           />
-        <% } else { %>
-          <input
-            type="hidden"
-            name="currentPassword"
-            value="isGoogleUser" 
-          />
-        <% } %>
       </div>
 
       <div class="form-group">
@@ -306,7 +290,7 @@
       <small id="modalPasswordError" style="color: red; display: block; margin-bottom: 1rem"></small>
 
       <button type="submit" class="btn btn-primary" style="width: 100%">
-        <%= passExist ? 'Update Password' : 'Set Password' %>
+       Update Password
       </button>
     </form>
   </div>
@@ -330,6 +314,7 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="/js/user-profile.js"></script>
   </body>
 </html>
