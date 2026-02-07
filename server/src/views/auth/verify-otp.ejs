@@ -8,6 +8,7 @@
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Fredoka:wght@300..700&display=swap"
       rel="stylesheet"
     />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
       @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Fredoka:wght@300..700&display=swap");
 
@@ -431,6 +432,43 @@
           resendBtn.textContent = "Resend code";
           resendBtn.disabled = false;
           alert("Failed to resend OTP");
+        }
+      });
+    </script>
+    <script>
+      // OTP Input Validation
+      document.addEventListener("DOMContentLoaded", function() {
+        const form = document.querySelector('form');
+        const otpInput = document.querySelector('.otp-input');
+
+        if (form && otpInput) {
+          form.addEventListener('submit', (e) => {
+              const otp = otpInput.value.trim();
+              
+              if (!/^\d+$/.test(otp)) {
+                  e.preventDefault();
+                  Swal.fire({
+                      icon: 'error',
+                      title: 'Invalid OTP',
+                      text: 'Please enter only numbers',
+                      timer: 2000,
+                      showConfirmButton: false
+                  });
+                  return;
+              }
+
+              if (otp.length !== 6) {
+                  e.preventDefault();
+                  Swal.fire({
+                      icon: 'warning',
+                      title: 'Incomplete OTP',
+                      text: 'Please enter the full 6-digit code',
+                      timer: 2000,
+                      showConfirmButton: false
+                  });
+                  return;
+              }
+          });
         }
       });
     </script>

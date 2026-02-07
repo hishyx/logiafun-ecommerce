@@ -9,6 +9,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/css/login-signup.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   </head>
   <body>
     <div class="form-section">
@@ -42,6 +43,28 @@
             <a href="login.html">Back to Login</a>
           </div>
         </form>
+        
+        <script>
+            document.querySelector('form').addEventListener('submit', function(e) {
+                const emailInput = document.getElementById('email');
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                 // Clear previous errors
+                 const existingError = this.querySelector('.error-text');
+                 if(existingError) existingError.remove();
+
+                if (!emailRegex.test(emailInput.value.trim())) {
+                    e.preventDefault();
+                    
+                    const error = document.createElement('small');
+                    error.className = 'error-text';
+                    error.style.color = 'red';
+                    error.style.marginTop = '5px';
+                    error.innerText = 'Please enter a valid email address';
+                    
+                    emailInput.parentElement.appendChild(error);
+                }
+            });
+        </script>
       </div>
     </div>
 

@@ -8,6 +8,7 @@
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Fredoka:wght@300..700&display=swap"
       rel="stylesheet"
     />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   </head>
   <body>
     <div class="form-section">
@@ -113,6 +114,54 @@
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         const toggleIcons = document.querySelectorAll(".password-toggle-icon");
+        const loginForm = document.querySelector('form');
+
+        // Validation Logic
+        loginForm.addEventListener('submit', function(e) {
+            // Clear previous errors
+            document.querySelectorAll('.error-text').forEach(el => el.remove());
+            
+            let isValid = true;
+            const email = document.getElementById('email');
+            const password = document.getElementById('password');
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (!email.value.trim()) {
+                 showError(email, 'Email is required');
+                 isValid = false;
+            } else if (!emailRegex.test(email.value.trim())) {
+                 showError(email, 'Please enter a valid email address');
+                 isValid = false;
+            }
+
+            if (!password.value.trim()) {
+                 showError(password, 'Password is required'); // Fixed selector in showError
+                 isValid = false;
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+            }
+        });
+
+        function showError(input, message) {
+            const parent = input.closest('.input-group');
+            const error = document.createElement('small');
+            error.className = 'error-text';
+            error.style.color = 'red';
+            error.style.marginTop = '5px';
+            error.style.display = 'block';
+            error.innerText = message;
+             
+             // If password wrapper exists, append after it, otherwise after input
+             const wrapper = parent.querySelector('.password-wrapper');
+             if(wrapper) {
+                 wrapper.after(error);
+             } else {
+                 input.after(error);
+             }
+        }
 
         toggleIcons.forEach((icon) => {
           icon.addEventListener("click", function () {

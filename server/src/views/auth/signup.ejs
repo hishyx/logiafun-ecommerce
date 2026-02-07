@@ -9,6 +9,8 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/css/login-signup.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/js/validation.js"></script>
   </head>
   <body>
     <div class="form-section">
@@ -181,16 +183,82 @@
 
     <div class="image-section"></div>
 
+    </script>
     <script>
       const signupForm = document.querySelector("form");
       const signupBtn = document.getElementById("signupBtn");
       const loader = document.getElementById("signupLoader");
 
-      signupForm.addEventListener("submit", () => {
+      signupForm.addEventListener("submit", (e) => {
+        // Clear previous errors
+        document.querySelectorAll('.error-text').forEach(el => el.remove());
+        
+        let isValid = true;
+        const name = document.getElementById('name');
+        const email = document.getElementById('email');
+        const phone = document.getElementById('phone');
+        const password = document.getElementById('password');
+        const confirmPassword = document.getElementById('confirm-password');
+        
+        // Name Validation
+        if (!name.value.trim() || name.value.trim().length < 3) {
+           showError(name, 'Name must be at least 3 characters long');
+           isValid = false;
+        }
+
+        // Email Validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email.value.trim())) {
+           showError(email, 'Please enter a valid email address');
+           isValid = false;
+        }
+
+        // Phone Validation (Optional but if entered must be 10 digits)
+        if (phone.value.trim() && !/^\d{10}$/.test(phone.value.trim())) {
+           showError(phone, 'Phone number must be exactly 10 digits');
+           isValid = false;
+        }
+
+        // Password Validation
+        if (password.value.length < 8) {
+           showError(password, 'Password must be at least 8 characters long');
+           isValid = false;
+        }
+
+        // Confirm Password Validation
+        if (password.value !== confirmPassword.value) {
+           showError(confirmPassword, 'Passwords do not match');
+           isValid = false;
+        }
+
+        if (!isValid) {
+          e.preventDefault();
+          return;
+        }
+
+        // If valid, show loader
         signupBtn.disabled = true;
         signupBtn.textContent = "Signing up...";
         loader.style.display = "block";
       });
+
+      function showError(input, message) {
+        const parent = input.closest('.input-group') || input.parentElement; // ensuring correct parent selection
+        const error = document.createElement('small');
+        error.className = 'error-text';
+        error.style.color = 'red';
+        error.style.marginTop = '5px';
+        error.style.display = 'block';
+        error.innerText = message;
+        
+        // If password wrapper exists, append after it, otherwise after input
+         const wrapper = parent.querySelector('.password-wrapper');
+         if(wrapper) {
+             wrapper.after(error);
+         } else {
+             input.after(error);
+         }
+      }
     </script>
     <script>
       document.addEventListener("DOMContentLoaded", function () {

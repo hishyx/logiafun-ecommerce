@@ -15,6 +15,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <link rel="stylesheet" href="/css/admin/login.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   </head>
   <body>
     <div class="login-container">
@@ -86,6 +87,51 @@
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         const toggleIcons = document.querySelectorAll(".password-toggle-icon");
+        const loginForm = document.querySelector('form');
+
+        // Validation Logic
+        if(loginForm) {
+            loginForm.addEventListener('submit', function(e) {
+                // Clear previous errors
+                document.querySelectorAll('.error-message').forEach(el => el.remove());
+                
+                let isValid = true;
+                const email = document.getElementById('email');
+                const password = document.getElementById('password');
+
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                
+                if (!email.value.trim()) {
+                     showError(email, 'Email is required');
+                     isValid = false;
+                } else if (!emailRegex.test(email.value.trim())) {
+                     showError(email, 'Invalid email format');
+                     isValid = false;
+                }
+
+                if (!password.value.trim()) {
+                     showError(password, 'Password is required');
+                     isValid = false;
+                }
+
+                if (!isValid) {
+                    e.preventDefault();
+                }
+            });
+        }
+
+        function showError(input, message) {
+            const parent = input.closest('.form-group');
+            const error = document.createElement('small');
+            error.className = 'error-message';
+            error.style.color = '#ef4444';
+            error.style.fontSize = '0.85rem';
+            error.style.marginTop = '5px';
+            error.style.display = 'block';
+            error.innerText = message;
+            
+            parent.appendChild(error);
+        }
 
         toggleIcons.forEach((icon) => {
           icon.addEventListener("click", function () {
