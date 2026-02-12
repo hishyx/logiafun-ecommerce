@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Product Management - Admin Panel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/css/admin/main.css" />
+    <style>
+      /* Quick inline overrides for product-specific needs if any */
+      .product-img {
+        width: 40px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 6px;
+        margin-right: 12px;
+      }
+      .product-cell {
+        display: flex;
+        align-items: center;
+      }
+      .product-info span {
+        display: block;
+        font-weight: 500;
+        color: var(--text-dark);
+      }
+      .product-info small {
+        color: var(--text-light);
+        font-size: 0.8rem;
+      }
+      .badge-stock {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+      .stock-in {
+        background: #dcfce7;
+        color: #166534;
+      }
+      .stock-low {
+        background: #fef9c3;
+        color: #854d0e;
+      }
+      .stock-out {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="admin-container">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="logo-area">
+          <h2>LogiaFun <span class="badge">Admin</span></h2>
+        </div>
+
+        <nav class="sidebar-nav">
+          <ul>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li class="nav-item active">
+              <a href="/admin/products" class="nav-link">
+                <i class="fa-solid fa-box"></i>
+                <span>Products</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/admin/categories" class="nav-link">
+                <i class="fa-solid fa-layer-group"></i>
+                <span>Categories</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span>Orders</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/admin/users" class="nav-link">
+                <i class="fa-solid fa-users"></i>
+                <span>Users</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="fa-solid fa-image"></i>
+                <span>Banners</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <div class="sidebar-footer">
+          <form action="/admin/logout" method="POST" class="logout-form">
+            <button type="submit" class="nav-link logout logout-btn">
+              <i class="fa-solid fa-right-from-bracket"></i>
+              <span>Logout</span>
+            </button>
+          </form>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Top Bar -->
+        <header class="top-bar">
+          <div class="mobile-toggle">
+            <i class="fa-solid fa-bars"></i>
+          </div>
+          <div class="page-title">
+            <h1>Product Management</h1>
+          </div>
+          <div class="user-profile">
+            <div class="notification-icon">
+              <i class="fa-regular fa-bell"></i>
+              <span class="dot"></span>
+            </div>
+            <div class="profile-info">
+              <img
+                src="https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff"
+                alt="Admin"
+              />
+              <span>Admin</span>
+            </div>
+          </div>
+        </header>
+
+        <!-- Content Body -->
+        <div class="content-body">
+          <!-- Controls Area -->
+          <div class="controls-area">
+            <div class="search-wrapper">
+              <i class="fa-solid fa-magnifying-glass search-icon"></i>
+              <input type="text" placeholder="Search products..." />
+              <button class="action-btn clear-btn" aria-label="Clear Search">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+
+            <div class="actions-wrapper">
+              <div class="sort-wrapper">
+                <label>Filter By:</label>
+                <select>
+                  <option value="all">All Categories</option>
+                  <option value="electronics">Electronics</option>
+                  <option value="fashion">Fashion</option>
+                  <option value="home">Home & Living</option>
+                </select>
+              </div>
+              <div class="sort-wrapper">
+                <label>Sort By:</label>
+                <select>
+                  <option value="newest">Newest First</option>
+                  <option value="price_low">Price: Low to High</option>
+                  <option value="price_high">Price: High to Low</option>
+                </select>
+              </div>
+              <button
+                class="btn-primary"
+                style="padding: 0.5rem 1rem; margin-left: 10px"
+              >
+                <i class="fa-solid fa-plus"></i> Add Product
+              </button>
+            </div>
+          </div>
+
+          <!-- Product Table -->
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th>Stock</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                Static Row 1
+                <tr>
+                  <td>
+                    <div class="product-cell">
+                      <img
+                        src="/images/product-placeholder.png"
+                        alt="Product"
+                        class="product-img"
+                        onerror="this.src = 'https://placehold.co/40x40'"
+                      />
+                      <div class="product-info">
+                        <span>Wireless Headphones</span>
+                        <small>ID: #PROD-001</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td>Electronics</td>
+                  <td>$129.99</td>
+                  <td><span class="badge-stock stock-in">45 In Stock</span></td>
+                  <td>
+                    <span class="status-badge status-active">
+                      <span class="status-indicator"></span> Active
+                    </span>
+                  </td>
+                  <td>
+                    <button class="action-btn" title="Edit">
+                      <i class="fa-regular fa-pen-to-square"></i>
+                    </button>
+                    <button
+                      class="action-btn"
+                      title="Delete"
+                      style="color: #ef4444"
+                    >
+                      <i class="fa-regular fa-trash-can"></i>
+                    </button>
+                  </td>
+                </tr>
+
+                <!-- Static Row 2 -->
+                <tr>
+                  <td>
+                    <div class="product-cell">
+                      <img
+                        src="/images/product-placeholder.png"
+                        alt="Product"
+                        class="product-img"
+                        onerror="this.src = 'https://placehold.co/40x40'"
+                      />
+                      <div class="product-info">
+                        <span>Smart Watch Series 5</span>
+                        <small>ID: #PROD-002</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td>Wearables</td>
+                  <td>$199.50</td>
+                  <td><span class="badge-stock stock-low">5 Left</span></td>
+                  <td>
+                    <span class="status-badge status-active">
+                      <span class="status-indicator"></span> Active
+                    </span>
+                  </td>
+                  <td>
+                    <button class="action-btn" title="Edit">
+                      <i class="fa-regular fa-pen-to-square"></i>
+                    </button>
+                    <button
+                      class="action-btn"
+                      title="Delete"
+                      style="color: #ef4444"
+                    >
+                      <i class="fa-regular fa-trash-can"></i>
+                    </button>
+                  </td>
+                </tr>
+
+                <!-- Static Row 3 -->
+                <tr>
+                  <td>
+                    <div class="product-cell">
+                      <img
+                        src="/images/product-placeholder.png"
+                        alt="Product"
+                        class="product-img"
+                        onerror="this.src = 'https://placehold.co/40x40'"
+                      />
+                      <div class="product-info">
+                        <span>Leather Wallet</span>
+                        <small>ID: #PROD-003</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td>Fashion</td>
+                  <td>$45.00</td>
+                  <td>
+                    <span class="badge-stock stock-out">Out of Stock</span>
+                  </td>
+                  <td>
+                    <span class="status-badge status-blocked">
+                      <span class="status-indicator"></span> Inactive
+                    </span>
+                  </td>
+                  <td>
+                    <button class="action-btn" title="Edit">
+                      <i class="fa-regular fa-pen-to-square"></i>
+                    </button>
+                    <button
+                      class="action-btn"
+                      title="Delete"
+                      style="color: #ef4444"
+                    >
+                      <i class="fa-regular fa-trash-can"></i>
+                    </button>
+                  </td>
+                </tr>
+
+                <!-- Static Row 4 -->
+                <tr>
+                  <td>
+                    <div class="product-cell">
+                      <img
+                        src="/images/product-placeholder.png"
+                        alt="Product"
+                        class="product-img"
+                        onerror="this.src = 'https://placehold.co/40x40'"
+                      />
+                      <div class="product-info">
+                        <span>Gaming Mouse RGB</span>
+                        <small>ID: #PROD-004</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td>Electronics</td>
+                  <td>$59.99</td>
+                  <td>
+                    <span class="badge-stock stock-in">120 In Stock</span>
+                  </td>
+                  <td>
+                    <span class="status-badge status-active">
+                      <span class="status-indicator"></span> Active
+                    </span>
+                  </td>
+                  <td>
+                    <button class="action-btn" title="Edit">
+                      <i class="fa-regular fa-pen-to-square"></i>
+                    </button>
+                    <button
+                      class="action-btn"
+                      title="Delete"
+                      style="color: #ef4444"
+                    >
+                      <i class="fa-regular fa-trash-can"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="pagination-area">
+            <div class="pagination-info">Showing 1 - 4 of 12</div>
+            <div class="pagination-controls">
+              <button class="page-btn" disabled>
+                <i class="fa-solid fa-chevron-left"></i>
+              </button>
+              <div class="page-numbers">
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+              </div>
+              <button class="page-btn">
+                <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

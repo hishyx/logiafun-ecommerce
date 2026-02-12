@@ -1,7 +1,9 @@
 import User from "../models/user.model.js";
 import Address from "../models/addresses.model.js";
 import bcrypt from "bcrypt";
-import cloudinary from "../config/cloudinary.js";
+import uploadImageToCloudinary from "../utils/cloudinary.upload.js";
+import cloudinaryFolders from "../components/cloudinary.folders.js";
+
 
 export const updateUser = async (userId, userData) => {
   const user = await User.findById(userId);
@@ -84,38 +86,21 @@ export const changeDefaultAddress = async (userId, addressId) => {
   );
 };
 
-export const UploadProfilePic = async (file, userId) => {
+export const UploadProfilePic = async (imageFile, userId) => {
   // 1. multer puts the file here
-  if (!file) {
+  if (!imageFile) {
     throw new Error("No image recieved");
   }
 
-  // 2. upload buffer to cloudinary
-  const result = await new Promise((resolve, reject) => {
-    console.log("Reached upload promise");
-    const stream = cloudinary.uploader.upload_stream(
-      {
-        folder: "logiafun/profile",
-        resource_type: "image",
-      },
-      (error, result) => {
-        if (error) return reject(error);
-        resolve(result);
-      },
-    );
-
-    stream.end(file.buffer);
-  });
-
-  console.log("Cloudinary result:", result.secure_url);
-
-  console.log("Updating user:", userId);
+  const uploadedURL=await uploadImageToCloudinary(imageFile,{
+    folder:cloudinaryFolders.PROFILE
+  })
 
   // 3. save url in DB
   await User.findByIdAndUpdate(userId, {
-    profileImage: result.secure_url,
+    profileImage: uploadedURL,
   });
 
   // 4. return url
-  return result.secure_url;
+  return uploadedURL;
 };

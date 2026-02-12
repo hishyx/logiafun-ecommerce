@@ -262,8 +262,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const passwordChangeForm = document.getElementById("passwordChangeForm");
   const modalPasswordError = document.getElementById("modalPasswordError");
 
-  if (changePasswordBtn) {
-    changePasswordBtn.addEventListener("click", () => {
+  if (changePasswordButton) {
+    changePasswordButton.addEventListener("click", () => {
       if (passwordModal) {
         passwordModal.classList.add("active");
         if (passwordChangeForm) passwordChangeForm.reset();

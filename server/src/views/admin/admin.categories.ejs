@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Category Management - Admin Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/css/admin/main.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <style>
+    /* Enhanced Styles */
+    .btn-primary {
+      background-color: #0f172a;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+    }
+
+    .btn-primary:hover {
+      background-color: #1e293b;
+      transform: translateY(-1px);
+    }
+
+    .action-btn {
+      background: white;
+      border: 1px solid #e2e8f0;
+      padding: 0.5rem;
+      border-radius: 6px;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .action-btn:hover {
+      background: #f8fafc;
+      color: #0f172a;
+      border-color: #cbd5e1;
+    }
+
+    .product-cell {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .product-img {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 1px solid #e2e8f0;
+    }
+
+    .product-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .product-info span {
+      font-weight: 500;
+      color: #0f172a;
+    }
+
+    .product-info small {
+      color: #64748b;
+      font-size: 0.75rem;
+    }
+
+    .category-cell {
+      display: flex;
+      align-items: center;
+    }
+
+    .category-icon {
+      width: 40px;
+      height: 40px;
+      background: #f1f5f9;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      color: var(--primary-color);
+      font-size: 1.2rem;
+    }
+
+    .description-cell {
+      max-width: 250px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #64748b;
+    }
+
+    /* Table Styles */
+    .table-container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .data-table th {
+      background: #f8fafc;
+      padding: 1rem 1.5rem;
+      text-align: left;
+      font-weight: 600;
+      color: #475569;
+      font-size: 0.875rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .data-table td {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+      color: #334155;
+      font-size: 0.95rem;
+    }
+
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .data-table tr:hover {
+      background-color: #f8fafc;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal-container {
+      background: white;
+      width: 100%;
+      max-width: 500px;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      transform: scale(0.95);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .modal-overlay.active .modal-container {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    .close-modal {
+      background: none;
+      border: none;
+      font-size: 1.25rem;
+      cursor: pointer;
+      color: #94a3b8;
+      transition: color 0.2s;
+      padding: 0.5rem;
+      border-radius: 50%;
+    }
+
+    .close-modal:hover {
+      color: #ef4444;
+      background: #fef2f2;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #334155;
+      font-size: 0.9rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+      color: #0f172a;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    textarea.form-control {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .file-upload-wrapper {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      border: 2px dashed #cbd5e1;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: #f8fafc;
+      overflow: hidden;
+    }
+
+    .file-upload-wrapper:hover {
+      border-color: #3b82f6;
+      background: #eff6ff;
+    }
+
+    .file-upload-input {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    .upload-icon {
+      font-size: 2.5rem;
+      color: #94a3b8;
+      margin-bottom: 0.75rem;
+      transition: color 0.2s;
+    }
+
+    .file-upload-wrapper:hover .upload-icon {
+      color: #3b82f6;
+    }
+
+    .upload-text {
+      color: #64748b;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .preview-image {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      background: white;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #f1f5f9;
+    }
+
+    .btn-block {
+      width: 100%;
+    }
+
+    .modal-footer button {
+      min-width: 100px;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="admin-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo-area">
+        <h2>LogiaFun <span class="badge">Admin</span></h2>
+      </div>
+
+      <nav class="sidebar-nav">
+        <ul>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="fa-solid fa-chart-line"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/admin/products" class="nav-link">
+              <i class="fa-solid fa-box"></i>
+              <span>Products</span>
+            </a>
+          </li>
+          <li class="nav-item active">
+            <a href="/admin/categories" class="nav-link">
+              <i class="fa-solid fa-layer-group"></i>
+              <span>Categories</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="fa-solid fa-cart-shopping"></i>
+              <span>Orders</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/admin/users" class="nav-link">
+              <i class="fa-solid fa-users"></i>
+              <span>Users</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="fa-solid fa-image"></i>
+              <span>Banners</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="fa-solid fa-gear"></i>
+              <span>Settings</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <div class="sidebar-footer">
+        <form action="/admin/logout" method="POST" class="logout-form">
+          <button type="submit" class="nav-link logout logout-btn">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
+          </button>
+        </form>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="top-bar">
+        <div class="mobile-toggle">
+          <i class="fa-solid fa-bars"></i>
+        </div>
+        <div class="page-title">
+          <h1>Category Management</h1>
+        </div>
+        <div class="user-profile">
+          <div class="notification-icon">
+            <i class="fa-regular fa-bell"></i>
+            <span class="dot"></span>
+          </div>
+          <div class="profile-info">
+            <img src="https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff" alt="Admin" />
+            <span>Admin</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content Body -->
+      <div class="content-body">
+        <!-- Controls Area -->
+        <div class="controls-area">
+          <div class="search-wrapper">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" placeholder="Search categories..." />
+            <button class="action-btn clear-btn" aria-label="Clear Search">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
+          <div class="actions-wrapper">
+            <div class="sort-wrapper">
+              <label>Filter Status:</label>
+              <select>
+                <option value="all">All</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+            </div>
+            <button class="btn-primary" style="padding: 0.5rem 1rem; margin-left: 10px" onclick="openModal()">
+              <i class="fa-solid fa-plus"></i> Add Category
+            </button>
+          </div>
+        </div>
+
+        <!-- Category Table -->
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Category Name</th>
+                <th>Description</th>
+                <th>Total Products</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% categories.forEach((category, index)=> { %>
+                <tr>
+                  <td>
+                    <div class="product-cell">
+                      <img src="<%= category.thumbnail %>" alt="Category" class="product-img"
+                        onerror="this.src='https://placehold.co/40x40'" />
+                      <div class="product-info">
+                        <span>
+                          <%= category.name %>
+                        </span>
+                        <small>ID: <%= category._id %></small>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td>Category</td>
+
+                  <td>
+                    <%= category.sold %> Sold
+                  </td>
+
+                  <td>
+                    <% if (category.stock> 10) { %>
+                      <span class="badge-stock stock-in">
+                        <%= category.stock %> In Stock
+                      </span>
+                      <% } else if (category.stock> 0) { %>
+                        <span class="badge-stock stock-low">
+                          <%= category.stock %> Left
+                        </span>
+                        <% } else { %>
+                          <span class="badge-stock stock-out">Out of Stock</span>
+                          <% } %>
+                  </td>
+
+                  <td>
+                    <% if (category.isActive) { %>
+                      <span class="status-badge status-active">
+                        <span class="status-indicator"></span> Active
+                      </span>
+                      <% } else { %>
+                        <span class="status-badge status-blocked">
+                          <span class="status-indicator"></span> Inactive
+                        </span>
+                        <% } %>
+                  </td>
+
+                  <td>
+                    <button class="action-btn edit-category-btn" title="Edit" data-id="<%= category._id %>"
+                      data-name="<%= category.name %>" data-description="<%= category.description %>"
+                      data-thumbnail="<%= category.thumbnail %>">
+                      <i class="fa-regular fa-pen-to-square"></i>
+                    </button>
+
+                    <button class="action-btn toggle-category-btn" title="<%= category.isActive ? 'Unlist' : 'List' %>"
+                      data-id="<%= category._id %>" data-active="<%= category.isActive %>"
+                      style="color: <%= category.isActive ? '#ef4444' : '#10b981' %>">
+                      <i class="fa-solid <%= category.isActive ? 'fa-eye-slash' : 'fa-eye' %>"></i>
+                    </button>
+                  </td>
+                </tr>
+                <% }) %>
+
+            </tbody>
+          </table>
+        </div>
+        <% if (!categories ||categories.length===0) { %>
+          <div id="emptyState" class="empty-state">
+            <i class="fa-solid fa-users-slash"></i>
+            <h3>No categories found</h3>
+            <p>Try adjusting your search or filters.</p>
+          </div>
+          <% } %>
+            <!-- Pagination -->
+            <div class="pagination-area">
+              <div class="pagination-info">Showing 1 - 4 of 8</div>
+              <div class="pagination-controls">
+                <button class="page-btn" disabled>
+                  <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <div class="page-numbers">
+                  <button class="page-btn active">1</button>
+                  <button class="page-btn">2</button>
+                </div>
+                <button class="page-btn">
+                  <i class="fa-solid fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add Category Modal -->
+  <div class="modal-overlay" id="addCategoryModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title">Add New Category</h3>
+        <button class="close-modal" onclick="closeModal()">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+      <form id="addCategoryForm" onsubmit="submitCategory(event)" enctype="multipart/form-data">
+
+        <div class="form-group">
+          <label class="form-label">Category Name</label>
+          <input type="text" name="name" class="form-control" placeholder="Enter category name" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea name="description" class="form-control" placeholder="Enter category description"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Category Image</label>
+          <div class="file-upload-wrapper">
+            <input type="file" name="image" class="file-upload-input" accept="image/*" required>
+            <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+            <span class="upload-text">Click to upload image</span>
+            <img id="imagePreview" class="preview-image" src="#" alt="Preview">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="action-btn btn-block" onclick="closeModal()">Cancel</button>
+          <button type="submit" class="btn-primary" style="padding: 0.5rem 1.5rem;">Add Category</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Category Modal -->
+  <div class="modal-overlay" id="editCategoryModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Category</h3>
+        <button class="close-modal" onclick="closeEditModal()">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+      <form id="editCategoryForm" onsubmit="submitEditCategory(event)" enctype="multipart/form-data">
+        <input type="hidden" id="editCategoryId" name="categoryId">
+
+        <div class="form-group">
+          <label class="form-label">Category Name</label>
+          <input type="text" id="editCategoryName" name="name" class="form-control" placeholder="Enter category name"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea id="editCategoryDescription" name="description" class="form-control"
+            placeholder="Enter category description"></textarea>
+        </div>
+
+        <!-- Unique structure for edit preview -->
+        <div class="form-group">
+          <label class="form-label">Category Image</label>
+          <div class="file-upload-wrapper" id="editFileUploadWrapper">
+            <input type="file" id="editImageInput" name="image" class="file-upload-input" accept="image/*">
+            <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+            <span class="upload-text">Click to upload new image (optional)</span>
+            <!-- Image preview for Edit Modal -->
+            <img id="editImagePreview" class="preview-image" src="#" alt="Preview" style="display: none;">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="action-btn btn-block" onclick="closeEditModal()">Cancel</button>
+          <button type="submit" class="btn-primary" style="padding: 0.5rem 1.5rem;">Save Changes</button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+  <div class="modal-overlay" id="cropperModal">
+    <div class="modal-container" style="max-width: 800px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Crop Image</h3>
+        <button class="close-modal" onclick="closeCropperModal()">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+      <div class="cropper-container" style="height: 500px; background: #f0f0f0;">
+        <img id="cropperImage" src="" alt="Image to crop" style="max-width: 100%; display: block;">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="action-btn" onclick="closeCropperModal()">Cancel</button>
+        <button type="button" class="btn-primary" onclick="cropImage()">Crop & Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script src="/js/admin/admin.categories.js"></script>
+</body>
+
+</html>

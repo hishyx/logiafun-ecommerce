@@ -2,5 +2,5 @@
   "watch": ["src"],
   "ignore": ["public", "src/views"],
   "ext": "js,json",
-  "exec": "node src/server.js"
+  "exec": "node -r dotenv/config src/server.js"
 }

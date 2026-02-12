@@ -1,5 +1,7 @@
 import bcrypt from "bcrypt";
 import User from "../models/user.model.js";
+import uploadImageToCloudinary from "../utils/cloudinary.upload.js";
+import cloudinaryFolders from "../components/cloudinary.folders.js";
 
 export const createTempUserForSignup = async (body) => {
   const { name, email, phone, password, confirm_password } = body;
@@ -83,7 +85,10 @@ export const googleUserExist = async (googleUser) => {
     name: googleUser.displayName,
     googleId: googleUser.id,
     email: googleUser.emails[0].value,
-    profileImage: googleUser.photos?.[0]?.value ?? null,
+    profileImage: await uploadImageToCloudinary(googleUser.photos?.[0]?.value, {
+      folder: cloudinaryFolders.PROFILE,
+      provider: "google",
+    }),
     isVerified: true,
   });
 
@@ -100,8 +105,11 @@ export const setNewPassword = async (password, userId) => {
 export const authenticateAdminLogin = async (adminData) => {
   const admin = await User.findOne({ role: "admin", email: adminData.email });
 
+  console.log(admin);
+
   if (!admin) throw new Error("Admin not found");
 
+  console.log("user entered pass ", adminData.password);
   const isMatch = await bcrypt.compare(adminData.password, admin.password);
 
   if (!isMatch) throw new Error("Invalid credentials");

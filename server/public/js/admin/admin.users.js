@@ -76,7 +76,7 @@ function wireUserEvents() {
 
 async function toggleUser(userId, isBlocked) {
   try {
-    const res = await fetch(`/admin/users/${userId}/block`, {
+    const res = await fetch(`/admin/users/${userId}/toggle`, {
       method: "PATCH",
     });
 
