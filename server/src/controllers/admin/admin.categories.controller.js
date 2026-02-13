@@ -2,10 +2,37 @@ import * as categoryServices from "../../services/admin/admin.category.services.
 import uploadImageToCloudinary from "../../utils/cloudinary.upload.js";
 
 export const adminCategoryListPage = async (req, res) => {
-  const categories = await categoryServices.getProductCategories();
-  res.render("admin/admin.categories.ejs", {
-    categories,
-  });
+  try {
+    let {
+      page = 1,
+      limit = 7,
+      search = "",
+      filter = "all",
+      sort = "latest",
+    } = req.query;
+
+    page = Number(page);
+    limit = Number(limit);
+
+    const safeSearch = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+    const categoriesList = await categoryServices.getProductCategories({
+      page,
+      limit,
+      search: safeSearch,
+      sort,
+      filter,
+    });
+
+    res.render("admin/admin.categories.ejs", {
+      ...categoriesList,
+      search,
+      filter,
+      sort,
+    });
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 export const addCategory = async (req, res) => {

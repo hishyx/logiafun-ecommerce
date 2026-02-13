@@ -433,7 +433,7 @@ function addCategoryRow(category) {
                     </div>
                 </div>
             </td>
-            <td>Category</td>
+            <td>${category.description}</td>
             <td>${category.sold} Sold</td>
             <td>
                 ${
@@ -472,5 +472,8 @@ function addCategoryRow(category) {
 
   // Add animation class if you have one, or just prepend
   tr.style.animation = "fadeIn 0.5s ease";
-  tbody.insertBefore(tr, tbody.firstChild);
+  // tbody.insertBefore(tr, tbody.firstChild);
+  tbody.append(tr);
 }
+
+//Pagination

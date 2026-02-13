@@ -16,12 +16,16 @@ export const adminUserListPage = async (req, res) => {
     page = Number(page);
     limit = Number(limit);
 
-    const userList = await getAdminUsersService(
+    const safeSearch = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+
+    const userList = await getAdminUsersService({
       page,
       limit,
-      search,
+      search: safeSearch,
       sort,
       filter,
+    }
     );
 
     res.render("admin/admin.users.ejs", {
@@ -37,7 +41,7 @@ export const adminUserListPage = async (req, res) => {
   } catch (err) {
     console.error("adminUserListPage error:", err);
 
-    res.status(500).render("error/500"); // or simple res.send
+    res.status(500).send("error/500"); // or simple res.send
   }
 };
 

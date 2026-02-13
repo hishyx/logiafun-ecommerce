@@ -429,19 +429,28 @@
         <div class="controls-area">
           <div class="search-wrapper">
             <i class="fa-solid fa-magnifying-glass search-icon"></i>
-            <input type="text" placeholder="Search categories..." />
-            <button class="action-btn clear-btn" aria-label="Clear Search">
+            <input type="text" id="listSearch" value="<%= search%>" placeholder="Search categories..." />
+            <button id="clearSearchBtn" class="action-btn clear-btn" aria-label="Clear Search">
               <i class="fa-solid fa-xmark"></i>
             </button>
           </div>
 
           <div class="actions-wrapper">
             <div class="sort-wrapper">
-              <label>Filter Status:</label>
-              <select>
-                <option value="all">All</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
+              <label for="filterBy">Filter By:</label>
+              <select id="filterBy">
+                <option value="all" <%=filter==="all" ?"selected":"" %>>All</option>
+                <option value="active" <%=filter==="active" ?"selected":"" %>>Active</option>
+                <option value="blocked" <%=filter==="blocked" ?"selected":"" %>>Blocked</option>
+              </select>
+            </div>
+            <div class="sort-wrapper">
+              <label for="sortBy">Sort By:</label>
+              <select id="sortBy">
+                <option value="newest" <%=sort==="latest" ?"selected":"" %>>Newest First</option>
+                <option value="oldest" <%=sort==="oldest" ?"selected":"" %>>Oldest First</option>
+                <option value="name_asc" <%=sort==="name_asc" ?"selected":"" %>>Name (A-Z)</option>
+                <option value="name_desc" <%=sort==="name_desc" ?"selected":"" %>>Name (Z-A)</option>
               </select>
             </div>
             <button class="btn-primary" style="padding: 0.5rem 1rem; margin-left: 10px" onclick="openModal()">
@@ -464,94 +473,91 @@
             </thead>
             <tbody>
               <% categories.forEach((category, index)=> { %>
-                <tr>
-                  <td>
-                    <div class="product-cell">
-                      <img src="<%= category.thumbnail %>" alt="Category" class="product-img"
-                        onerror="this.src='https://placehold.co/40x40'" />
-                      <div class="product-info">
-                        <span>
-                          <%= category.name %>
-                        </span>
-                        <small>ID: <%= category._id %></small>
-                      </div>
+              <tr>
+                <td>
+                  <div class="product-cell">
+                    <img src="<%= category.thumbnail %>" alt="Category" class="product-img" onerror="this.src='https://placehold.co/40x40'" />
+                    <div class="product-info">
+                      <span>
+                        <%= category.name %>
+                      </span>
+                      <small>ID: <%= category._id %></small>
                     </div>
-                  </td>
+                  </div>
+                </td>
 
-                  <td>Category</td>
+                <td>
+                  <%=category.description%>
+                </td>
 
-                  <td>
-                    <%= category.sold %> Sold
-                  </td>
+                <td>
+                  <%= category.sold %> Sold
+                </td>
 
-                  <td>
-                    <% if (category.stock> 10) { %>
-                      <span class="badge-stock stock-in">
-                        <%= category.stock %> In Stock
-                      </span>
-                      <% } else if (category.stock> 0) { %>
-                        <span class="badge-stock stock-low">
-                          <%= category.stock %> Left
-                        </span>
-                        <% } else { %>
-                          <span class="badge-stock stock-out">Out of Stock</span>
-                          <% } %>
-                  </td>
+                <td>
+                  <% if (category.stock> 10) { %>
+                  <span class="badge-stock stock-in">
+                    <%= category.stock %> In Stock
+                  </span>
+                  <% } else if (category.stock> 0) { %>
+                  <span class="badge-stock stock-low">
+                    <%= category.stock %> Left
+                  </span>
+                  <% } else { %>
+                  <span class="badge-stock stock-out">Out of Stock</span>
+                  <% } %>
+                </td>
 
-                  <td>
-                    <% if (category.isActive) { %>
-                      <span class="status-badge status-active">
-                        <span class="status-indicator"></span> Active
-                      </span>
-                      <% } else { %>
-                        <span class="status-badge status-blocked">
-                          <span class="status-indicator"></span> Inactive
-                        </span>
-                        <% } %>
-                  </td>
+                <td>
+                  <% if (category.isActive) { %>
+                  <span class="status-badge status-active">
+                    <span class="status-indicator"></span> Active
+                  </span>
+                  <% } else { %>
+                  <span class="status-badge status-blocked">
+                    <span class="status-indicator"></span> Inactive
+                  </span>
+                  <% } %>
+                </td>
 
-                  <td>
-                    <button class="action-btn edit-category-btn" title="Edit" data-id="<%= category._id %>"
-                      data-name="<%= category.name %>" data-description="<%= category.description %>"
-                      data-thumbnail="<%= category.thumbnail %>">
-                      <i class="fa-regular fa-pen-to-square"></i>
-                    </button>
+                <td>
+                  <button class="action-btn edit-category-btn" title="Edit" data-id="<%= category._id %>" data-name="<%= category.name %>" data-description="<%= category.description %>" data-thumbnail="<%= category.thumbnail %>">
+                    <i class="fa-regular fa-pen-to-square"></i>
+                  </button>
 
-                    <button class="action-btn toggle-category-btn" title="<%= category.isActive ? 'Unlist' : 'List' %>"
-                      data-id="<%= category._id %>" data-active="<%= category.isActive %>"
-                      style="color: <%= category.isActive ? '#ef4444' : '#10b981' %>">
-                      <i class="fa-solid <%= category.isActive ? 'fa-eye-slash' : 'fa-eye' %>"></i>
-                    </button>
-                  </td>
-                </tr>
-                <% }) %>
+                  <button class="action-btn toggle-category-btn" title="<%= category.isActive ? 'Unlist' : 'List' %>" data-id="<%= category._id %>" data-active="<%= category.isActive %>" style="color: <%= category.isActive ? '#ef4444' : '#10b981' %>">
+                    <i class="fa-solid <%= category.isActive ? 'fa-eye-slash' : 'fa-eye' %>"></i>
+                  </button>
+                </td>
+              </tr>
+              <% }) %>
 
             </tbody>
           </table>
         </div>
         <% if (!categories ||categories.length===0) { %>
-          <div id="emptyState" class="empty-state">
-            <i class="fa-solid fa-users-slash"></i>
-            <h3>No categories found</h3>
-            <p>Try adjusting your search or filters.</p>
-          </div>
-          <% } %>
-            <!-- Pagination -->
-            <div class="pagination-area">
-              <div class="pagination-info">Showing 1 - 4 of 8</div>
-              <div class="pagination-controls">
-                <button class="page-btn" disabled>
-                  <i class="fa-solid fa-chevron-left"></i>
-                </button>
-                <div class="page-numbers">
-                  <button class="page-btn active">1</button>
-                  <button class="page-btn">2</button>
-                </div>
-                <button class="page-btn">
-                  <i class="fa-solid fa-chevron-right"></i>
-                </button>
-              </div>
+        <div id="emptyState" class="empty-state">
+          <i class="fa-solid fa-users-slash"></i>
+          <h3>No categories found</h3>
+          <p>Try adjusting your search or filters.</p>
+        </div>
+        <% } %>
+        <!-- Pagination -->
+        <div class="pagination-area">
+          <div class="pagination-info">Showing 1 - 4 of 8</div>
+          <div class="pagination-controls">
+            <button class="page-btn" disabled>
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <div class="page-numbers">
+              <button class="page-btn active">1</button>
+              <button class="page-btn">2</button>
             </div>
+            <button class="page-btn">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
       </div>
     </main>
   </div>
@@ -602,7 +608,7 @@
       <div class="modal-header">
         <h3 class="modal-title">Edit Category</h3>
         <button class="close-modal" onclick="closeEditModal()">
-          <i class="fa-solid fa-times"></i>
+          <!-- <i class="fa-solid fa-times"></i> -->
         </button>
       </div>
       <form id="editCategoryForm" onsubmit="submitEditCategory(event)" enctype="multipart/form-data">
@@ -610,14 +616,12 @@
 
         <div class="form-group">
           <label class="form-label">Category Name</label>
-          <input type="text" id="editCategoryName" name="name" class="form-control" placeholder="Enter category name"
-            required>
+          <input type="text" id="editCategoryName" name="name" class="form-control" placeholder="Enter category name" required>
         </div>
 
         <div class="form-group">
           <label class="form-label">Description</label>
-          <textarea id="editCategoryDescription" name="description" class="form-control"
-            placeholder="Enter category description"></textarea>
+          <textarea id="editCategoryDescription" name="description" class="form-control" placeholder="Enter category description"></textarea>
         </div>
 
         <!-- Unique structure for edit preview -->
@@ -662,6 +666,7 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <script src="/js/admin/admin.categories.js"></script>
+  <script src="/js/admin/pagination.search.js"></script>
 </body>
 
 </html>
