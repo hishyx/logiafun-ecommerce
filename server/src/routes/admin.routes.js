@@ -13,7 +13,6 @@ router.use("/admin", isAdmin);
 router.use("/admin", checkAdminStatus);
 
 router.get("/admin/users", adminUserControllers.adminUserListPage);
-router.get("/admin/products", adminProductControllers.adminProductListPage);
 
 router
   .route("/admin/categories")
@@ -36,6 +35,18 @@ router.patch(
   adminCategoryControllers.editCategory,
 );
 router.get("/admin/categories", adminCategoryControllers.adminCategoryListPage);
+
+router
+  .route("/admin/products")
+  .get(adminProductControllers.adminProductListPage)
+  .post(upload.any(), adminProductControllers.addProduct)
+  .patch(upload.any(), adminProductControllers.editProduct);
+
+router.patch(
+  "/admin/products/:productId/toggle",
+  adminProductControllers.listUnlistProduct,
+);
+
 router.all("/admin/{*any}", (req, res) => {
   res.status(404).render("404-not-found");
 });

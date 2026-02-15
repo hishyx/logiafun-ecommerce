@@ -17,16 +17,14 @@ export const adminUserListPage = async (req, res) => {
     limit = Number(limit);
 
     const safeSearch = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
-
+    console.log(safeSearch);
     const userList = await getAdminUsersService({
       page,
       limit,
       search: safeSearch,
       sort,
       filter,
-    }
-    );
+    });
 
     res.render("admin/admin.users.ejs", {
       users: userList.users,

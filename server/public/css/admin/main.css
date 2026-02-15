@@ -1,4 +1,8 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Fredoka:wght@300..700&display=swap");
+/* Fix SweetAlert appearing behind modal */
+.swal2-container {
+  z-index: 9999 !important;
+}
 
 :root {
   /* Brand Colors (Matching User Side) */
@@ -534,47 +538,62 @@ h4,
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 0.5rem;
+  padding: 1rem;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(0, 0, 0, 0.03);
 }
 
 .pagination-info {
-  color: var(--text-light);
+  color: var(--text-muted);
   font-size: 0.9rem;
+  font-weight: 500;
 }
 
 .pagination-controls {
   display: flex;
-  gap: 6px;
+  gap: 8px;
+  align-items: center;
 }
 
 .page-btn {
   width: 36px;
   height: 36px;
-  border-radius: 50%;
-  border: 1px solid #e2e8f0;
-  background: #fff;
+  border-radius: 8px; /* Slightly rounded squares look more modern */
+  border: 1px solid transparent;
+  background: var(--bg-body);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   color: var(--text-dark);
-  transition: var(--transition);
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .page-btn:hover:not(:disabled) {
-  border-color: var(--primary);
+  background: #fff;
+  border-color: #e2e8f0;
   color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
 .page-btn.active {
   background: var(--primary);
   color: #fff;
   border-color: var(--primary);
+  box-shadow: 0 4px 10px rgba(30, 58, 95, 0.25);
 }
 
 .page-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
+  background: transparent;
+  box-shadow: none;
 }
 
 /* Responsiveness */

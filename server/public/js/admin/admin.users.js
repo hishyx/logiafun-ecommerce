@@ -1,7 +1,6 @@
 // Initialization
 document.addEventListener("DOMContentLoaded", () => {
   // setupEventListeners();
-  wireUserEvents();
 });
 
 function setupEventListeners() {

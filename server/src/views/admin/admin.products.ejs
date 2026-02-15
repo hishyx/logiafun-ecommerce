@@ -1,382 +1,1023 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Product Management - Admin Panel</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <link rel="stylesheet" href="/css/admin/main.css" />
-    <style>
-      /* Quick inline overrides for product-specific needs if any */
-      .product-img {
-        width: 40px;
-        height: 40px;
-        object-fit: cover;
-        border-radius: 6px;
-        margin-right: 12px;
-      }
-      .product-cell {
-        display: flex;
-        align-items: center;
-      }
-      .product-info span {
-        display: block;
-        font-weight: 500;
-        color: var(--text-dark);
-      }
-      .product-info small {
-        color: var(--text-light);
-        font-size: 0.8rem;
-      }
-      .badge-stock {
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 0.75rem;
-        font-weight: 600;
-      }
-      .stock-in {
-        background: #dcfce7;
-        color: #166534;
-      }
-      .stock-low {
-        background: #fef9c3;
-        color: #854d0e;
-      }
-      .stock-out {
-        background: #fee2e2;
-        color: #991b1b;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="admin-container">
-      <!-- Sidebar -->
-      <aside class="sidebar">
-        <div class="logo-area">
-          <h2>LogiaFun <span class="badge">Admin</span></h2>
-        </div>
 
-        <nav class="sidebar-nav">
-          <ul>
-            <li class="nav-item">
-              <a href="#" class="nav-link">
-                <i class="fa-solid fa-chart-line"></i>
-                <span>Dashboard</span>
-              </a>
-            </li>
-            <li class="nav-item active">
-              <a href="/admin/products" class="nav-link">
-                <i class="fa-solid fa-box"></i>
-                <span>Products</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="/admin/categories" class="nav-link">
-                <i class="fa-solid fa-layer-group"></i>
-                <span>Categories</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="#" class="nav-link">
-                <i class="fa-solid fa-cart-shopping"></i>
-                <span>Orders</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="/admin/users" class="nav-link">
-                <i class="fa-solid fa-users"></i>
-                <span>Users</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="#" class="nav-link">
-                <i class="fa-solid fa-image"></i>
-                <span>Banners</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="#" class="nav-link">
-                <i class="fa-solid fa-gear"></i>
-                <span>Settings</span>
-              </a>
-            </li>
-          </ul>
-        </nav>
-        <div class="sidebar-footer">
-          <form action="/admin/logout" method="POST" class="logout-form">
-            <button type="submit" class="nav-link logout logout-btn">
-              <i class="fa-solid fa-right-from-bracket"></i>
-              <span>Logout</span>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product Management - Admin Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/css/admin/main.css" />
+  <style>
+    /* Shared Styles from Categories */
+    .btn-primary {
+      background-color: #0f172a;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+    }
+
+    .btn-primary:hover {
+      background-color: #1e293b;
+      transform: translateY(-1px);
+    }
+
+    .action-btn {
+      background: white;
+      border: 1px solid #e2e8f0;
+      padding: 0.5rem;
+      border-radius: 6px;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .action-btn:hover {
+      background: #f8fafc;
+      color: #0f172a;
+      border-color: #cbd5e1;
+    }
+
+    /* Product Specific Overrides */
+    .product-img {
+      width: 48px;
+      height: 48px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      margin-right: 12px;
+    }
+
+    .product-cell {
+      display: flex;
+      align-items: center;
+    }
+
+    .product-info span {
+      display: block;
+      font-weight: 500;
+      color: #0f172a;
+    }
+
+    .product-info small {
+      color: #64748b;
+      font-size: 0.75rem;
+    }
+
+    .badge-stock {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .stock-in {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .stock-low {
+      background: #fef9c3;
+      color: #854d0e;
+    }
+
+    .stock-out {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    /* Modal Styles Match */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.active {
+      display: flex;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal-container {
+      background: white;
+      width: 100%;
+      max-width: 650px;
+      /* Slightly wider for products */
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      transform: scale(0.95);
+      opacity: 0;
+      transition: all 0.3s ease;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-container.modal-xl {
+      width: 95%;
+      max-width: 1400px;
+      /* Or larger if needed */
+      max-height: 95vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-container.modal-xl form {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      height: 100%;
+      /* Ensure form takes full height if content is short, for footer positioning */
+    }
+
+    .modal-container.modal-xl .modal-body {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+
+    .modal-overlay.active .modal-container {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    .close-modal {
+      background: none;
+      border: none;
+      font-size: 1.25rem;
+      cursor: pointer;
+      color: #94a3b8;
+      transition: color 0.2s;
+      padding: 0.5rem;
+      border-radius: 50%;
+    }
+
+    .close-modal:hover {
+      color: #ef4444;
+      background: #fef2f2;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #334155;
+      font-size: 0.9rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+      color: #0f172a;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .variants-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .variant-item {
+      border: 1px solid #e2e8f0;
+      padding: 15px;
+      border-radius: 8px;
+      background-color: #f8fafc;
+      position: relative;
+    }
+
+    .remove-variant-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      color: #ef4444;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .add-variant-btn {
+      margin-top: 10px;
+      width: 100%;
+      padding: 0.6rem;
+      background-color: #f1f5f9;
+      border: 1px dashed #cbd5e1;
+      color: #475569;
+      cursor: pointer;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .add-variant-btn:hover {
+      background-color: #e2e8f0;
+      color: #0f172a;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="admin-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo-area">
+        <h2>LogiaFun <span class="badge">Admin</span></h2>
+      </div>
+
+      <nav class="sidebar-nav">
+        <ul>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="fa-solid fa-chart-line"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item active">
+            <a href="/admin/products" class="nav-link">
+              <i class="fa-solid fa-box"></i>
+              <span>Products</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/admin/categories" class="nav-link">
+              <i class="fa-solid fa-layer-group"></i>
+              <span>Categories</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="fa-solid fa-cart-shopping"></i>
+              <span>Orders</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/admin/users" class="nav-link">
+              <i class="fa-solid fa-users"></i>
+              <span>Users</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="fa-solid fa-image"></i>
+              <span>Banners</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="fa-solid fa-gear"></i>
+              <span>Settings</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <div class="sidebar-footer">
+        <form action="/admin/logout" method="POST" class="logout-form">
+          <button type="submit" class="nav-link logout logout-btn">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
+          </button>
+        </form>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="top-bar">
+        <div class="mobile-toggle">
+          <i class="fa-solid fa-bars"></i>
+        </div>
+        <div class="page-title">
+          <h1>Product Management</h1>
+        </div>
+        <div class="user-profile">
+          <div class="notification-icon">
+            <i class="fa-regular fa-bell"></i>
+            <span class="dot"></span>
+          </div>
+          <div class="profile-info">
+            <img src="https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff" alt="Admin" />
+            <span>Admin</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content Body -->
+      <div class="content-body">
+        <!-- Controls Area -->
+        <div class="controls-area">
+          <div class="search-wrapper">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="listSearch" value="<%= search%>" placeholder="Search categories..." />
+            <button id="clearSearchBtn" class="action-btn clear-btn" aria-label="Clear Search">
+              <i class="fa-solid fa-xmark"></i>
             </button>
-          </form>
-        </div>
-      </aside>
-
-      <!-- Main Content -->
-      <main class="main-content">
-        <!-- Top Bar -->
-        <header class="top-bar">
-          <div class="mobile-toggle">
-            <i class="fa-solid fa-bars"></i>
-          </div>
-          <div class="page-title">
-            <h1>Product Management</h1>
-          </div>
-          <div class="user-profile">
-            <div class="notification-icon">
-              <i class="fa-regular fa-bell"></i>
-              <span class="dot"></span>
-            </div>
-            <div class="profile-info">
-              <img
-                src="https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff"
-                alt="Admin"
-              />
-              <span>Admin</span>
-            </div>
-          </div>
-        </header>
-
-        <!-- Content Body -->
-        <div class="content-body">
-          <!-- Controls Area -->
-          <div class="controls-area">
-            <div class="search-wrapper">
-              <i class="fa-solid fa-magnifying-glass search-icon"></i>
-              <input type="text" placeholder="Search products..." />
-              <button class="action-btn clear-btn" aria-label="Clear Search">
-                <i class="fa-solid fa-xmark"></i>
-              </button>
-            </div>
-
-            <div class="actions-wrapper">
-              <div class="sort-wrapper">
-                <label>Filter By:</label>
-                <select>
-                  <option value="all">All Categories</option>
-                  <option value="electronics">Electronics</option>
-                  <option value="fashion">Fashion</option>
-                  <option value="home">Home & Living</option>
-                </select>
-              </div>
-              <div class="sort-wrapper">
-                <label>Sort By:</label>
-                <select>
-                  <option value="newest">Newest First</option>
-                  <option value="price_low">Price: Low to High</option>
-                  <option value="price_high">Price: High to Low</option>
-                </select>
-              </div>
-              <button
-                class="btn-primary"
-                style="padding: 0.5rem 1rem; margin-left: 10px"
-              >
-                <i class="fa-solid fa-plus"></i> Add Product
-              </button>
-            </div>
           </div>
 
-          <!-- Product Table -->
-          <div class="table-container">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Product</th>
-                  <th>Category</th>
-                  <th>Price</th>
-                  <th>Stock</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                Static Row 1
-                <tr>
-                  <td>
-                    <div class="product-cell">
-                      <img
-                        src="/images/product-placeholder.png"
-                        alt="Product"
-                        class="product-img"
-                        onerror="this.src = 'https://placehold.co/40x40'"
-                      />
-                      <div class="product-info">
-                        <span>Wireless Headphones</span>
-                        <small>ID: #PROD-001</small>
-                      </div>
-                    </div>
-                  </td>
-                  <td>Electronics</td>
-                  <td>$129.99</td>
-                  <td><span class="badge-stock stock-in">45 In Stock</span></td>
-                  <td>
-                    <span class="status-badge status-active">
-                      <span class="status-indicator"></span> Active
-                    </span>
-                  </td>
-                  <td>
-                    <button class="action-btn" title="Edit">
-                      <i class="fa-regular fa-pen-to-square"></i>
-                    </button>
-                    <button
-                      class="action-btn"
-                      title="Delete"
-                      style="color: #ef4444"
-                    >
-                      <i class="fa-regular fa-trash-can"></i>
-                    </button>
-                  </td>
-                </tr>
-
-                <!-- Static Row 2 -->
-                <tr>
-                  <td>
-                    <div class="product-cell">
-                      <img
-                        src="/images/product-placeholder.png"
-                        alt="Product"
-                        class="product-img"
-                        onerror="this.src = 'https://placehold.co/40x40'"
-                      />
-                      <div class="product-info">
-                        <span>Smart Watch Series 5</span>
-                        <small>ID: #PROD-002</small>
-                      </div>
-                    </div>
-                  </td>
-                  <td>Wearables</td>
-                  <td>$199.50</td>
-                  <td><span class="badge-stock stock-low">5 Left</span></td>
-                  <td>
-                    <span class="status-badge status-active">
-                      <span class="status-indicator"></span> Active
-                    </span>
-                  </td>
-                  <td>
-                    <button class="action-btn" title="Edit">
-                      <i class="fa-regular fa-pen-to-square"></i>
-                    </button>
-                    <button
-                      class="action-btn"
-                      title="Delete"
-                      style="color: #ef4444"
-                    >
-                      <i class="fa-regular fa-trash-can"></i>
-                    </button>
-                  </td>
-                </tr>
-
-                <!-- Static Row 3 -->
-                <tr>
-                  <td>
-                    <div class="product-cell">
-                      <img
-                        src="/images/product-placeholder.png"
-                        alt="Product"
-                        class="product-img"
-                        onerror="this.src = 'https://placehold.co/40x40'"
-                      />
-                      <div class="product-info">
-                        <span>Leather Wallet</span>
-                        <small>ID: #PROD-003</small>
-                      </div>
-                    </div>
-                  </td>
-                  <td>Fashion</td>
-                  <td>$45.00</td>
-                  <td>
-                    <span class="badge-stock stock-out">Out of Stock</span>
-                  </td>
-                  <td>
-                    <span class="status-badge status-blocked">
-                      <span class="status-indicator"></span> Inactive
-                    </span>
-                  </td>
-                  <td>
-                    <button class="action-btn" title="Edit">
-                      <i class="fa-regular fa-pen-to-square"></i>
-                    </button>
-                    <button
-                      class="action-btn"
-                      title="Delete"
-                      style="color: #ef4444"
-                    >
-                      <i class="fa-regular fa-trash-can"></i>
-                    </button>
-                  </td>
-                </tr>
-
-                <!-- Static Row 4 -->
-                <tr>
-                  <td>
-                    <div class="product-cell">
-                      <img
-                        src="/images/product-placeholder.png"
-                        alt="Product"
-                        class="product-img"
-                        onerror="this.src = 'https://placehold.co/40x40'"
-                      />
-                      <div class="product-info">
-                        <span>Gaming Mouse RGB</span>
-                        <small>ID: #PROD-004</small>
-                      </div>
-                    </div>
-                  </td>
-                  <td>Electronics</td>
-                  <td>$59.99</td>
-                  <td>
-                    <span class="badge-stock stock-in">120 In Stock</span>
-                  </td>
-                  <td>
-                    <span class="status-badge status-active">
-                      <span class="status-indicator"></span> Active
-                    </span>
-                  </td>
-                  <td>
-                    <button class="action-btn" title="Edit">
-                      <i class="fa-regular fa-pen-to-square"></i>
-                    </button>
-                    <button
-                      class="action-btn"
-                      title="Delete"
-                      style="color: #ef4444"
-                    >
-                      <i class="fa-regular fa-trash-can"></i>
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Pagination -->
-          <div class="pagination-area">
-            <div class="pagination-info">Showing 1 - 4 of 12</div>
-            <div class="pagination-controls">
-              <button class="page-btn" disabled>
-                <i class="fa-solid fa-chevron-left"></i>
-              </button>
-              <div class="page-numbers">
-                <button class="page-btn active">1</button>
-                <button class="page-btn">2</button>
-                <button class="page-btn">3</button>
-              </div>
-              <button class="page-btn">
-                <i class="fa-solid fa-chevron-right"></i>
-              </button>
+          <div class="actions-wrapper">
+            <div class="sort-wrapper">
+              <label>Filter By:</label>
+              <select id="filterBy">
+                <option value="all" <%=filter==="all" ?"selected":"" %>>All</option>
+                <option value="active" <%=filter==="active" ?"selected":"" %>>Active</option>
+                <option value="blocked" <%=filter==="blocked" ?"selected":"" %>>Blocked</option>
+              </select>
             </div>
+            <div class="sort-wrapper">
+              <label>Sort By:</label>
+              <select id="sortBy">
+                <option value="latest" <%=sort==="latest" ?"selected":"" %>>
+                  Newest First
+                </option>
+
+                <option value="oldest" <%=sort==="oldest" ?"selected":"" %>>
+                  Oldest First
+                </option>
+
+                <option value="name_asc" <%=sort==="name_asc" ?"selected":"" %>>
+                  Name (A-Z)
+                </option>
+
+                <option value="name_desc" <%=sort==="name_desc" ?"selected":"" %>>
+                  Name (Z-A)
+                </option>
+                <!-- 
+                <option value="price_asc" <%= sort==="price_asc" ?"selected":"" %>>
+                  Price (Low → High)
+                </option>
+
+                <option value="price_desc" <%= sort==="price_desc" ?"selected":"" %>>
+                  Price (High → Low)
+                </option> -->
+              </select>
+            </div>
+            <button class="btn-primary" id="addProductBtn" style="padding: 0.5rem 1rem; margin-left: 10px">
+              <i class="fa-solid fa-plus"></i> Add Product
+            </button>
           </div>
         </div>
-      </main>
+
+        <!-- Product Table -->
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <% products.forEach(product=> { %>
+              <tr>
+                <td>
+                  <div class="product-cell">
+                    <img src="<%= product.variants[0].images[0] || '/images/product-placeholder.png' %>" alt="Product" class="product-img" onerror="this.src='https://placehold.co/40x40'" />
+
+                    <div class="product-info">
+                      <span>
+                        <%= product.name %>
+                      </span>
+                      <small>ID: <%= product._id %></small>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <%= product.category ? product.category.name : "No Category" %>
+                </td>
+
+                <td>
+                  $<%= product.variants[0]?.price?.toFixed(2) %>
+                </td>
+
+                <td>
+                  <% if (product.stock===0) { %>
+                  <span class="badge-stock stock-out">Out of Stock</span>
+                  <% } else if (product.stock <=10) { %>
+                  <span class="badge-stock stock-low">
+                    <%= product.stock %> Left
+                  </span>
+                  <% } else { %>
+                  <span class="badge-stock stock-in">
+                    <%= product.stock %> In Stock
+                  </span>
+                  <% } %>
+                </td>
+
+                <td>
+                  <% if (product.isActive) { %>
+                  <span class="status-badge status-active">
+                    <span class="status-indicator"></span> Active
+                  </span>
+                  <% } else { %>
+                  <span class="status-badge status-blocked">
+                    <span class="status-indicator"></span> Inactive
+                  </span>
+                  <% } %>
+                </td>
+
+                <td>
+                  <button class="action-btn edit-product-btn" title="Edit" data-id="<%= product._id %>" data-product='<%= JSON.stringify(product) %>'>
+                    <i class="fa-regular fa-pen-to-square"></i>
+                  </button>
+
+                  <button class="action-btn toggle-product-btn" title="<%= product.isActive ? 'Unlist' : 'List' %>" data-id="<%= product._id %>" data-active="<%= product.isActive %>" style="color: <%= product.isActive ? '#ef4444' : '#10b981' %>">
+                    <i class="fa-solid <%= product.isActive ? 'fa-eye-slash' : 'fa-eye' %>"></i>
+                  </button>
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-area">
+          <div class="pagination-info">
+            Showing
+            <%= total===0 ? 0 : ((page - 1) * limit + 1) %>
+            -
+            <%= Math.min(page * limit, total) %>
+            of
+            <%= total %>
+          </div>
+          <div class="pagination-controls">
+            <button class="page-btn" <%=page===1 ? "disabled" : "" %> onclick="goToPage(<%= page - 1 %>)">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+
+            <div class="page-numbers">
+              <button class="page-btn active">
+                <%=page%>
+              </button>
+            </div>
+            <button class="page-btn" <%=page===totalPages ? "disabled" : "" %> onclick="goToPage(<%= page + 1 %>)">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <!-- Add Product Modal -->
+  <div class="modal-overlay" id="addProductModal">
+    <div class="modal-container modal-xl">
+      <div class="modal-header">
+        <h3 class="modal-title">Add New Product</h3>
+        <button class="close-modal close-modal-btn">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+      <form id="addProductForm" action="/admin/products" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+          <label class="form-label" for="addName">Product Name</label>
+          <input type="text" class="form-control" id="addName" name="name" required placeholder="Enter product name">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="addCategory">Category</label>
+          <select class="form-control" id="addCategory" name="categoryId" required>
+            <option value="" disabled selected>Select Category</option>
+            <%if(categories && categories.length!=0){%>
+            <% categories.forEach(category=>{%>
+            <option value="<%=category._id%>" id="category-<%=category._id%>">
+              <%=category.name%>
+            </option>
+            <%=category.name%>
+            </option>
+            <%})%>
+            <%}%>
+          </select>
+        </div>
+
+        <!-- Product Attributes Section (Global for Product) -->
+        <h4 style="margin: 1.5rem 0 0.5rem; color: #334155; font-size: 1rem;">Product Attributes</h4>
+        <small style="display:block; margin-bottom: 1rem; color: #64748b;">Define attributes like Color, Size. These
+          will be available for all variants.</small>
+
+        <div id="addProductAttributes" class="attributes-wrapper" style="margin-bottom: 1.5rem;">
+          <!-- Populated by JS -->
+        </div>
+
+        <div class="form-row" style="margin-bottom: 1.5rem; align-items: flex-end;">
+          <div class="form-group" style="margin-bottom: 0; flex: 1;">
+            <label class="form-label">Add New Attribute</label>
+            <input type="text" id="addAttrInput" class="form-control" placeholder="e.g. Color">
+          </div>
+          <button type="button" id="addProdAttrBtn" class="btn-secondary" style="height: 42px;">
+            <i class="fa-solid fa-plus"></i> Add
+          </button>
+        </div>
+
+        <!-- Dynamic Variants Section -->
+        <h4 style="margin: 1.5rem 0 1rem; color: #334155; font-size: 1rem;">Product Variants</h4>
+        <div id="addVariantsWrapper" class="variants-wrapper">
+          <!-- Populated by JS -->
+        </div>
+        <button type="button" id="addVariantBtn" class="add-variant-btn">
+          <i class="fa-solid fa-plus"></i> Add Another Variant
+        </button>
+
+        <div class="form-group" style="margin-top: 1.5rem;">
+          <label class="form-label" for="addDescription">Description</label>
+          <textarea class="form-control" id="addDescription" name="description" rows="3" required
+            placeholder="Product description"></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary close-modal-btn"
+            style="padding: 0.6rem 1.2rem; border: 1px solid #e2e8f0; border-radius: 8px; background: white;">Cancel</button>
+          <button type="submit" class="btn-primary">Add Product</button>
+        </div>
+      </form>
     </div>
-  </body>
+  </div>
+
+  <!-- Edit Product Modal -->
+  <div class="modal-overlay" id="editProductModal">
+    <div class="modal-container modal-xl">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Product</h3>
+        <button class="close-modal close-modal-btn">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+      <form id="editProductForm" action="/admin/products" method="PATCH" enctype="multipart/form-data">
+        <input type="hidden" id="editProductId" name="id">
+
+        <div class="form-group">
+          <label class="form-label" for="editName">Product Name</label>
+          <input type="text" class="form-control" id="editName" name="name" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="editCategory">Category</label>
+          <select class="form-control" id="editCategory" name="categoryId" required>
+            <option value="" disabled>Select Category</option>
+            <%if(categories && categories.length!=0){%>
+            <% categories.forEach(category=>{%>
+            <option value="<%=category._id%>">
+              <%=category.name%>
+            </option>
+            <%})%>
+            <%}%>
+          </select>
+        </div>
+
+        <!-- Product Attributes Section (Global for Product) -->
+        <h4 style="margin: 1.5rem 0 0.5rem; color: #334155; font-size: 1rem;">Product Attributes</h4>
+        <div id="editProductAttributes" class="attributes-wrapper" style="margin-bottom: 1.5rem;">
+          <!-- Populated by JS -->
+        </div>
+
+        <div class="form-row" style="margin-bottom: 1.5rem; align-items: flex-end;">
+          <div class="form-group" style="margin-bottom: 0; flex: 1;">
+            <label class="form-label">Add New Attribute</label>
+            <input type="text" id="editAttrInput" class="form-control" placeholder="e.g. Color">
+          </div>
+          <button type="button" id="editProdAttrBtn" class="btn-secondary" style="height: 42px;">
+            <i class="fa-solid fa-plus"></i> Add
+          </button>
+        </div>
+
+        <!-- Dynamic Variants Section -->
+        <h4 style="margin: 1.5rem 0 1rem; color: #334155; font-size: 1rem;">Product Variants</h4>
+        <div id="editVariantsWrapper" class="variants-wrapper">
+          <!-- Populated by JS -->
+        </div>
+        <button type="button" id="editAddVariantBtn" class="add-variant-btn">
+          <i class="fa-solid fa-plus"></i> Add Another Variant
+        </button>
+
+        <div class="form-group" style="margin-top: 1.5rem;">
+          <label class="form-label" for="editDescription">Description</label>
+          <textarea class="form-control" id="editDescription" name="description" rows="3" required></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary close-modal-btn"
+            style="padding: 0.6rem 1.2rem; border: 1px solid #e2e8f0; border-radius: 8px; background: white;">Cancel</button>
+          <button type="submit" class="btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+
+  <style>
+    /* Modal Styles */
+    .modal-overlay {
+      display: none;
+      /* Hidden by default */
+      position: fixed;
+      z-index: 10000;
+      /* Increased z-index */
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      /* Prevent body scroll interaction */
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      /* Flexbox alignment */
+      justify-content: center;
+      /* Flexbox alignment */
+    }
+
+    .modal-overlay.active {
+      display: flex !important;
+      /* Force flex display when active */
+    }
+
+    .modal-container {
+      background-color: #fff;
+      margin: auto;
+      padding: 0;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      animation: modalSlideIn 0.3s ease-out;
+    }
+
+    @keyframes modalSlideIn {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .close-modal {
+      background: none;
+      border: none;
+      color: #9ca3af;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0;
+    }
+
+    .close-modal:hover {
+      color: #111827;
+    }
+
+    form {
+      padding: 24px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 640px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #374151;
+      font-size: 0.95rem;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      transition: border-color 0.15s;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #4f46e5;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    textarea.form-control {
+      resize: vertical;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .btn-secondary {
+      background-color: #fff;
+      border: 1px solid #d1d5db;
+      color: #374151;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .btn-secondary:hover {
+      background-color: #f9fafb;
+    }
+
+    /* New Variant Styles */
+    .variants-wrapper {
+      border: 1px solid #e5e7eb;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      background-color: #f9fafb;
+    }
+
+    .variant-item {
+      border: 1px solid #e5e7eb;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      position: relative;
+      background-color: #fff;
+    }
+
+    .variant-item:last-of-type {
+      margin-bottom: 0;
+    }
+
+    .remove-variant-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      color: #ef4444;
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 5px;
+      line-height: 1;
+    }
+
+    .remove-variant-btn:hover {
+      color: #dc2626;
+    }
+
+    .add-variant-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background-color: #f0f4f8;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.2s, color 0.2s;
+    }
+  </style>
+
+  <style>
+    /* Image Manager Styles */
+    .image-manager {
+      border: 1px dashed #cbd5e1;
+      padding: 15px;
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .preview-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .preview-item {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+    }
+
+    .preview-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .remove-image-btn {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      background: rgba(239, 68, 68, 0.9);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .upload-btn-wrapper {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+    }
+
+    .btn-upload {
+      border: 1px solid #cbd5e1;
+      color: #475569;
+      background-color: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-upload:hover {
+      background-color: #f8fafc;
+      color: #0f172a;
+    }
+
+    .upload-btn-wrapper input[type=file] {
+      font-size: 100px;
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Added for Refactor */
+    .attribute-badge {
+      display: inline-flex;
+      align-items: center;
+      background: #e2e8f0;
+      color: #334155;
+      padding: 4px 10px;
+      border-radius: 20px;
+      margin-right: 8px;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .attribute-badge .fa-times {
+      margin-left: 6px;
+      cursor: pointer;
+      color: #64748b;
+      font-size: 0.8rem;
+    }
+
+    .attribute-badge .fa-times:hover {
+      color: #ef4444;
+    }
+
+    /* Existing preview item overwrite to match JS preference if needed, 
+       but keeping 80px is better for UI. JS was setting 60px. 
+       Let's stick to the CSS 80px unless user complains, or I can force 60px here.
+       The user wants "exact same functionality", so visually it should be similar.
+       I will add a modifier for variant previews.
+    */
+    .variant-preview-item {
+      position: relative;
+      width: 60px;
+      height: 60px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .variant-preview-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+
+    
+  .swal2-container {
+    z-index: 20000 !important;
+  }
+
+  .swal2-popup {
+    z-index: 20001 !important;
+  }
+
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="/js/admin/admin.products.js"></script>
+  <script src="/js/admin/pagination.search.js"></script>
+
+</body>
+
 </html>

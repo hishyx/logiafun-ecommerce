@@ -29,6 +29,9 @@ export const adminCategoryListPage = async (req, res) => {
       search,
       filter,
       sort,
+      page,
+      limit,
+      totalPages: Math.ceil(categoriesList.total / limit),
     });
   } catch (err) {
     console.log(err);
@@ -51,7 +54,10 @@ export const addCategory = async (req, res) => {
     });
   } catch (error) {
     console.error("Error adding category:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(400).json({
+      success: false,
+      message: error.message || "Failed to add category"
+    });
   }
 };
 

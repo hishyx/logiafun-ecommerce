@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npx nodemon -r dotenv/config src/server.js",
-    "dev": "npx nodemon -r dotenv/config src/server.js"
+    "start": "nodemon src/server.js",
+    "dev": "nodemon src/server.js"
   },
   "keywords": [],
   "author": "",
@@ -20,7 +20,7 @@
     "express": "^5.2.1",
     "express-session": "^1.18.2",
     "method-override": "^3.0.0",
-    "mongodb": "^7.0.0",
+    "mongodb": "^7.1.0",
     "mongoose": "^9.1.4",
     "multer": "^2.0.2",
     "nocache": "^4.0.0",

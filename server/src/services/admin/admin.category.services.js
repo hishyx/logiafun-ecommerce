@@ -94,3 +94,9 @@ export const updateCategory = async (categoryId, newData) => {
 
   return updatedCategory;
 };
+
+export const getAvailableCategories = async () => {
+  const categories = await Category.find({ isActive: true });
+
+  return categories;
+};

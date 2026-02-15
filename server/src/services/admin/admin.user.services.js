@@ -1,12 +1,12 @@
 import User from "../../models/user.model.js";
 
-export const getAdminUsersService = async (
+export const getAdminUsersService = async ({
   page,
   limit,
   search,
   sort,
   filter,
-) => {
+}) => {
   page = parseInt(page);
   limit = parseInt(limit);
 
