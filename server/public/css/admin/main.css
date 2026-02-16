@@ -652,3 +652,14 @@ h4,
   object-fit: cover;
   display: block;
 }
+
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-box input {
+  padding-right: 30px;
+  position: relative;
+}

@@ -22,7 +22,15 @@ document.addEventListener("DOMContentLoaded", () => {
       add: 0,
       edit: 0,
     },
+    // Track current cropping session
+    cropping: {
+      mode: null,
+      variantIndex: null,
+      currentFile: null,
+    },
   };
+
+  let cropper = null;
 
   // ==========================================
   // 2. DOM UTILITIES
@@ -221,7 +229,7 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
             <div class="new-previews gap-2 flex flex-wrap mb-2" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;"></div>
             
-            <input type="file" class="form-control file-selector" accept="image/*" multiple data-index="${index}" data-mode="${mode}" style="margin-top: 10px;">
+            <input type="file" class="form-control file-selector" accept="image/*" data-index="${index}" data-mode="${mode}" style="margin-top: 10px;">
           </div>
         </div>
       `;
@@ -309,21 +317,131 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // ==========================================
-  // 6. IMAGE MANAGEMENT LOGIC
+  // 6. CROPPER LOGIC
+  // ==========================================
+  const CropperManager = {
+    init: () => {
+      const cropBtn = DOM.get("cropImageBtn");
+      if (cropBtn) {
+        cropBtn.addEventListener("click", () => CropperManager.crop());
+      }
+
+      // Close cropper modal action
+      const cropperModal = DOM.get("cropperModal");
+      if (cropperModal) {
+        const closeBtns = cropperModal.querySelectorAll(".close-modal-btn");
+        closeBtns.forEach((btn) => {
+          btn.addEventListener("click", () => CropperManager.close());
+        });
+      }
+    },
+
+    open: (file, mode, variantIndex) => {
+      State.cropping.mode = mode;
+      State.cropping.variantIndex = variantIndex;
+      State.cropping.currentFile = file;
+
+      const image = DOM.get("cropperImage");
+      if (!image) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        image.src = e.target.result;
+
+        // Open Modal manually
+        const modal = DOM.get("cropperModal");
+        if (modal) modal.classList.add("active");
+
+        // Destroy existing
+        if (cropper) {
+          cropper.destroy();
+        }
+
+        // Init Cropper
+        cropper = new Cropper(image, {
+          aspectRatio: 1, // Fixed Square
+          viewMode: 2, // Restrict crop box to not exceed canvas
+          autoCropArea: 1,
+          responsive: true,
+          background: false, // Cleaner look
+        });
+      };
+      reader.readAsDataURL(file);
+    },
+
+    close: () => {
+      const modal = DOM.get("cropperModal");
+      if (modal) modal.classList.remove("active");
+
+      if (cropper) {
+        cropper.destroy();
+        cropper = null;
+      }
+
+      // Clear input state
+      State.cropping = { mode: null, variantIndex: null, currentFile: null };
+    },
+
+    crop: () => {
+      if (!cropper) return;
+
+      cropper
+        .getCroppedCanvas({
+          // Optional limits can go here
+        })
+        .toBlob(
+          (blob) => {
+            if (!blob) return;
+
+            const { mode, variantIndex, currentFile } = State.cropping;
+            if (!mode || !variantIndex) return;
+
+            const key = `${mode}-${variantIndex}`;
+
+            if (!State.images.has(key)) State.images.set(key, []);
+
+            // Reconstruct filename
+            const originalName = currentFile ? currentFile.name : "image.jpg";
+            const fileName = `cropped-${originalName}`;
+
+            const croppedFile = new File([blob], fileName, {
+              type: "image/jpeg",
+            });
+
+            State.images.get(key).push(croppedFile);
+
+            Images.renderPreviews(mode, variantIndex);
+            CropperManager.close();
+          },
+          "image/jpeg",
+          0.9,
+        );
+    },
+  };
+
+  // ==========================================
+  // 7. IMAGE MANAGEMENT LOGIC
   // ==========================================
   const Images = {
     handleSelect: (e) => {
       const input = e.target;
       const { mode, index } = input.dataset;
-      const files = Array.from(input.files);
-      const key = `${mode}-${index}`;
 
-      if (!State.images.has(key)) State.images.set(key, []);
-      const currentImages = State.images.get(key);
-      files.forEach((f) => currentImages.push(f));
+      if (input.files && input.files.length > 0) {
+        const file = input.files[0];
+
+        // Validate type
+        if (!file.type.startsWith("image/")) {
+          Swal.fire("Error", "Please select an image file", "error");
+          input.value = "";
+          return;
+        }
+
+        // Open Cropper instead of adding directly
+        CropperManager.open(file, mode, index);
+      }
 
       input.value = ""; // Clear input to allow re-selecting same file
-      Images.renderPreviews(mode, index);
     },
 
     remove: (btn) => {
@@ -425,7 +543,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (!name || name.trim() === "") errors.push("Product Name is required");
       if (!category || category === "") errors.push("Category is required");
-      if (!description || description.trim() === "") errors.push("Description is required");
+      if (!description || description.trim() === "")
+        errors.push("Description is required");
 
       // 2. Variants
       // We need to check how many variants are being submitted.
@@ -440,56 +559,64 @@ document.addEventListener("DOMContentLoaded", () => {
         errors.push("At least one variant is required");
       }
 
-      variantIndices.forEach(index => {
+      variantIndices.forEach((index) => {
         const price = parseFloat(formData.get(`variants[${index}][price]`));
         const stock = parseFloat(formData.get(`variants[${index}][stock]`));
 
         if (isNaN(price) || price <= 0) {
-          errors.push(`Variant ${parseInt(index) + 1}: Price must be greater than 0`);
+          errors.push(
+            `Variant ${parseInt(index) + 1}: Price must be greater than 0`,
+          );
         }
         if (isNaN(stock) || stock < 0) {
-          errors.push(`Variant ${parseInt(index) + 1}: Stock must be 0 or greater`);
+          errors.push(
+            `Variant ${parseInt(index) + 1}: Stock must be 0 or greater`,
+          );
         }
+
+        const key = `${mode}-${index}`;
 
         // 3. Images (Min 3)
         // We need to check State.images for NEW images
         // AND potentially existing images if in edit mode (though logic gets complex with deletions)
         // For 'add' mode, it's simple: check State.images.
 
-        let imageCount = 0;
+        // Count total visible images in UI
+        const container = document.querySelector(`#container-${mode}-${index}`);
 
-        // Count new images
-        const key = `${mode}-${index}`;
-        if (State.images.has(key)) {
-          imageCount += State.images.get(key).length;
-        }
+        if (container) {
+          const totalImages = container.querySelectorAll(
+            ".variant-preview-item",
+          ).length;
 
-        // Count existing images (Edit mode)
-        // This is tricky because formData doesn't easily report *keeping* existing images
-        // We have to rely on what's in the DOM or passed data.
-        // For now, let's strictly validate 'add' mode for images as per instruction Part 1. 
-        // "PART 1 — Frontend JS Validation (Add Product Modal)"
-
-        if (mode === 'add') {
-          if (imageCount < 3) {
-            errors.push(`Variant ${parseInt(index) + 1}: Must have at least 3 images`);
+          if (totalImages < 3) {
+            errors.push(
+              `Variant ${parseInt(index) + 1}: Must have at least 3 images`,
+            );
           }
         }
 
         // Check file types for new images
         if (State.images.has(key)) {
           const files = State.images.get(key);
-          const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
-          files.forEach(file => {
+          const validTypes = [
+            "image/jpeg",
+            "image/png",
+            "image/webp",
+            "image/jpg",
+          ];
+          files.forEach((file) => {
             if (!validTypes.includes(file.type)) {
-              errors.push(`Variant ${parseInt(index) + 1}: Invalid file type ${file.name}. Only JPG, PNG, WEBP allowed.`);
+              errors.push(
+                `Variant ${parseInt(index) + 1}: Invalid file type ${file.name}. Only JPG, PNG, WEBP allowed.`,
+              );
             }
           });
         }
       });
 
       return errors;
-    }
+    },
   };
 
   const Forms = {
@@ -508,7 +635,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       // 2. Append New Images (needed for validation check on file types/counts if we were looking at formData, but we look at State)
-      // We'll append them to formData AFTER validation to ensure we don't send invalid data, 
+      // We'll append them to formData AFTER validation to ensure we don't send invalid data,
       // BUT our validation function typically inspects State for images anyway.
 
       // Run Validation
@@ -518,7 +645,7 @@ document.addEventListener("DOMContentLoaded", () => {
         Swal.fire({
           title: "Validation Error",
           html: validationErrors.join("<br>"),
-          icon: "error"
+          icon: "error",
         });
         return;
       }
@@ -600,7 +727,7 @@ document.addEventListener("DOMContentLoaded", () => {
         Swal.fire({
           icon: "error",
           title: "Error",
-          text: err.message || "An unexpected error occurred"
+          text: err.message || "An unexpected error occurred",
         });
       } finally {
         submitBtn.innerHTML = originalText;
@@ -616,6 +743,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const editForm = DOM.get("editProductForm");
       if (editForm)
         editForm.addEventListener("submit", (e) => Forms.submit(e, "edit"));
+
+      // Init Cropper
+      if (typeof CropperManager !== "undefined") {
+        CropperManager.init();
+      }
     },
   };
 
@@ -648,9 +780,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const imgParam =
       product.variants &&
-        product.variants.length > 0 &&
-        product.variants[0].images &&
-        product.variants[0].images.length > 0
+      product.variants.length > 0 &&
+      product.variants[0].images &&
+      product.variants[0].images.length > 0
         ? product.variants[0].images[0]
         : "https://placehold.co/40x40";
 
@@ -707,17 +839,18 @@ document.addEventListener("DOMContentLoaded", () => {
       toggleBtn.style.color = product.isActive ? "#ef4444" : "#10b981";
 
       const icon = toggleBtn.querySelector("i");
-      icon.className = `fa-solid ${product.isActive ? "fa-eye-slash" : "fa-eye"
-        }`;
+      icon.className = `fa-solid ${
+        product.isActive ? "fa-eye-slash" : "fa-eye"
+      }`;
     }
   }
 
   function generateProductRowHTML(product) {
     const imgParam =
       product.variants &&
-        product.variants.length > 0 &&
-        product.variants[0].images &&
-        product.variants[0].images.length > 0
+      product.variants.length > 0 &&
+      product.variants[0].images &&
+      product.variants[0].images.length > 0
         ? product.variants[0].images[0]
         : "https://placehold.co/40x40";
 
@@ -771,9 +904,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     <!-- Status Column -->
     <td>
-      ${product.isActive
-        ? `<span class="status-badge status-active"><span class="status-indicator"></span> Active</span>`
-        : `<span class="status-badge status-blocked"><span class="status-indicator"></span> Inactive</span>`
+      ${
+        product.isActive
+          ? `<span class="status-badge status-active"><span class="status-indicator"></span> Active</span>`
+          : `<span class="status-badge status-blocked"><span class="status-indicator"></span> Inactive</span>`
       }
     </td>
 
@@ -796,8 +930,9 @@ document.addEventListener("DOMContentLoaded", () => {
           data-active="${product.isActive}"
           style="color: ${product.isActive ? "#ef4444" : "#10b981"}"
         >
-          <i class="fa-solid ${product.isActive ? "fa-eye-slash" : "fa-eye"
-      }"></i>
+          <i class="fa-solid ${
+            product.isActive ? "fa-eye-slash" : "fa-eye"
+          }"></i>
         </button>
       </div>
     </td>
@@ -809,6 +944,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // ==========================================
   const EditMode = {
     populate: (product) => {
+      console.log("Full product from backend:", product);
+      console.log("Variants:", product.variants);
+      console.log("First variant _id:", product.variants[0]?._id);
+
       // 1. Basic Fields
       DOM.get("editProductId").value = product._id;
       DOM.get("editName").value = product.name;

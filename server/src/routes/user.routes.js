@@ -1,6 +1,7 @@
 import express from "express";
 
 import * as userControllers from "../controllers/user.controller.js";
+import * as userProductControllers from "../controllers/user.product.controller.js";
 
 import { checkUserStatus, isAuth } from "../middlewares/auth.middleware.js";
 
@@ -44,5 +45,11 @@ router.post(
   upload.single("image"),
   userControllers.changeProfilePicture,
 );
+
+
+//Product related works
+
+
+router.route("/products").get(userProductControllers.productListPage)
 
 export default router;

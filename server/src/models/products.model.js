@@ -12,8 +12,8 @@ const variantSchema = mongoose.Schema({
   images: {
     type: [String],
     validate: {
-      validator: (v) => v.length > 0,
-      message: "At least one image is required",
+      validator: (v) => v.length >= 3,
+      message: "At least 3 image is required",
     },
   },
   attributes: {
@@ -34,6 +34,10 @@ const productSchema = mongoose.Schema(
       ref: "Category",
       required: true,
       index: true,
+    },
+    discount: {
+      type: Number,
+      required: false,
     },
     attributes: [String],
     ageGroup: {

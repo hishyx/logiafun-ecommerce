@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="stylesheet" href="/css/admin/main.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" />
   <style>
     /* Shared Styles from Categories */
     .btn-primary {
@@ -800,8 +801,14 @@
     .modal-footer {
       display: flex;
       justify-content: flex-end;
-      gap: 12px;
-      margin-top: 24px;
+      gap: 1rem;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #f1f5f9;
+    }
+
+    .modal-footer button {
+      min-width: 100px;
     }
 
     .btn-secondary {
@@ -1003,21 +1010,63 @@
       border-radius: 6px;
     }
 
-    
-  .swal2-container {
-    z-index: 20000 !important;
-  }
 
-  .swal2-popup {
-    z-index: 20001 !important;
-  }
+    .swal2-container {
+      z-index: 20000 !important;
+    }
 
+    .swal2-popup {
+      z-index: 20001 !important;
+    }
   </style>
 
+  <div class="modal-overlay" id="cropperModal">
+    <div class="modal-container" style="max-width: 800px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Crop Image</h3>
+        <button class="close-modal close-modal-btn">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+      <div class="cropper-container">
+        <img id="cropperImage" src="" alt="Image to crop">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="action-btn close-modal-btn">Cancel</button>
+        <button type="button" class="btn-primary" id="cropImageBtn">Crop & Save</button>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    /* Scoped Styles for Cropper in Products */
+    #cropperModal .modal-container {
+      max-width: 900px;
+      width: 95%;
+      display: flex;
+      flex-direction: column;
+      max-height: 90vh;
+    }
+
+    #cropperModal .cropper-container {
+      height: 600px;
+      background: #0f172a;
+      /* Dark background for better contrast */
+      overflow: hidden;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+    }
+
+    #cropperImage {
+      max-width: 100%;
+      display: block;
+    }
+  </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="/js/admin/admin.products.js"></script>
-  <script src="/js/admin/pagination.search.js"></script>
-
+<script src="/js/admin/admin.pagination.search.js"></script>
 </body>
 
 </html>

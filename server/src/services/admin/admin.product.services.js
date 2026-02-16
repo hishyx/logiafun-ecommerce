@@ -156,20 +156,24 @@ export const updateProduct = async (productData, productImages) => {
   }
 
   // 2️ Add newly uploaded images
-  for (const file of productImages) {
-    const match = file.fieldname.match(/variants\[(\d+)\]/);
-    if (!match) continue;
+  // 2️⃣ Add newly uploaded images safely
+  if (productImages && productImages.length > 0) {
+    for (const file of productImages) {
+      const match = file.fieldname.match(/variants\[(\d+)\]/);
+      if (!match) continue;
 
-    const index = parseInt(match[1]);
+      const index = parseInt(match[1]);
+      if (!updatedVariants[index]) continue;
 
-    const imageUrl = await uploadImageToCloudinary(file);
+      const imageUrl = await uploadImageToCloudinary(file);
 
-    if (!updatedVariants[index].images) {
-      updatedVariants[index].images = [];
+      updatedVariants[index].images.push(imageUrl);
     }
-
-    updatedVariants[index].images.push(imageUrl);
   }
+
+  updatedVariants.forEach((variant, i) => {
+    console.log(`Variant ${i + 1} final images count:`, variant.images?.length);
+  });
 
   // Validate Variants
   updatedVariants.forEach((variant, i) => {

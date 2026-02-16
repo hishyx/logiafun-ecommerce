@@ -120,6 +120,8 @@ img {
 }
 
 .search-box {
+  position: relative;
+  /* Context for clear button */
   display: flex;
   align-items: center;
   background: var(--bg-light);
@@ -230,7 +232,8 @@ img {
   position: relative;
   display: flex;
   align-items: center;
-  min-height: 600px; /* Increased height for impact */
+  min-height: 600px;
+  /* Increased height for impact */
   background: #f4f7f9;
   overflow: hidden;
   margin-bottom: 2rem;
@@ -251,18 +254,17 @@ img {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.95) 0%,
-    rgba(255, 255, 255, 0.7) 35%,
-    rgba(255, 255, 255, 0) 100%
-  );
+  background: linear-gradient(90deg,
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(255, 255, 255, 0.7) 35%,
+      rgba(255, 255, 255, 0) 100%);
   z-index: 1;
 }
 
 .hero-content {
   position: relative;
-  z-index: 2; /* Above the gradient */
+  z-index: 2;
+  /* Above the gradient */
   max-width: 600px;
   padding: 2rem;
   /* Removed boxy background */
@@ -273,11 +275,13 @@ img {
   line-height: 1.1;
   color: var(--primary);
   margin-bottom: 1.25rem;
-  text-shadow: 0 2px 5px rgba(255, 255, 255, 0.5); /* Subtle lift */
+  text-shadow: 0 2px 5px rgba(255, 255, 255, 0.5);
+  /* Subtle lift */
 }
 
 .hero p {
-  color: var(--text-dark); /* Darker text for overlay readability */
+  color: var(--text-dark);
+  /* Darker text for overlay readability */
   margin-bottom: 2rem;
   font-size: 1.15rem;
   font-weight: 500;
@@ -587,7 +591,8 @@ img {
 }
 
 .gallery-item:hover img {
-  transform: scale(1.05); /* Subtle zoom */
+  transform: scale(1.05);
+  /* Subtle zoom */
 }
 
 .features-grid {
@@ -740,7 +745,8 @@ img {
 /* --- Footer --- */
 .footer {
   background: #f0f2f5;
-  padding: 4rem 0 0; /* Updated padding */
+  padding: 4rem 0 0;
+  /* Updated padding */
   margin-top: 0;
 }
 
@@ -802,10 +808,12 @@ img {
   .categories-grid {
     grid-template-columns: repeat(3, 1fr);
   }
+
   .products-grid,
   .gallery-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
   .features-grid,
   .testimonials-grid {
     grid-template-columns: 1fr;
@@ -813,24 +821,45 @@ img {
 }
 
 @media (max-width: 768px) {
+
   .nav,
   .top-bar {
     display: none;
   }
+
   .menu-toggle {
     display: flex;
   }
+
   .eco-section,
   .footer-grid {
     grid-template-columns: 1fr;
   }
+
   .header-content {
     gap: 1rem;
   }
+
   .hero {
     text-align: center;
   }
+
   .hero-content {
     margin: 0 auto;
   }
+}
+
+.clear-search {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  color: #888;
+}
+
+.clear-search:hover {
+  color: #000;
 }

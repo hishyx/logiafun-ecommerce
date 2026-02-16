@@ -38,6 +38,10 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 // Routes
+app.use((req, res, next) => {
+  res.locals.user = req.user || null;
+  next();
+});
 
 app.use("/", authRoute);
 app.use("/", adminRoute);

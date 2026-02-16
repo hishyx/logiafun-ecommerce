@@ -26,6 +26,8 @@ export const adminProductListPage = async (req, res) => {
 
     const categories = await adminCategoryServices.getAvailableCategories();
 
+    console.log("the product are : ", productsList.products[0].variants);
+
     res.render("admin/admin.products.ejs", {
       ...productsList,
       categories,
@@ -60,7 +62,7 @@ export const addProduct = async (req, res) => {
     // Return 400 for validation errors
     res.status(400).json({
       success: false,
-      message: error.message || "Failed to add product"
+      message: error.message || "Failed to add product",
     });
   }
 };
@@ -83,7 +85,7 @@ export const editProduct = async (req, res) => {
     console.log(err);
     return res.status(400).json({
       success: false,
-      message: err.message || "Failed to update product"
+      message: err.message || "Failed to update product",
     });
   }
 };

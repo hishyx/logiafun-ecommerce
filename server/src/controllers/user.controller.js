@@ -178,10 +178,6 @@ export const setDefault = async (req, res) => {
       req.params.addressId,
     );
 
-    // res.status(201).json({
-    //   address: editedAddress,
-    // });
-
     res.sendStatus(204);
   } catch (err) {
     console.log(err);
