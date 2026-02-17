@@ -241,8 +241,9 @@ export const passwordResetSuccessPage = (req, res) => {
   if (!req.session.forgotToken) return res.redirect("/auth/login");
 
   delete req.session.forgotToken;
-  return res.render("success-page", {
-    successMessage: "Password reset successfully",
+  return res.render("success-or-error", {
+    status: "success",
+    message: "Password reset successfully",
     returnLocation: "Login",
     returnLink: "/auth/login",
   });

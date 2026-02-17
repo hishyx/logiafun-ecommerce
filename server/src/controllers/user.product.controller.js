@@ -62,3 +62,31 @@ export const productListPage = async (req, res) => {
     selectedCategoryIds: category || [],
   });
 };
+
+export const productDetailsPage = async (req, res) => {
+  const productId = req.params.productId || "";
+
+  try {
+    const product = await userProductServices.getProductDetails(productId);
+    const relatedProducts = await userProductServices.getRelatedProducts(
+      product.categoryId,
+    );
+
+    console.log("Related product is : ", relatedProducts);
+
+    res.render("user/product.details.ejs", { product, relatedProducts });
+  } catch (err) {
+    // req.flash("error", err.message);
+    req.flash("error", "Product not available or got blocked");
+    res.redirect(`/products/:${productId}/not-found`);
+  }
+};
+
+export const productNotAvailablePage = (req, res) => {
+  res.render("success-or-error", {
+    status: "error",
+    message: req.flash("error"),
+    returnLocation: "back",
+    returnLink: "javascript:history.back()",
+  });
+};

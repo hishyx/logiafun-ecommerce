@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Details - LogiaFun</title>
+  <link rel="stylesheet" href="/css/home.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #0f172a;
+      --accent: #3b82f6;
+      --surface: #ffffff;
+      --background: #f8fafc;
+      --text-main: #1e293b;
+      --text-secondary: #64748b;
+      --border: #e2e8f0;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .product-details-page {
+      padding: 2rem 0 4rem;
+    }
+
+    /* Breadcrumbs */
+    .breadcrumbs {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .breadcrumbs a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .breadcrumbs a:hover {
+      color: var(--accent);
+    }
+
+    .breadcrumbs span.current {
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    /* Product Container */
+    .product-container {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 3rem;
+      background: var(--surface);
+      padding: 2.5rem;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 3rem;
+    }
+
+    /* Image Gallery */
+    .product-gallery {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .main-image-wrapper {
+      position: relative;
+      background: #f1f5f9;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      aspect-ratio: 1;
+      /* Square aspect ratio */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border);
+    }
+
+    .main-image-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .main-image-wrapper:hover img {
+      transform: scale(1.05);
+    }
+
+    .thumbnail-list {
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+    }
+
+    .thumbnail-item {
+      width: 80px;
+      height: 80px;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: var(--transition);
+      background: #f1f5f9;
+    }
+
+    .thumbnail-item.active {
+      border-color: var(--accent);
+    }
+
+    .thumbnail-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Product Info */
+    .product-info {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .product-badges {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-primary {
+      background: rgba(59, 130, 246, 0.1);
+      color: var(--accent);
+    }
+
+    .badge-secondary {
+      background: #f1f5f9;
+      color: var(--text-secondary);
+    }
+
+    .product-title {
+      font-size: 2rem;
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--text-main);
+    }
+
+    .rating-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+    }
+
+    .stars {
+      color: #fbbf24;
+    }
+
+    .review-count {
+      color: var(--text-secondary);
+    }
+
+    .price-wrapper {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .current-price {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .old-price {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      text-decoration: line-through;
+    }
+
+    .discount-tag {
+      background: #ef4444;
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .product-description {
+      color: var(--text-secondary);
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+
+    /* Variants */
+    .variant-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .variant-label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text-main);
+    }
+
+    .variant-options {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .color-option {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid var(--border);
+      position: relative;
+      transition: transform 0.2s;
+    }
+
+    .color-option.active {
+      border-color: var(--text-main);
+      transform: scale(1.1);
+    }
+
+    .color-option.active::after {
+      content: '';
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border: 1px solid var(--accent);
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .variant-option {
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+      background: var(--surface);
+    }
+
+    .variant-option:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .variant-option.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    /* Actions */
+    .action-row {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .qty-selector {
+      display: flex;
+      align-items: center;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .qty-btn {
+      width: 40px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--background);
+      border: none;
+      cursor: pointer;
+      color: var(--text-main);
+      transition: background 0.2s;
+    }
+
+    .qty-btn:hover {
+      background: #e2e8f0;
+    }
+
+    .qty-input {
+      width: 50px;
+      height: 44px;
+      border: none;
+      text-align: center;
+      font-weight: 600;
+      color: var(--text-main);
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+
+    .btn-primary {
+      flex: 1;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary:hover {
+      background: #1e293b;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-secondary {
+      width: 50px;
+      height: 44px;
+      /* Match height of other buttons */
+      border: 1px solid var(--border);
+      background: var(--surface);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 1.2rem;
+      color: var(--text-main);
+    }
+
+    .btn-secondary:hover {
+      border-color: #ef4444;
+      color: #ef4444;
+      background: #fef2f2;
+    }
+
+    /* Additional Info Details */
+    .details-tabs {
+      margin-top: 3rem;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .tab-header {
+      display: flex;
+      gap: 2rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      padding-bottom: 1rem;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      position: relative;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+    }
+
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--primary);
+    }
+
+    .tab-content {
+      color: var(--text-secondary);
+      line-height: 1.8;
+    }
+
+    /* Related Products - Simplified replication of product grid */
+    .related-section {
+      margin-top: 4rem;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      color: var(--text-main);
+    }
+
+    /* Product Card Styles from product.list.page.ejs */
+    .product-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: var(--transition);
+      border: 1px solid transparent;
+      position: relative;
+    }
+
+    .product-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-lg);
+      border-color: rgba(59, 130, 246, 0.1);
+    }
+
+    .product-image-wrapper {
+      position: relative;
+      aspect-ratio: 1;
+      background: #f1f5f9;
+      overflow: hidden;
+      border: none;
+      /* override main page style if needed */
+    }
+
+    .product-image-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+
+    .product-card:hover .product-image-wrapper img {
+      transform: scale(1.08);
+    }
+
+    /* Ensure main image doesn't get affected or vice versa */
+    .main-image-wrapper {
+      border: 1px solid var(--border);
+      /* Restore if needed */
+    }
+
+    .card-actions {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      opacity: 0;
+      transform: translateX(10px);
+      transition: var(--transition);
+      z-index: 10;
+    }
+
+    .product-card:hover .card-actions {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .action-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: white;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-main);
+      box-shadow: var(--shadow-md);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .action-btn:hover {
+      background: var(--primary);
+      color: white;
+      transform: scale(1.1);
+    }
+
+    .product-content {
+      padding: 1.25rem;
+    }
+
+    .product-card .product-category-tag {
+      font-size: 0.75rem;
+      color: var(--accent);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.5rem;
+    }
+
+    .product-card .product-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .product-card .current-price {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .add-cart-btn {
+      padding: 0.5rem 1rem;
+      background: var(--background);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .product-card:hover .add-cart-btn {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    @media (max-width: 900px) {
+      .product-container {
+        grid-template-columns: 1fr;
+        padding: 1.5rem;
+      }
+    }
+
+
+    .variant-option.disabled {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .products-layout {
+      display: block;
+    }
+
+    .products-grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <%- include('../partials/header.ejs') %>
+
+  <main class="product-details-page">
+    <div class="container">
+
+      <!-- Breadcrumbs -->
+      <div class="breadcrumbs">
+        <a href="/"><i class="fa-solid fa-home"></i></a>
+        <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
+        <a href="#">Shop</a>
+        <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
+        <a href="#">
+          <%=product.category.name%>
+        </a>
+        <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
+        <span class="current">
+          <%=product.name%>
+        </span>
+      </div>
+
+      <div class="product-container">
+        <!-- Gallery -->
+        <div class="product-gallery">
+          <div class="main-image-wrapper">
+            <img src="<%=product.variants[0].images[0]%>" alt="Premium Wireless Headphones" id="main-image">
+          </div>
+          <div class="thumbnail-list">
+            <%product.variants[0].images.forEach(thumbnailUrl=>{%>
+            <div class="thumbnail-item active" onclick="changeImage('<%=thumbnailUrl%>', this)">
+              <img src="<%=thumbnailUrl%>" alt="View 1">
+            </div>
+            <%})%>
+          </div>
+        </div>
+
+        <!-- Info -->
+        <div class="product-info">
+          <div class="product-badges">
+            <span class="badge badge-primary">
+              <%=product.category.name%>
+            </span>
+            <!-- <span class="badge badge-secondary">New Arrival</span> -->
+          </div>
+
+          <h1 class="product-title">
+            <%=product.name%>
+          </h1>
+
+          <div class="rating-wrapper">
+            <div class="stars">
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star"></i>
+              <i class="fa-solid fa-star-half-stroke"></i>
+            </div>
+            <span class="review-count">(<%=product.reviewCount%> verified reviews)</span>
+          </div>
+
+          <div class="price-wrapper">
+            <span class="current-price" id="current-price">
+              ₹<%= product.variants[0].price - (product.discount / 100) * product.variants[0].price %>
+            </span>
+
+            <%if(product.discount!==0){%>
+            <span class="old-price" id="old-price">
+              ₹<%= product.variants[0].price %>
+            </span>
+
+            <span class="discount-tag">
+              <%= product.discount %>% OFF
+            </span>
+            <%}%>
+            </div>
+
+
+            <div class="product-description">
+              <%=product.description%>
+          </div>
+
+          <!-- Variants -->
+
+          <% product.attributes.forEach(attribute=> { %>
+          <div class="variant-section" id="<%= attribute %>">
+            <div class="variant-label">
+              <%= attribute %>
+            </div>
+            <div class="variant-options">
+
+              <% const uniqueValues=new Set(); product.variants.forEach(variant=> {
+                    if (variant.attributes && variant.attributes[attribute]) {
+                    uniqueValues.add(variant.attributes[attribute]);
+                    }
+                    });
+                    %>
+
+              <% uniqueValues.forEach(value=> { %>
+              <div class="variant-option">
+                <%= value %>
+              </div>
+              <% }) %>
+
+            </div>
+          </div>
+          <% }) %>
+
+          <div id="productdetails" data-product='<%- JSON.stringify(product) %>'>
+          </div>
+
+
+          <!-- Actions -->
+          <div class="action-row">
+            <div class="qty-selector">
+              <button class="qty-btn" onclick="updateQty(-1)"><i class="fa-solid fa-minus"></i></button>
+              <input type="text" class="qty-input" value="1" readonly id="qty-input">
+              <button class="qty-btn" onclick="updateQty(1)"><i class="fa-solid fa-plus"></i></button>
+            </div>
+
+            <button class="btn-primary">
+              <i class="fa-solid fa-cart-shopping"></i>
+              Add to Cart
+            </button>
+
+            <button class="btn-secondary" title="Add to Wishlist">
+              <i class="fa-regular fa-heart"></i>
+            </button>
+          </div>
+
+          <div style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary);">
+            <i class="fa-solid fa-check-circle" style="color: #22c55e; margin-right: 6px;"></i> In Stock
+            & Ready to Ship
+          </div>
+        </div>
+      </div>
+
+      <!-- Additional Details Tabs
+      <div class="details-tabs">
+        <div class="tab-header">
+          <button class="tab-btn active">Description</button>
+          <button class="tab-btn">Specifications</button>
+          <button class="tab-btn">Reviews (124)</button>
+        </div>
+        <div class="tab-content">
+          <p><strong>Immersive Sound Quality</strong></p>
+          <p style="margin-bottom: 1rem;">Lose yourself in the music with industry-leading noise
+            cancellation technology that adapts to your environment. Whether you're on a noisy plane or
+            in a busy office, hear only what you want to hear.</p>
+
+          <p><strong>All-Day Comfort</strong></p>
+          <p>Plush ear cushions and a lightweight headband ensure you can listen for hours without
+            fatigue. The foldable design makes it easy to carry wherever you go.</p>
+        </div>
+      </div> -->
+
+      <!-- Related Products Section (Static Mockup) -->
+      <div class="related-section">
+        <h2 class="section-title">You Might Also Like</h2>
+        <div class="products-layout" style="grid-template-columns: 1fr;">
+          <!-- Reusing existing layout class but full width -->
+          <div class="products-grid" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));">
+            <!-- Product Card 1 -->
+            <%relatedProducts.forEach(relatedProd=>{%>
+            <div class="product-card">
+              <a href="/products/<%= relatedProd._id %>" style="display: block; height: 100%; text-decoration: none; color: inherit;">
+                <div class="product-image-wrapper">
+                  <img src="<%= relatedProd?.variants[0]?.images[0] %>" alt="<%= relatedProd.name %>">
+                </div>
+                <div class="product-content">
+                  <div class="product-category-tag"><%= relatedProd.category?.name %></div>
+                  <h3 class="product-title"><%= relatedProd.name %></h3>
+                  <div class="current-price">
+                    ₹<%= (
+                        relatedProd.variants[0].price *
+                        (1 - (relatedProd.discount || 0) / 100)
+                        ).toFixed(2) %>
+                  </div>
+                </div>
+              </a>
+              <div class="card-actions">
+                <button class="action-btn"><i class="fa-regular fa-heart"></i></button>
+              </div>
+            </div>
+            <%})%>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <%- include('../partials/footer') %>
+
+
+
+  <script src="/js/product.details.js"></script>
+
+
+</body>
+
+</html>

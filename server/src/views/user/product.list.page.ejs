@@ -464,9 +464,9 @@
               Categories
               <i class="fa-solid fa-layer-group" style="color: var(--text-secondary);"></i>
             </div>
-            <% categories.forEach((category) => { %>
+            <% categories.forEach((category)=> { %>
             <label class="filter-option">
-              <input type="checkbox" class="category-checkboxes" value="<%= category._id %>" <%= selectedCategoryIds.includes(category._id.toString()) ? "checked" : "" %>>
+              <input type="checkbox" class="category-checkboxes" value="<%= category._id %>" <%=selectedCategoryIds.includes(category._id.toString()) ? "checked" : "" %>>
               <%= category.name %>
             </label>
             <% }) %>
@@ -502,96 +502,105 @@
         <div class="products-content">
 
           <div class="listing-header">
-            <span class="results-count">Showing <strong><%=skip+1%>-<%=skip+products.length%></strong> of <strong><%=totalProducts%></strong> premium
+            <span class="results-count">Showing <strong>
+                <%=skip+1%>-<%=skip+products.length%>
+              </strong> of <strong>
+                <%=totalProducts%>
+              </strong> premium
               toys</span>
             <div class="sort-wrapper">
               <select class="sort-select" id="sortBy">
-                <option value="newest" <%=sortBy=="newest"?"selected":""%>>Newest Arrivals</option>
-                <option value="price_asc" <%=sortBy=="price_asc"?"selected":""%>>Price: Low to High</option>
-                <option value="price_desc" <%=sortBy=="price_desc"?"selected":""%>>Price: High to Low</option>
-                <option value="popular" <%=sortBy=="popular"?"selected":""%>>Best Sellers</option>
+                <option value="newest" <%=sortBy=="newest" ?"selected":""%>>Newest Arrivals</option>
+                <option value="price_asc" <%=sortBy=="price_asc" ?"selected":""%>>Price: Low to High</option>
+                <option value="price_desc" <%=sortBy=="price_desc" ?"selected":""%>>Price: High to Low</option>
+                <option value="popular" <%=sortBy=="popular" ?"selected":""%>>Best Sellers</option>
               </select>
             </div>
           </div>
 
           <div class="products-grid">
 
-            <% if (products && products.length > 0) { %>
+            <% if (products && products.length> 0) { %>
 
-            <% products.forEach(product => { %>
+            <% products.forEach(product=> { %>
 
-            <% 
-        const firstVariant = product.variants?.[0];
-        const price = firstVariant?.price || 0;
-        const image = firstVariant?.images?.[0] || "https://picsum.photos/400";
-      %>
+            <% const firstVariant=product.variants?.[0]; const price=firstVariant?.price || 0; const
+                    image=firstVariant?.images?.[0]%>
 
             <div class="product-card">
-              <div class="product-image-wrapper">
-                <img src="<%= image %>" alt="<%= product.name %>">
-
-                <div class="card-actions">
-                  <button class="action-btn" title="Wishlist">
-                    <i class="fa-regular fa-heart"></i>
-                  </button>
-
-                  <button class="action-btn" title="Quick View">
-                    <i class="fa-regular fa-eye"></i>
-                  </button>
-                </div>
-              </div>
-
-              <div class="product-content">
-
-                <div class="product-category-tag">
-                  <%= product.categoryName || "General" %>
+              <a href="/products/<%= product._id %>" style="display: block; height: 100%; text-decoration: none; color: inherit;">
+                <div class="product-image-wrapper">
+                  <img src="<%= image %>" alt="<%= product.name %>">
                 </div>
 
-                <h3 class="product-title">
-                  <%= product.name %>
-                </h3>
+                <div class="product-content">
 
-                <div class="rating-wrapper">
-                  <div class="stars">
-                    <% 
-                const rating = product.rating || 0;
-                for (let i = 1; i <= 5; i++) {
-                  if (rating >= i) { 
-              %>
-                    <i class="fa-solid fa-star"></i>
-                    <% 
-                  } else if (rating >= i - 0.5) { 
-              %>
-                    <i class="fa-solid fa-star-half-stroke"></i>
-                    <% 
-                  } else { 
-              %>
-                    <i class="fa-regular fa-star"></i>
-                    <% } } %>
+                  <div class="product-category-tag">
+                    <%= product.category.name || "General" %>
                   </div>
 
-                  <span class="review-count">
-                    (<%= product.reviewCount || 0 %> reviews)
-                  </span>
-                </div>
+                  <h3 class="product-title">
+                    <%= product.name %>
+                  </h3>
 
-                <div class="price-row">
-                  <div class="price-wrapper">
-                    <span class="current-price">
-                      ₹<%= price.toLocaleString() %>
-                    </span>
+                  <div class="rating-wrapper">
+                    <div class="stars">
+                      <% const rating=product.rating || 0; for (let i=1; i <=5; i++) { if (rating>= i) {
+                                %>
+                      <i class="fa-solid fa-star"></i>
+                      <% } else if (rating>= i - 0.5) {
+                                  %>
+                      <i class="fa-solid fa-star-half-stroke"></i>
+                      <% } else { %>
+                      <i class="fa-regular fa-star"></i>
+                      <% } } %>
+                    </div>
 
-                    <span class="old-price">
-                      ₹999
+                    <span class="review-count">
+                      (<%= product.reviewCount || 0 %> reviews)
                     </span>
                   </div>
 
-                  <button class="add-cart-btn" data-id="<%= product._id %>">
-                    <i class="fa-solid fa-plus"></i>
-                  </button>
-                </div>
+                  <div class="price-row">
+                    <div class="price-wrapper">
 
+                      <% 
+      const hasDiscount = product.discount && product.discount > 0;
+      const finalPrice = hasDiscount 
+        ? product.discountedPrice 
+        : price;
+    %>
+
+                      <span class="current-price">
+                        ₹<%= Math.round(finalPrice).toLocaleString() %>
+                      </span>
+
+                      <% if (hasDiscount) { %>
+                      <span class="old-price">
+                        ₹<%= price.toLocaleString() %>
+                      </span>
+                      <% } %>
+
+                    </div>
+                  </div>
+
+
+                </div>
+              </a>
+
+              <div class="card-actions" style="z-index: 10;">
+                <button class="action-btn" title="Wishlist">
+                  <i class="fa-regular fa-heart"></i>
+                </button>
+
+                <button class="action-btn" title="Quick View">
+                  <i class="fa-regular fa-eye"></i>
+                </button>
               </div>
+
+              <button class="add-cart-btn" data-id="<%= product._id %>" style="position: absolute; bottom: 1.25rem; right: 1.25rem; z-index: 10;">
+                <i class="fa-solid fa-plus"></i>
+              </button>
             </div>
 
             <% }) %>
@@ -606,13 +615,16 @@
 
           <!-- Modern Pagination -->
           <div class="pagination">
-            <button class="page-link" id="page-back-btn" onclick="goToPage(<%= currentPage-1%>)" <%= currentPage <= 1 ? 'disabled' : '' %>><i class="fa-solid fa-chevron-left"></i></button>
-            <% for (let i = 1; i <= totalPages; i++) { %>
-            <button class="page-link <%= i === currentPage ? 'active' : '' %>" onclick="goToPage(<%= i %>)"> <%= i %> </button>
+            <button class="page-link" id="page-back-btn" onclick="goToPage(<%= currentPage-1%>)" <%=currentPage <=1
+                ? 'disabled' : '' %>><i class="fa-solid fa-chevron-left"></i></button>
+            <% for (let i=1; i <=totalPages; i++) { %>
+            <button class="page-link <%= i === currentPage ? 'active' : '' %>" onclick="goToPage(<%= i %>)">
+              <%= i %>
+            </button>
 
             <% } %>
 
-            <button class="page-link" id="page-front-btn" onclick="goToPage(<%= currentPage+1 %>)" <%= currentPage >= totalPages ? 'disabled' : '' %>><i class="fa-solid fa-chevron-right"></i></button>
+            <button class="page-link" id="page-front-btn" onclick="goToPage(<%= currentPage+1 %>)" <%=currentPage>= totalPages ? 'disabled' : '' %>><i class="fa-solid fa-chevron-right"></i></button>
           </div>
 
         </div>

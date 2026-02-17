@@ -46,10 +46,17 @@ router.post(
   userControllers.changeProfilePicture,
 );
 
-
 //Product related works
 
+router.route("/products").get(userProductControllers.productListPage);
 
-router.route("/products").get(userProductControllers.productListPage)
+router
+  .route("/products/:productId")
+  .get(userProductControllers.productDetailsPage);
+
+router.get(
+  "/products/:productId/not-found",
+  userProductControllers.productNotAvailablePage,
+);
 
 export default router;

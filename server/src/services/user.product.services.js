@@ -1,4 +1,36 @@
+import Category from "../models/categories.model.js";
 import Product from "../models/products.model.js";
+import mongoose from "mongoose";
+
+//Helper function for valid Product checking
+
+export const checkProductAvailability = async (productId) => {
+  productId = new mongoose.Types.ObjectId(productId);
+  const result = await Product.aggregate([
+    {
+      $match: {
+        _id: productId,
+        isActive: true,
+      },
+    },
+    {
+      $lookup: {
+        from: "categories",
+        localField: "categoryId",
+        foreignField: "_id",
+        as: "category",
+      },
+    },
+    { $unwind: "$category" },
+    {
+      $match: {
+        "category.isActive": true,
+      },
+    },
+  ]);
+
+  return result[0];
+};
 
 export const getAllProducts = async ({
   search,
@@ -13,8 +45,8 @@ export const getAllProducts = async ({
 
   let sort = { createdAt: -1 };
 
-  if (sortBy == "price_asc") sort = { firstVariantPrice: 1 };
-  if (sortBy == "price_desc") sort = { firstVariantPrice: -1 };
+  if (sortBy == "price_asc") sort = { discountedPrice: 1 };
+  if (sortBy == "price_desc") sort = { discountedPrice: -1 };
   if (sortBy == "popular") sort = { sold: -1 };
 
   const skip = (page - 1) * limit >= 0 ? (page - 1) * limit : 0;
@@ -25,12 +57,28 @@ export const getAllProducts = async ({
 
   if (minPrice)
     priceConditions.push({
-      $gt: [{ $arrayElemAt: ["$variants.price", 0] }, minPrice],
+      $gt: [
+        {
+          $multiply: [
+            { $arrayElemAt: ["$variants.price", 0] },
+            { $subtract: [1, { $divide: ["$discount", 100] }] },
+          ],
+        },
+        minPrice,
+      ],
     });
 
   if (maxPrice)
     priceConditions.push({
-      $lt: [{ $arrayElemAt: ["$variants.price", 0] }, maxPrice],
+      $lt: [
+        {
+          $multiply: [
+            { $arrayElemAt: ["$variants.price", 0] },
+            { $subtract: [1, { $divide: ["$discount", 100] }] },
+          ],
+        },
+        maxPrice,
+      ],
     });
 
   const match = {
@@ -51,7 +99,19 @@ export const getAllProducts = async ({
     },
     {
       $addFields: {
-        firstVariantPrice: { $arrayElemAt: ["$variants.price", 0] },
+        discountedPrice: {
+          $multiply: [
+            { $arrayElemAt: ["$variants.price", 0] },
+            {
+              $subtract: [
+                1,
+                {
+                  $divide: [{ $ifNull: ["$discount", 0] }, 100],
+                },
+              ],
+            },
+          ],
+        },
       },
     },
     { $sort: sort },
@@ -88,4 +148,46 @@ export const getAllProducts = async ({
     products,
     total,
   };
+};
+
+export const getProductDetails = async (productId) => {
+  const availableProduct = await checkProductAvailability(productId); // 1st DB call
+
+  console.log("The product is  : ", availableProduct);
+  if (!availableProduct) {
+    throw new Error("Product not available or got blocked");
+  }
+
+  return availableProduct;
+};
+
+export const getRelatedProducts = async (categoryId) => {
+  const limit = 4;
+  const relatedProducts = await Product.aggregate([
+    {
+      $match: {
+        isActive: true,
+        categoryId: categoryId,
+      },
+    },
+    {
+      $lookup: {
+        from: "categories",
+        localField: "categoryId",
+        foreignField: "_id",
+        as: "category",
+      },
+    },
+    { $unwind: "$category" },
+    {
+      $match: {
+        "category.isActive": true,
+      },
+    },
+    {
+      $limit: limit,
+    },
+  ]);
+
+  return relatedProducts;
 };
