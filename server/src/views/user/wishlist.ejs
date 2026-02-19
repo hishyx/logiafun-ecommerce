@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Wishlist - logiaFun</title>
+  <link rel="stylesheet" href="/css/home.css" />
+  <link rel="stylesheet" href="/css/profile.css" />
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
+  <style>
+    .wishlist-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .wishlist-item {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+      transition: transform 0.2s, box-shadow 0.2s;
+      position: relative;
+    }
+
+    .wishlist-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .wishlist-img-container {
+      position: relative;
+      padding-top: 100%;
+      /* 1:1 Aspect Ratio */
+      overflow: hidden;
+    }
+
+    .wishlist-img-container img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .wishlist-details {
+      padding: 15px;
+    }
+
+    .wishlist-title {
+      font-weight: 600;
+      margin-bottom: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .wishlist-price {
+      color: #0f172a;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .wishlist-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-sm {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.875rem;
+    }
+
+    .remove-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #ef4444;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s;
+    }
+
+    .remove-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .empty-wishlist {
+      text-align: center;
+      padding: 50px 20px;
+      color: #64748b;
+    }
+
+    .empty-wishlist i {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      color: #cbd5e1;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header -->
+  <%- include('../partials/header.ejs')%>
+
+  <main>
+    <div class="profile-container">
+      <!-- Sidebar -->
+      <aside class="profile-sidebar">
+        <div class="profile-user-info">
+          <div class="profile-avatar-large"><img src="<%=user.profileImage%>"></div>
+          <div>
+            <!-- Keeping file input hidden but structure same as profile -->
+            <div class="profile-user-name" id="sidebarName">
+              <%=user.name%>
+            </div>
+            <div class="profilacce-user-email" id="sidebarEmail">
+              <%=user.email%>
+            </div>
+          </div>
+        </div>
+        <nav class="sidebar-menu">
+          <a href="/user/profile" class="sidebar-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            Profile
+          </a>
+          <a href="/user/addresses" class="sidebar-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            Addresses
+          </a>
+          <a href="#" class="sidebar-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="1" y="3" width="15" height="13" />
+              <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+              <circle cx="5.5" cy="18.5" r="2.5" />
+              <circle cx="18.5" cy="18.5" r="2.5" />
+            </svg>
+            My Orders
+          </a>
+          <a href="/user/wishlist" class="sidebar-link active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+              </path>
+            </svg>
+            Wishlist
+          </a>
+          <a href="#" class="sidebar-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="5" width="20" height="14" rx="2" />
+              <line x1="2" y1="10" x2="22" y2="10" />
+            </svg>
+            Wallet
+          </a>
+          <form action="/user/logout" method="POST" style="display: inline">
+            <button type="submit" class="sidebar-link logout-link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              Log Out
+            </button>
+          </form>
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <section class="profile-content">
+        <div class="profile-header">
+          <h2>My Wishlist</h2>
+        </div>
+
+        <% if (wishlistItems.length===0) { %>
+        <div class="empty-wishlist">
+          <i class="fa-regular fa-heart"></i>
+          <h3>Your wishlist is empty</h3>
+          <p>Explore more products and shortlist some items.</p>
+          <a href="/products" class="btn btn-primary" style="margin-top: 15px;">Explore Products</a>
+        </div>
+        <% } else { %>
+        <div class="wishlist-grid">
+          <% wishlistItems.forEach(item=> { %>
+          <div class="wishlist-item" id="wishlist-item" data-item-id="<%=item._id%>">
+            <button class="remove-btn" title="Remove from wishlist" onclick="removeFromWishlist(event, '<%=item._id%>')">
+              <i class="fa-solid fa-times"></i>
+            </button>
+            <div class="wishlist-img-container">
+              <img src="<%=item.image%>" alt="<%=item.name%>">
+            </div>
+            <div class="wishlist-details">
+              <a href="/products/<%=item._id%>" class="wishlist-title">
+                <%=item.name%>
+              </a>
+              <div class="wishlist-price">₹<%=item.price.toFixed(2)%>
+              </div>
+              <div class="wishlist-actions">
+                <button onclick="addToCartFromWishList(event)" class="btn btn-primary btn-sm" style="flex: 1;" data-product-id="<%=item.productId%>" data-variant-id="<%=item.variantId%>">
+                  <i class="fa-solid fa-cart-plus"></i> Add to Cart
+                </button>
+                <button class="btn btn-outline btn-sm remove-wishlist-item-btn" title="Remove" onclick="removeFromWishlist(event, '<%=item._id%>')">
+                  X
+                </button>
+              </div>
+            </div>
+          </div>
+          <% }) %>
+        </div>
+        <% } %>
+
+      </section>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <%- include('../partials/footer') %>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <script src="/js/user.wishlist.js"></script>
+</body>
+
+
+</html>

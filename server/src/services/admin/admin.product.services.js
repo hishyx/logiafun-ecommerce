@@ -125,6 +125,7 @@ export const updateProduct = async (productData, productImages) => {
   product.categoryId = productData.categoryId;
   product.description = productData.description;
   product.attributes = productData.attributes || [];
+  product.discount = productData.discount;
 
   const updatedVariants = [];
 

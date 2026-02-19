@@ -2,6 +2,8 @@ import express from "express";
 
 import * as userControllers from "../controllers/user.controller.js";
 import * as userProductControllers from "../controllers/user.product.controller.js";
+import * as userCartControllers from "../controllers/user.cart.controller.js";
+import * as userWishlistControllers from "../controllers/user.wishlist.controller.js";
 
 import { checkUserStatus, isAuth } from "../middlewares/auth.middleware.js";
 
@@ -17,7 +19,10 @@ router
   .route("/user/profile")
   .get(userControllers.profilePage)
   .patch(userControllers.editProfile);
-router.route("/user/cart").get(userControllers.cartPage);
+router
+  .route("/user/cart")
+  .get(userCartControllers.cartPage)
+  .post(userCartControllers.addToCart);
 router
   .route("/user/change-email")
   .post(userControllers.changeEmail)
@@ -58,5 +63,20 @@ router.get(
   "/products/:productId/not-found",
   userProductControllers.productNotAvailablePage,
 );
+
+// Wishlist
+router
+  .route("/user/wishlist")
+  .get(userWishlistControllers.wishlistPage)
+  .post(userWishlistControllers.addToWishList);
+
+router
+  .route("/user/wishlist/:itemId")
+  .delete(userWishlistControllers.removeWishlistItem);
+
+router
+  .route("/user/cart/:itemId")
+  .delete(userCartControllers.deleteCartItem)
+  .patch(userCartControllers.updateCartItem);
 
 export default router;

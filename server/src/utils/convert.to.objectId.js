@@ -5,3 +5,10 @@ export const ArrayStringsToObjectId = (array) => {
 
   return ObjectIds;
 };
+
+export const StringIdToObjectId = (id) => {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new Error("Invalid item id");
+  }
+  return new mongoose.Types.ObjectId(id);
+};

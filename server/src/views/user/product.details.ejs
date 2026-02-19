@@ -7,6 +7,8 @@
   <title>Product Details - LogiaFun</title>
   <link rel="stylesheet" href="/css/home.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+
   <style>
     :root {
       --primary: #0f172a;
@@ -571,7 +573,8 @@
 
     .variant-option.disabled {
       opacity: 0.4;
-      pointer-events: none;
+      cursor: not-allowed;
+      /* pointer-events: none; removed to allow clicking */
     }
 
     .products-layout {
@@ -582,6 +585,27 @@
       display: grid;
       gap: 1.5rem;
     }
+
+
+    /* ===== Image Magnifier ===== */
+
+    #zoom-container {
+      position: relative;
+      overflow: hidden;
+    }
+
+    #zoom-lens {
+      position: absolute;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
+      display: none;
+      pointer-events: none;
+      background-repeat: no-repeat;
+      z-index: 10;
+    }
   </style>
 </head>
 
@@ -589,140 +613,142 @@
 
   <%- include('../partials/header.ejs') %>
 
-  <main class="product-details-page">
-    <div class="container">
+    <main class="product-details-page">
+      <div class="container">
 
-      <!-- Breadcrumbs -->
-      <div class="breadcrumbs">
-        <a href="/"><i class="fa-solid fa-home"></i></a>
-        <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
-        <a href="#">Shop</a>
-        <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
-        <a href="#">
-          <%=product.category.name%>
-        </a>
-        <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
-        <span class="current">
-          <%=product.name%>
-        </span>
-      </div>
-
-      <div class="product-container">
-        <!-- Gallery -->
-        <div class="product-gallery">
-          <div class="main-image-wrapper">
-            <img src="<%=product.variants[0].images[0]%>" alt="Premium Wireless Headphones" id="main-image">
-          </div>
-          <div class="thumbnail-list">
-            <%product.variants[0].images.forEach(thumbnailUrl=>{%>
-            <div class="thumbnail-item active" onclick="changeImage('<%=thumbnailUrl%>', this)">
-              <img src="<%=thumbnailUrl%>" alt="View 1">
-            </div>
-            <%})%>
-          </div>
+        <!-- Breadcrumbs -->
+        <div class="breadcrumbs">
+          <a href="/"><i class="fa-solid fa-home"></i></a>
+          <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
+          <a href="#">Shop</a>
+          <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
+          <a href="#">
+            <%=product.category.name%>
+          </a>
+          <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
+          <span class="current">
+            <%=product.name%>
+          </span>
         </div>
 
-        <!-- Info -->
-        <div class="product-info">
-          <div class="product-badges">
-            <span class="badge badge-primary">
-              <%=product.category.name%>
-            </span>
-            <!-- <span class="badge badge-secondary">New Arrival</span> -->
-          </div>
-
-          <h1 class="product-title">
-            <%=product.name%>
-          </h1>
-
-          <div class="rating-wrapper">
-            <div class="stars">
-              <i class="fa-solid fa-star"></i>
-              <i class="fa-solid fa-star"></i>
-              <i class="fa-solid fa-star"></i>
-              <i class="fa-solid fa-star"></i>
-              <i class="fa-solid fa-star-half-stroke"></i>
+        <div class="product-container">
+          <!-- Gallery -->
+          <div class="product-gallery">
+            <div class="main-image-wrapper" id="zoom-container">
+              <img src="<%=product.variants[0].images[0]%>" id="main-image">
+              <div id="zoom-lens"></div>
             </div>
-            <span class="review-count">(<%=product.reviewCount%> verified reviews)</span>
+            <div class="thumbnail-list">
+              <%product.variants[0].images.forEach(thumbnailUrl=>{%>
+                <div class="thumbnail-item active" onclick="changeImage('<%=thumbnailUrl%>', this)">
+                  <img src="<%=thumbnailUrl%>" alt="View 1">
+                </div>
+                <%})%>
+            </div>
           </div>
 
-          <div class="price-wrapper">
-            <span class="current-price" id="current-price">
-              ₹<%= product.variants[0].price - (product.discount / 100) * product.variants[0].price %>
-            </span>
+          <!-- Info -->
+          <div class="product-info">
+            <div class="product-badges">
+              <span class="badge badge-primary">
+                <%=product.category.name%>
+              </span>
+              <!-- <span class="badge badge-secondary">New Arrival</span> -->
+            </div>
 
-            <%if(product.discount!==0){%>
-            <span class="old-price" id="old-price">
-              ₹<%= product.variants[0].price %>
-            </span>
+            <h1 class="product-title" id="current-product-title">
+              <%=product.name%>
+            </h1>
 
-            <span class="discount-tag">
-              <%= product.discount %>% OFF
-            </span>
-            <%}%>
+            <div class="rating-wrapper">
+              <div class="stars">
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star-half-stroke"></i>
+              </div>
+              <span class="review-count">(<%=product.reviewCount%> verified reviews)</span>
+            </div>
+
+            <div class="price-wrapper">
+              <span class="current-price" id="current-price">
+                ₹<%= product.variants[0].price - (product.discount / 100) * product.variants[0].price %>
+              </span>
+
+              <%if(product.discount!==0 && product.discount!==null){%>
+                <span class="old-price" id="old-price">
+                  ₹<%= product.variants[0].price %>
+                </span>
+
+                <span class="discount-tag">
+                  <%= product.discount %>% OFF
+                </span>
+                <%}%>
             </div>
 
 
             <div class="product-description">
               <%=product.description%>
-          </div>
-
-          <!-- Variants -->
-
-          <% product.attributes.forEach(attribute=> { %>
-          <div class="variant-section" id="<%= attribute %>">
-            <div class="variant-label">
-              <%= attribute %>
             </div>
-            <div class="variant-options">
 
-              <% const uniqueValues=new Set(); product.variants.forEach(variant=> {
+            <!-- Variants -->
+
+            <% product.attributes.forEach(attribute=> { %>
+              <div class="variant-section" id="<%= attribute %>">
+                <div class="variant-label">
+                  <%= attribute %>
+                </div>
+                <div class="variant-options">
+
+                  <% const uniqueValues=new Set(); product.variants.forEach(variant=> {
                     if (variant.attributes && variant.attributes[attribute]) {
                     uniqueValues.add(variant.attributes[attribute]);
                     }
                     });
                     %>
 
-              <% uniqueValues.forEach(value=> { %>
-              <div class="variant-option">
-                <%= value %>
+                    <% uniqueValues.forEach(value=> { %>
+                      <div class="variant-option">
+                        <%= value %>
+                      </div>
+                      <% }) %>
+
+                </div>
               </div>
               <% }) %>
 
-            </div>
-          </div>
-          <% }) %>
-
-          <div id="productdetails" data-product='<%- JSON.stringify(product) %>'>
-          </div>
+                <div id="productdetails" data-product='<%- JSON.stringify(product) %>'>
+                </div>
 
 
-          <!-- Actions -->
-          <div class="action-row">
-            <div class="qty-selector">
+                <!-- Actions -->
+                <div class="action-row">
+                  <!-- <div class="qty-selector">
               <button class="qty-btn" onclick="updateQty(-1)"><i class="fa-solid fa-minus"></i></button>
               <input type="text" class="qty-input" value="1" readonly id="qty-input">
               <button class="qty-btn" onclick="updateQty(1)"><i class="fa-solid fa-plus"></i></button>
-            </div>
+            </div> -->
 
-            <button class="btn-primary">
-              <i class="fa-solid fa-cart-shopping"></i>
-              Add to Cart
-            </button>
+                  <button class="btn-primary" id="addToCartBtn" data-product-id="<%=product._id%>">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    Add to Cart
+                  </button>
 
-            <button class="btn-secondary" title="Add to Wishlist">
-              <i class="fa-regular fa-heart"></i>
-            </button>
-          </div>
+                  <button class="btn-secondary" id="addToWishListBtn" title="Add to Wishlist"
+                    data-product-id="<%=product._id%>">
+                    <i class="fa-regular fa-heart"></i>
+                  </button>
+                </div>
 
-          <div style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary);">
-            <i class="fa-solid fa-check-circle" style="color: #22c55e; margin-right: 6px;"></i> In Stock
-            & Ready to Ship
+                <div style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-secondary);">
+                  <i class="fa-solid fa-check-circle" style="color: #22c55e; margin-right: 6px;"></i> In Stock
+                  & Ready to Ship
+                </div>
           </div>
         </div>
-      </div>
 
-      <!-- Additional Details Tabs
+        <!-- Additional Details Tabs
       <div class="details-tabs">
         <div class="tab-header">
           <button class="tab-btn active">Description</button>
@@ -741,48 +767,99 @@
         </div>
       </div> -->
 
-      <!-- Related Products Section (Static Mockup) -->
-      <div class="related-section">
-        <h2 class="section-title">You Might Also Like</h2>
-        <div class="products-layout" style="grid-template-columns: 1fr;">
-          <!-- Reusing existing layout class but full width -->
-          <div class="products-grid" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));">
-            <!-- Product Card 1 -->
-            <%relatedProducts.forEach(relatedProd=>{%>
-            <div class="product-card">
-              <a href="/products/<%= relatedProd._id %>" style="display: block; height: 100%; text-decoration: none; color: inherit;">
-                <div class="product-image-wrapper">
-                  <img src="<%= relatedProd?.variants[0]?.images[0] %>" alt="<%= relatedProd.name %>">
-                </div>
-                <div class="product-content">
-                  <div class="product-category-tag"><%= relatedProd.category?.name %></div>
-                  <h3 class="product-title"><%= relatedProd.name %></h3>
-                  <div class="current-price">
-                    ₹<%= (
-                        relatedProd.variants[0].price *
-                        (1 - (relatedProd.discount || 0) / 100)
-                        ).toFixed(2) %>
+        <!-- Related Products Section (Static Mockup) -->
+        <div class="related-section">
+          <h2 class="section-title">
+            <%= relatedProducts.length>0 ? "You Might Also Like" : "No Related Products found"%>
+          </h2>
+          <div class="products-layout" style="grid-template-columns: 1fr;">
+            <!-- Reusing existing layout class but full width -->
+            <div class="products-grid" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));">
+              <!-- Product Card 1 -->
+              <%relatedProducts.forEach(relatedProd=>{%>
+                <div class="product-card">
+                  <a href="/products/<%= relatedProd._id %>"
+                    style="display: block; height: 100%; text-decoration: none; color: inherit;">
+                    <div class="product-image-wrapper">
+                      <img src="<%= relatedProd?.variants[0]?.images[0] %>" alt="<%= relatedProd.name %>">
+                    </div>
+                    <div class="product-content">
+                      <div class="product-category-tag">
+                        <%= relatedProd.category?.name %>
+                      </div>
+                      <h3 class="product-title">
+                        <%= relatedProd.name %>
+                      </h3>
+                      <div class="current-price">
+                        ₹<%= ( relatedProd.variants[0].price * (1 - (relatedProd.discount || 0) / 100) ).toFixed(2) %>
+                      </div>
+                    </div>
+                  </a>
+                  <div class="card-actions">
+                    <button class="action-btn"><i class="fa-regular fa-heart"></i></button>
                   </div>
                 </div>
-              </a>
-              <div class="card-actions">
-                <button class="action-btn"><i class="fa-regular fa-heart"></i></button>
-              </div>
-            </div>
-            <%})%>
+                <%})%>
 
+            </div>
           </div>
         </div>
+
       </div>
+    </main>
 
-    </div>
-  </main>
-
-  <%- include('../partials/footer') %>
+    <%- include('../partials/footer') %>
 
 
 
-  <script src="/js/product.details.js"></script>
+      <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+      <script src="/js/product.details.js"></script>
+      <script src="/js/user.cart.js"></script>
+      <script src="/js/user.wishlist.js"></script>
+
+
+      <script>
+        const img = document.getElementById("main-image");
+        const lens = document.getElementById("zoom-lens");
+        const container = document.getElementById("zoom-container");
+
+        let zoomLevel = 2.5;
+
+        container.addEventListener("mousemove", moveZoom);
+        container.addEventListener("mouseenter", () => {
+          lens.style.display = "block";
+        });
+        container.addEventListener("mouseleave", () => {
+          lens.style.display = "none";
+        });
+
+        function moveZoom(e) {
+          const rect = img.getBoundingClientRect();
+
+          let x = e.clientX - rect.left;
+          let y = e.clientY - rect.top;
+
+          const lensSize = lens.offsetWidth / 2;
+
+          // keep lens inside image
+          x = Math.max(lensSize, Math.min(x, rect.width - lensSize));
+          y = Math.max(lensSize, Math.min(y, rect.height - lensSize));
+
+          lens.style.left = x - lensSize + "px";
+          lens.style.top = y - lensSize + "px";
+
+          lens.style.backgroundImage = `url(${img.src})`;
+          lens.style.backgroundSize =
+            rect.width * zoomLevel + "px " +
+            rect.height * zoomLevel + "px";
+
+          lens.style.backgroundPosition =
+            `-${x * zoomLevel - lensSize}px -${y * zoomLevel - lensSize}px`;
+        }
+      </script>
+
+
+
 
 
 </body>

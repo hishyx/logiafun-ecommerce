@@ -70,8 +70,10 @@ export const productDetailsPage = async (req, res) => {
     const product = await userProductServices.getProductDetails(productId);
     const relatedProducts = await userProductServices.getRelatedProducts(
       product.categoryId,
+      product._id,
     );
 
+    console.log("the real product is : ".product);
     console.log("Related product is : ", relatedProducts);
 
     res.render("user/product.details.ejs", { product, relatedProducts });

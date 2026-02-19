@@ -37,10 +37,6 @@ export const profilePage = async (req, res) => {
   }
 };
 
-export const cartPage = (req, res) => {
-  res.render("user/cart", { user: req.user });
-};
-
 export const editProfile = async (req, res) => {
   try {
     const { name, phone, newPassword, currentPassword } = req.body;

@@ -161,13 +161,14 @@ export const getProductDetails = async (productId) => {
   return availableProduct;
 };
 
-export const getRelatedProducts = async (categoryId) => {
+export const getRelatedProducts = async (categoryId, productId) => {
   const limit = 4;
   const relatedProducts = await Product.aggregate([
     {
       $match: {
         isActive: true,
         categoryId: categoryId,
+        _id: { $ne: productId },
       },
     },
     {

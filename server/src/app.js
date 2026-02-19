@@ -6,6 +6,8 @@ import passport from "./config/passport.js";
 import nocache from "nocache";
 import methodOverride from "method-override";
 import preventHTMLCache from "./middlewares/prevent.cache.js";
+import errorHandler from "./middlewares/error.handling.middleware.js";
+import { getCartCount } from "./services/user.cart.services.js";
 
 //importing routers
 
@@ -38,9 +40,20 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 // Routes
-app.use((req, res, next) => {
-  res.locals.user = req.user || null;
-  next();
+app.use(async (req, res, next) => {
+  try {
+    res.locals.user = req.user || null;
+
+    if (req.user) {
+      res.locals.cartCount = await getCartCount(req.user._id);
+    } else {
+      res.locals.cartCount = 0;
+    }
+
+    next();
+  } catch (err) {
+    next(err);
+  }
 });
 
 app.use("/", authRoute);
@@ -50,5 +63,7 @@ app.use("/", userRoute);
 app.use((req, res) => {
   res.status(404).render("404-not-found");
 });
+
+app.use(errorHandler);
 
 export default app;

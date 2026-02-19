@@ -3,6 +3,8 @@
  * Refactored for readability and modularity.
  */
 
+let imagePreviewContainer;
+
 document.addEventListener("DOMContentLoaded", () => {
   // ==========================================
   // 1. GLOBAL STATE
@@ -471,6 +473,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const container = wrapper.querySelector(".new-previews");
       if (!container) return;
 
+      imagePreviewContainer = container;
       const images = State.images.get(key) || [];
       container.innerHTML = "";
 
@@ -692,31 +695,22 @@ document.addEventListener("DOMContentLoaded", () => {
         const data = await response.json();
 
         if (response.ok) {
-          if (mode === "add") {
-            // Add new row
-            addProductRow(data.product);
-            Modals.close("addProductModal");
-            Swal.fire({
-              toast: true,
-              position: "top-end",
-              icon: "success",
-              title: "Product added successfully",
-              showConfirmButton: false,
-              timer: 3000,
-            });
-          } else {
-            // Update existing row
-            updateProductRow(data.product);
-            Modals.close("editProductModal");
-            Swal.fire({
-              toast: true,
-              position: "bottom-end",
-              icon: "success",
-              title: "Product updated successfully",
-              showConfirmButton: false,
-              timer: 3000,
-            });
-          }
+          const modalId =
+            mode === "add" ? "addProductModal" : "editProductModal";
+          Modals.close(modalId);
+
+          Swal.fire({
+            toast: true,
+            position: "top-end",
+            icon: "success",
+            title: `Product ${mode === "add" ? "added" : "updated"} successfully`,
+            showConfirmButton: false,
+            timer: 600,
+          });
+
+          setTimeout(() => {
+            window.location.reload();
+          }, 600);
         } else {
           // THROW ERROR TO BE CAUGHT BELOW
           throw new Error(data.message || "Failed to save product");
@@ -738,7 +732,9 @@ document.addEventListener("DOMContentLoaded", () => {
     init: () => {
       const addForm = DOM.get("addProductForm");
       if (addForm)
-        addForm.addEventListener("submit", (e) => Forms.submit(e, "add"));
+        addForm.addEventListener("submit", (e) => {
+          Forms.submit(e, "add");
+        });
 
       const editForm = DOM.get("editProductForm");
       if (editForm)
@@ -780,9 +776,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const imgParam =
       product.variants &&
-      product.variants.length > 0 &&
-      product.variants[0].images &&
-      product.variants[0].images.length > 0
+        product.variants.length > 0 &&
+        product.variants[0].images &&
+        product.variants[0].images.length > 0
         ? product.variants[0].images[0]
         : "https://placehold.co/40x40";
 
@@ -839,18 +835,17 @@ document.addEventListener("DOMContentLoaded", () => {
       toggleBtn.style.color = product.isActive ? "#ef4444" : "#10b981";
 
       const icon = toggleBtn.querySelector("i");
-      icon.className = `fa-solid ${
-        product.isActive ? "fa-eye-slash" : "fa-eye"
-      }`;
+      icon.className = `fa-solid ${product.isActive ? "fa-eye-slash" : "fa-eye"
+        }`;
     }
   }
 
   function generateProductRowHTML(product) {
     const imgParam =
       product.variants &&
-      product.variants.length > 0 &&
-      product.variants[0].images &&
-      product.variants[0].images.length > 0
+        product.variants.length > 0 &&
+        product.variants[0].images &&
+        product.variants[0].images.length > 0
         ? product.variants[0].images[0]
         : "https://placehold.co/40x40";
 
@@ -904,10 +899,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     <!-- Status Column -->
     <td>
-      ${
-        product.isActive
-          ? `<span class="status-badge status-active"><span class="status-indicator"></span> Active</span>`
-          : `<span class="status-badge status-blocked"><span class="status-indicator"></span> Inactive</span>`
+      ${product.isActive
+        ? `<span class="status-badge status-active"><span class="status-indicator"></span> Active</span>`
+        : `<span class="status-badge status-blocked"><span class="status-indicator"></span> Inactive</span>`
       }
     </td>
 
@@ -930,9 +924,8 @@ document.addEventListener("DOMContentLoaded", () => {
           data-active="${product.isActive}"
           style="color: ${product.isActive ? "#ef4444" : "#10b981"}"
         >
-          <i class="fa-solid ${
-            product.isActive ? "fa-eye-slash" : "fa-eye"
-          }"></i>
+          <i class="fa-solid ${product.isActive ? "fa-eye-slash" : "fa-eye"
+      }"></i>
         </button>
       </div>
     </td>

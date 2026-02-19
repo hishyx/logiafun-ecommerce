@@ -88,6 +88,7 @@ export const verifySignupOTP = async (otpId, inputOtp, pendingUser) => {
     email: pendingUser.email,
     phone: pendingUser.phone,
     password: pendingUser.password,
+    profilImage: "https://www.computerhope.com/jargon/g/guest-user.png",
     isVerified: true,
   });
 
