@@ -70,6 +70,11 @@ if (addToCartButton) {
   addToCartButton.addEventListener("click", async (e) => {
     const activeVariant = getActiveVariant();
 
+    if (!activeVariant) {
+      showToast("Please select a valid variant option");
+      return;
+    }
+
     const productId = addToCartButton.dataset.productId;
     const variantId = activeVariant._id;
     const quantity = 1;
@@ -96,6 +101,7 @@ if (addToCartButton) {
         badge.innerText = addToCartResult.cartCount;
       }
     } else {
+      console.log("Not added")
       showToast(addToCartResult.message);
     }
   });

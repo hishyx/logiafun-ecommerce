@@ -342,42 +342,40 @@ img {
 
 /* --- Categories --- */
 .categories-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 1.5rem;
-}
-
-.category-card {
-  text-align: center;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.category-card:hover {
-  transform: translateY(-5px);
-}
-
-.category-icon {
-  width: 90px;
-  height: 90px;
-  margin: 0 auto 1rem;
-  background: var(--bg-light);
-  border-radius: 50%;
   display: flex;
-  align-items: center;
+  flex-wrap: wrap;
   justify-content: center;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.category-card-styled {
+  padding: 1rem 2rem;
+  background: var(--bg-light);
+  border: 1px solid #eee;
+  border-radius: var(--radius-pill);
+  transition: var(--transition);
+  text-align: center;
+  min-width: 160px;
+}
+
+.category-card-styled:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-sm);
+}
+
+.category-card-styled h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
   color: var(--primary);
   transition: var(--transition);
 }
 
-.category-card:hover .category-icon {
-  background: var(--primary);
+.category-card-styled:hover h3 {
   color: var(--white);
-}
-
-.category-card h3 {
-  font-size: 0.95rem;
-  font-weight: 600;
 }
 
 /* --- Products --- */

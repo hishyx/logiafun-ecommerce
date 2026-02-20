@@ -26,7 +26,7 @@ export const adminProductListPage = async (req, res) => {
 
     const categories = await adminCategoryServices.getAvailableCategories();
 
-    console.log("the product are : ", productsList.products[0].variants);
+    const totalPages = Math.ceil(productsList.total / limit);
 
     res.render("admin/admin.products.ejs", {
       ...productsList,
@@ -36,10 +36,11 @@ export const adminProductListPage = async (req, res) => {
       sort,
       page,
       limit,
-      totalPages: Math.ceil(productsList.total / limit),
+      totalPages,
     });
   } catch (err) {
-    console.log(err);
+    console.error("Error in adminProductListPage:", err);
+    res.status(500).render("404-not-found");
   }
 };
 

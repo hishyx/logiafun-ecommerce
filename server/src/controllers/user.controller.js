@@ -13,12 +13,20 @@ import {
 } from "../services/OTP.services.js";
 
 import User from "../models/user.model.js";
+import { getAvailableCategories } from "../services/admin/admin.category.services.js";
 
-export const homePage = (req, res) => {
-  console.log(req.user);
-  res.render("user/home.ejs", {
-    user: req.user,
-  });
+export const homePage = async (req, res) => {
+  try {
+    const categories = await getAvailableCategories();
+
+    res.render("user/home.ejs", {
+      user: req.user,
+      categories,
+    });
+  } catch (err) {
+    console.error("Home page error:", err);
+    res.status(500).render("404-not-found");
+  }
 };
 
 export const profilePage = async (req, res) => {
@@ -52,7 +60,7 @@ export const editProfile = async (req, res) => {
         phone: updatedUser.phone,
       },
     });
-  } catch (err) {}
+  } catch (err) { }
 };
 
 export const changeEmail = async (req, res) => {

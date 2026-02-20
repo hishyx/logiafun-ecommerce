@@ -368,7 +368,7 @@
         <div class="controls-area">
           <div class="search-wrapper">
             <i class="fa-solid fa-magnifying-glass search-icon"></i>
-            <input type="text" id="listSearch" value="<%= search%>" placeholder="Search categories..." />
+            <input type="text" id="listSearch" value="<%= search%>" placeholder="Search products..." />
             <button id="clearSearchBtn" class="action-btn clear-btn" aria-label="Clear Search">
               <i class="fa-solid fa-xmark"></i>
             </button>
@@ -419,81 +419,92 @@
 
         <!-- Product Table -->
         <div class="table-container">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Product</th>
-                <th>Category</th>
-                <th>Price</th>
-                <th>Stock</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
+          <% if (typeof products !=='undefined' && products.length> 0) { %>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th>Stock</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
 
-            <tbody>
-              <% products.forEach(product=> { %>
-              <tr>
-                <td>
-                  <div class="product-cell">
-                    <img src="<%= product.variants[0].images[0] || '/images/product-placeholder.png' %>" alt="Product" class="product-img" onerror="this.src='https://placehold.co/40x40'" />
+              <tbody>
+                <% products.forEach(product=> { %>
+                  <tr>
+                    <td>
+                      <div class="product-cell">
+                        <img src="<%= product.variants[0].images[0] || '/images/product-placeholder.png' %>"
+                          alt="Product" class="product-img" onerror="this.src='https://placehold.co/40x40'" />
 
-                    <div class="product-info">
-                      <span>
-                        <%= product.name %>
-                      </span>
-                      <small>ID: <%= product._id %></small>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <%= product.category ? product.category.name : "No Category" %>
-                </td>
+                        <div class="product-info">
+                          <span>
+                            <%= product.name %>
+                          </span>
+                          <small>ID: <%= product._id %></small>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <%= product.category ? product.category.name : "No Category" %>
+                    </td>
 
-                <td>
-                  $<%= product.variants[0]?.price?.toFixed(2) %>
-                </td>
+                    <td>
+                      ₹<%= product.variants[0]?.price?.toFixed(2) %>
+                    </td>
 
-                <td>
-                  <% if (product.stock===0) { %>
-                  <span class="badge-stock stock-out">Out of Stock</span>
-                  <% } else if (product.stock <=10) { %>
-                  <span class="badge-stock stock-low">
-                    <%= product.stock %> Left
-                  </span>
-                  <% } else { %>
-                  <span class="badge-stock stock-in">
-                    <%= product.stock %> In Stock
-                  </span>
-                  <% } %>
-                </td>
+                    <td>
+                      <% if (product.stock===0) { %>
+                        <span class="badge-stock stock-out">Out of Stock</span>
+                        <% } else if (product.stock <=10) { %>
+                          <span class="badge-stock stock-low">
+                            <%= product.stock %> Left
+                          </span>
+                          <% } else { %>
+                            <span class="badge-stock stock-in">
+                              <%= product.stock %> In Stock
+                            </span>
+                            <% } %>
+                    </td>
 
-                <td>
-                  <% if (product.isActive) { %>
-                  <span class="status-badge status-active">
-                    <span class="status-indicator"></span> Active
-                  </span>
-                  <% } else { %>
-                  <span class="status-badge status-blocked">
-                    <span class="status-indicator"></span> Inactive
-                  </span>
-                  <% } %>
-                </td>
+                    <td>
+                      <% if (product.isActive) { %>
+                        <span class="status-badge status-active">
+                          <span class="status-indicator"></span> Active
+                        </span>
+                        <% } else { %>
+                          <span class="status-badge status-blocked">
+                            <span class="status-indicator"></span> Inactive
+                          </span>
+                          <% } %>
+                    </td>
 
-                <td>
-                  <button class="action-btn edit-product-btn" title="Edit" data-id="<%= product._id %>" data-product='<%= JSON.stringify(product) %>'>
-                    <i class="fa-regular fa-pen-to-square"></i>
-                  </button>
+                    <td>
+                      <button class="action-btn edit-product-btn" title="Edit" data-id="<%= product._id %>"
+                        data-product='<%= JSON.stringify(product) %>'>
+                        <i class="fa-regular fa-pen-to-square"></i>
+                      </button>
 
-                  <button class="action-btn toggle-product-btn" title="<%= product.isActive ? 'Unlist' : 'List' %>" data-id="<%= product._id %>" data-active="<%= product.isActive %>" style="color: <%= product.isActive ? '#ef4444' : '#10b981' %>">
-                    <i class="fa-solid <%= product.isActive ? 'fa-eye-slash' : 'fa-eye' %>"></i>
-                  </button>
-                </td>
-              </tr>
-              <% }) %>
-            </tbody>
-          </table>
-
+                      <button class="action-btn toggle-product-btn" title="<%= product.isActive ? 'Unlist' : 'List' %>"
+                        data-id="<%= product._id %>" data-active="<%= product.isActive %>"
+                        style="color: <%= product.isActive ? '#ef4444' : '#10b981' %>">
+                        <i class="fa-solid <%= product.isActive ? 'fa-eye-slash' : 'fa-eye' %>"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <% }) %>
+              </tbody>
+            </table>
+            <% } else { %>
+              <div class="empty-state" style="padding: 3rem; text-align: center; color: #64748b;">
+                <i class="fa-solid fa-box-open" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                <h3>No products found</h3>
+                <p>Try adjusting your search or filters to find what you're looking for.</p>
+              </div>
+              <% } %>
         </div>
 
         <!-- Pagination -->
@@ -501,14 +512,15 @@
           <div class="pagination-info">
             Showing
             <%= total===0 ? 0 : ((page - 1) * limit + 1) %>
-            -
-            <%= Math.min(page * limit, total) %>
-            of
-            <%= total %>
+              -
+              <%= Math.min(page * limit, total) %>
+                of
+                <%= total %>
           </div>
           <div class="pagination-controls">
-            <button class="page-btn" <%=page===1 ? "disabled" : "" %> onclick="goToPage(<%= page - 1 %>)">
-              <i class="fa-solid fa-chevron-left"></i>
+            <button class="page-btn" <%=page===1 || totalPages===0 ? "disabled" : "" %> onclick="goToPage(<%= page - 1
+                %>)">
+                <i class="fa-solid fa-chevron-left"></i>
             </button>
 
             <div class="page-numbers">
@@ -516,8 +528,9 @@
                 <%=page%>
               </button>
             </div>
-            <button class="page-btn" <%=page===totalPages ? "disabled" : "" %> onclick="goToPage(<%= page + 1 %>)">
-              <i class="fa-solid fa-chevron-right"></i>
+            <button class="page-btn" <%=page===totalPages || totalPages===0 ? "disabled" : "" %> onclick="goToPage(<%=
+                page + 1 %>)">
+                <i class="fa-solid fa-chevron-right"></i>
             </button>
           </div>
         </div>
@@ -544,14 +557,14 @@
           <select class="form-control" id="addCategory" name="categoryId" required>
             <option value="" disabled selected>Select Category</option>
             <%if(categories && categories.length!=0){%>
-            <% categories.forEach(category=>{%>
-            <option value="<%=category._id%>" id="category-<%=category._id%>">
-              <%=category.name%>
-            </option>
-            <%=category.name%>
-            </option>
-            <%})%>
-            <%}%>
+              <% categories.forEach(category=>{%>
+                <option value="<%=category._id%>" id="category-<%=category._id%>">
+                  <%=category.name%>
+                </option>
+                <%=category.name%>
+                  </option>
+                  <%})%>
+                    <%}%>
           </select>
         </div>
 
@@ -584,8 +597,8 @@
         </button>
 
 
-          <label class="form-label" for="addDiscount" style="margin-top: 10px;">Discount percentage (Optional)</label>
-          <input type="text" class="form-control" id="addDiscount" name="discount" >
+        <label class="form-label" for="addDiscount" style="margin-top: 10px;">Discount percentage (Optional)</label>
+        <input type="text" class="form-control" id="addDiscount" name="discount">
 
 
         <div class="form-group" style="margin-top: 1.5rem;">
@@ -625,12 +638,12 @@
           <select class="form-control" id="editCategory" name="categoryId" required>
             <option value="" disabled>Select Category</option>
             <%if(categories && categories.length!=0){%>
-            <% categories.forEach(category=>{%>
-            <option value="<%=category._id%>">
-              <%=category.name%>
-            </option>
-            <%})%>
-            <%}%>
+              <% categories.forEach(category=>{%>
+                <option value="<%=category._id%>">
+                  <%=category.name%>
+                </option>
+                <%})%>
+                  <%}%>
           </select>
         </div>
 
@@ -660,8 +673,8 @@
         </button>
 
 
-          <label class="form-label" for="editDiscount" style="margin-top: 10px;">Discount percentage (Optional)</label>
-          <input type="text" class="form-control" id="editDiscount" name="discount" >
+        <label class="form-label" for="editDiscount" style="margin-top: 10px;">Discount percentage (Optional)</label>
+        <input type="text" class="form-control" id="editDiscount" name="discount">
 
         <div class="form-group" style="margin-top: 1.5rem;">
           <label class="form-label" for="editDescription">Description</label>
@@ -1075,7 +1088,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="/js/admin/admin.products.js"></script>
-<script src="/js/admin/admin.pagination.search.js"></script>
+  <script src="/js/admin/admin.pagination.search.js"></script>
 </body>
 
 </html>

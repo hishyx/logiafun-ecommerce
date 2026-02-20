@@ -175,18 +175,28 @@ function availableAttribute(changedAttribute = null) {
   updateImagesUI();
 }
 
-//Settting first varaint as selected
+// Set selection to match the first available variant on initial load
+const firstVariant = variants[0];
+if (firstVariant && firstVariant.attributes) {
+  document.querySelectorAll(".variant-section").forEach((section) => {
+    const attribute = section.querySelector(".variant-label").textContent.trim();
+    const value = firstVariant.attributes[attribute];
 
-// Set first option active in each section
-document.querySelectorAll(".variant-section").forEach((section) => {
-  const firstOption = section.querySelector(".variant-option");
-  if (firstOption) {
-    firstOption.classList.add("active");
-  }
-});
+    if (value) {
+      const options = section.querySelectorAll(".variant-option");
+      options.forEach((opt) => {
+        if (opt.textContent.trim() === value) {
+          opt.classList.add("active");
+        } else {
+          opt.classList.remove("active");
+        }
+      });
+    }
+  });
+}
 
-// Do NOT run filtering here
-updateImagesUI();
+// Initial sync of attributes and images
+availableAttribute();
 
 //My works ui updates
 

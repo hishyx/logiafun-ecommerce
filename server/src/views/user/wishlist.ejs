@@ -118,124 +118,133 @@
   <!-- Header -->
   <%- include('../partials/header.ejs')%>
 
-  <main>
-    <div class="profile-container">
-      <!-- Sidebar -->
-      <aside class="profile-sidebar">
-        <div class="profile-user-info">
-          <div class="profile-avatar-large"><img src="<%=user.profileImage%>"></div>
-          <div>
-            <!-- Keeping file input hidden but structure same as profile -->
-            <div class="profile-user-name" id="sidebarName">
-              <%=user.name%>
-            </div>
-            <div class="profilacce-user-email" id="sidebarEmail">
-              <%=user.email%>
+    <main>
+      <div class="profile-container">
+        <!-- Sidebar -->
+        <aside class="profile-sidebar">
+          <div class="profile-user-info">
+            <div class="profile-avatar-large"><img src="<%=user.profileImage%>"></div>
+            <div>
+              <!-- Keeping file input hidden but structure same as profile -->
+              <div class="profile-user-name" id="sidebarName">
+                <%=user.name%>
+              </div>
+              <div class="profilacce-user-email" id="sidebarEmail">
+                <%=user.email%>
+              </div>
             </div>
           </div>
-        </div>
-        <nav class="sidebar-menu">
-          <a href="/user/profile" class="sidebar-link">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-            Profile
-          </a>
-          <a href="/user/addresses" class="sidebar-link">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-              <circle cx="12" cy="10" r="3"></circle>
-            </svg>
-            Addresses
-          </a>
-          <a href="#" class="sidebar-link">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="1" y="3" width="15" height="13" />
-              <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
-              <circle cx="5.5" cy="18.5" r="2.5" />
-              <circle cx="18.5" cy="18.5" r="2.5" />
-            </svg>
-            My Orders
-          </a>
-          <a href="/user/wishlist" class="sidebar-link active">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
-              </path>
-            </svg>
-            Wishlist
-          </a>
-          <a href="#" class="sidebar-link">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="2" y="5" width="20" height="14" rx="2" />
-              <line x1="2" y1="10" x2="22" y2="10" />
-            </svg>
-            Wallet
-          </a>
-          <form action="/user/logout" method="POST" style="display: inline">
-            <button type="submit" class="sidebar-link logout-link">
+          <nav class="sidebar-menu">
+            <a href="/user/profile" class="sidebar-link">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                <polyline points="16 17 21 12 16 7"></polyline>
-                <line x1="21" y1="12" x2="9" y2="12"></line>
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
               </svg>
-              Log Out
-            </button>
-          </form>
-        </nav>
-      </aside>
+              Profile
+            </a>
+            <a href="/user/addresses" class="sidebar-link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+              Addresses
+            </a>
+            <a href="#" class="sidebar-link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="1" y="3" width="15" height="13" />
+                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+                <circle cx="5.5" cy="18.5" r="2.5" />
+                <circle cx="18.5" cy="18.5" r="2.5" />
+              </svg>
+              My Orders
+            </a>
+            <a href="/user/wishlist" class="sidebar-link active">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path
+                  d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                </path>
+              </svg>
+              Wishlist
+            </a>
+            <a href="#" class="sidebar-link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="5" width="20" height="14" rx="2" />
+                <line x1="2" y1="10" x2="22" y2="10" />
+              </svg>
+              Wallet
+            </a>
+            <form action="/user/logout" method="POST" style="display: inline">
+              <button type="submit" class="sidebar-link logout-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Log Out
+              </button>
+            </form>
+          </nav>
+        </aside>
 
-      <!-- Main Content -->
-      <section class="profile-content">
-        <div class="profile-header">
-          <h2>My Wishlist</h2>
-        </div>
-
-        <% if (wishlistItems.length===0) { %>
-        <div class="empty-wishlist">
-          <i class="fa-regular fa-heart"></i>
-          <h3>Your wishlist is empty</h3>
-          <p>Explore more products and shortlist some items.</p>
-          <a href="/products" class="btn btn-primary" style="margin-top: 15px;">Explore Products</a>
-        </div>
-        <% } else { %>
-        <div class="wishlist-grid">
-          <% wishlistItems.forEach(item=> { %>
-          <div class="wishlist-item" id="wishlist-item" data-item-id="<%=item._id%>">
-            <button class="remove-btn" title="Remove from wishlist" onclick="removeFromWishlist(event, '<%=item._id%>')">
-              <i class="fa-solid fa-times"></i>
-            </button>
-            <div class="wishlist-img-container">
-              <img src="<%=item.image%>" alt="<%=item.name%>">
-            </div>
-            <div class="wishlist-details">
-              <a href="/products/<%=item._id%>" class="wishlist-title">
-                <%=item.name%>
-              </a>
-              <div class="wishlist-price">₹<%=item.price.toFixed(2)%>
-              </div>
-              <div class="wishlist-actions">
-                <button onclick="addToCartFromWishList(event)" class="btn btn-primary btn-sm" style="flex: 1;" data-product-id="<%=item.productId%>" data-variant-id="<%=item.variantId%>">
-                  <i class="fa-solid fa-cart-plus"></i> Add to Cart
-                </button>
-                <button class="btn btn-outline btn-sm remove-wishlist-item-btn" title="Remove" onclick="removeFromWishlist(event, '<%=item._id%>')">
-                  X
-                </button>
-              </div>
-            </div>
+        <!-- Main Content -->
+        <section class="profile-content">
+          <div class="profile-header">
+            <h2>My Wishlist</h2>
           </div>
-          <% }) %>
-        </div>
-        <% } %>
 
-      </section>
-    </div>
-  </main>
+          <% if (wishlistItems.length===0) { %>
+            <div class="empty-wishlist">
+              <i class="fa-regular fa-heart"></i>
+              <h3>Your wishlist is empty</h3>
+              <p>Explore more products and shortlist some items.</p>
+              <a href="/products" class="btn btn-primary" style="margin-top: 15px;">Explore Products</a>
+            </div>
+            <% } else { %>
+              <div class="wishlist-grid">
+                <% wishlistItems.forEach(item=> { %>
+                  <div class="wishlist-item" id="wishlist-item" data-item-id="<%=item._id%>">
+                    <button class="remove-btn" title="Remove from wishlist"
+                      onclick="removeFromWishlist(event, '<%=item._id%>')">
+                      <i class="fa-solid fa-times"></i>
+                    </button>
+                    <a href="/products/<%=item.productId%>"
+                      style="text-decoration: none; color: inherit; display: block;">
+                      <div class="wishlist-img-container">
+                        <img src="<%=item.image%>" alt="<%=item.name%>">
+                      </div>
+                      <div class="wishlist-details">
+                        <span class="wishlist-title">
+                          <%=item.name%>
+                        </span>
+                        <div class="wishlist-price">₹<%=item.price.toFixed(2)%>
+                        </div>
+                      </div>
+                    </a>
+                    <div class="wishlist-details" style="padding-top: 0;">
+                      <div class="wishlist-actions">
+                        <button onclick="addToCartFromWishList(event)" class="btn btn-primary btn-sm" style="flex: 1;"
+                          data-product-id="<%=item.productId%>" data-variant-id="<%=item.variantId%>">
+                          <i class="fa-solid fa-cart-plus"></i> Add to Cart
+                        </button>
+                        <button class="btn btn-outline btn-sm remove-wishlist-item-btn" title="Remove"
+                          onclick="removeFromWishlist(event, '<%=item._id%>')">
+                          X
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <% }) %>
+              </div>
+              <% } %>
 
-  <!-- Footer -->
-  <%- include('../partials/footer') %>
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-  <script src="/js/user.wishlist.js"></script>
+        </section>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <%- include('../partials/footer') %>
+      <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+      <script src="/js/user.wishlist.js"></script>
 </body>
 
 
