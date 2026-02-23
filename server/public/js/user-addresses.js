@@ -8,11 +8,10 @@ function appendAddressCard(address) {
   div.dataset.id = address._id; // ✅ card level id
 
   div.innerHTML = `
-  ${
-    address.isDefault
+  ${address.isDefault
       ? `<span class="address-type-badge">${address.addressName}(Default)</span>`
       : `<span class="address-type-badge">${address.addressName}</span>`
-  }
+    }
 
   <div class="address-details">
 
@@ -32,10 +31,9 @@ function appendAddressCard(address) {
       Edit
     </button>
 
-    ${
-      address.isDefault
-        ? ""
-        : `
+    ${address.isDefault
+      ? ""
+      : `
           <button class="btn-link default-btn" data-id="${address._id}">
             Set as Default
           </button>
@@ -213,8 +211,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (addForm) {
     addForm.addEventListener("submit", async (e) => {
-      console.log("Add address form submitted");
       e.preventDefault();
+
+      // RUN VALIDATION
+      if (typeof FormValidator !== 'undefined' && !FormValidator.validateForm(addForm)) {
+        return;
+      }
+
+      console.log("Add address form submitted");
 
       const formData = new FormData(addForm);
       const dataOfForm = Object.fromEntries(formData.entries());
@@ -242,6 +246,11 @@ document.addEventListener("DOMContentLoaded", () => {
   if (editForm) {
     editForm.addEventListener("submit", async (e) => {
       e.preventDefault();
+
+      // RUN VALIDATION
+      if (typeof FormValidator !== 'undefined' && !FormValidator.validateForm(editForm)) {
+        return;
+      }
 
       const addressId = editForm.dataset.id;
 

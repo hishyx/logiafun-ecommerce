@@ -1,163 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Login - LogiaFun</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
-    <link rel="stylesheet" href="/css/admin/login.css" />
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  </head>
-  <body>
-    <div class="login-container">
-      <div class="login-card">
-        <div class="brand-header">
-          <div class="logo-icon">
-            <i class="fa-solid fa-code-branch"></i>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login - LogiaFun</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/css/admin/login.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="brand-header">
+        <div class="logo-icon">
+          <i class="fa-solid fa-code-branch"></i>
+        </div>
+        <h2>LogiaFun <span class="badge">Admin</span></h2>
+        <p>Welcome back! Please login to your account.</p>
+      </div>
+
+      <form action="/admin/auth/login" method="POST" autocomplete="off" novalidate>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <div class="input-wrapper">
+            <i class="fa-regular fa-envelope"></i>
+            <input type="email" id="email" name="email" value="admin@logiafun.com" placeholder="admin@logiafun.com"
+              required />
           </div>
-          <h2>LogiaFun <span class="badge">Admin</span></h2>
-          <p>Welcome back! Please login to your account.</p>
         </div>
 
-        <form action="/admin/auth/login" method="POST" autocomplete="off">
-          <div class="form-group">
-            <label for="email">Email Address</label>
-            <div class="input-wrapper">
-              <i class="fa-regular fa-envelope"></i>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value="admin@logiafun.com"
-                placeholder="admin@logiafun.com"
-                required
-              />
-            </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-lock"></i>
+            <input type="password" id="password" name="password" value="2007" placeholder="••••••••" required
+              data-skip-strength />
+            <i class="fa-solid fa-eye password-toggle-icon" id="togglePassword"></i>
           </div>
-
-          <div class="form-group">
-            <label for="password">Password</label>
-            <div class="input-wrapper">
-              <i class="fa-solid fa-lock"></i>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value="2007"
-                placeholder="••••••••"
-                required
-              />
-              <i
-                class="fa-solid fa-eye password-toggle-icon"
-                id="togglePassword"
-              ></i>
-            </div>
-          </div>
-
-          <p style="color: red; font-weight: bold"><%=error%></p>
-
-          <div class="form-options">
-            <label class="checkbox-container">
-              <input type="checkbox" checked />
-              <span class="checkmark"></span>
-              Remember me
-            </label>
-            <!-- <a href="#" class="forgot-link">Forgot Password?</a> -->
-          </div>
-
-          <button type="submit" class="login-btn">
-            Login to Dashboard <i class="fa-solid fa-arrow-right"></i>
-          </button>
-        </form>
-
-        <div class="card-footer">
-          <p>&copy; 2026 LogiaFun. All rights reserved.</p>
         </div>
+
+        <p style="color: red; font-weight: bold">
+          <%=error%>
+        </p>
+
+        <div class="form-options">
+          <label class="checkbox-container">
+            <input type="checkbox" checked />
+            <span class="checkmark"></span>
+            Remember me
+          </label>
+          <!-- <a href="#" class="forgot-link">Forgot Password?</a> -->
+        </div>
+
+        <button type="submit" class="login-btn">
+          Login to Dashboard <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+
+      <div class="card-footer">
+        <p>&copy; 2026 LogiaFun. All rights reserved.</p>
       </div>
     </div>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const toggleIcons = document.querySelectorAll(".password-toggle-icon");
-        const loginForm = document.querySelector('form');
+  </div>
+  <script src="/js/formValidator.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const toggleIcons = document.querySelectorAll(".password-toggle-icon");
 
-        // Validation Logic
-        if(loginForm) {
-            loginForm.addEventListener('submit', function(e) {
-                // Clear previous errors
-                document.querySelectorAll('.error-message').forEach(el => el.remove());
-                
-                let isValid = true;
-                const email = document.getElementById('email');
-                const password = document.getElementById('password');
+      toggleIcons.forEach((icon) => {
+        icon.addEventListener("click", function () {
+          const wrapper = this.closest(".input-wrapper");
+          if (!wrapper) return;
 
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                
-                if (!email.value.trim()) {
-                     showError(email, 'Email is required');
-                     isValid = false;
-                } else if (!emailRegex.test(email.value.trim())) {
-                     showError(email, 'Invalid email format');
-                     isValid = false;
-                }
+          const passwordInput = wrapper.querySelector("input");
+          if (!passwordInput) return;
 
-                if (!password.value.trim()) {
-                     showError(password, 'Password is required');
-                     isValid = false;
-                }
+          const type =
+            passwordInput.getAttribute("type") === "password"
+              ? "text"
+              : "password";
+          passwordInput.setAttribute("type", type);
 
-                if (!isValid) {
-                    e.preventDefault();
-                }
-            });
-        }
-
-        function showError(input, message) {
-            const parent = input.closest('.form-group');
-            const error = document.createElement('small');
-            error.className = 'error-message';
-            error.style.color = '#ef4444';
-            error.style.fontSize = '0.85rem';
-            error.style.marginTop = '5px';
-            error.style.display = 'block';
-            error.innerText = message;
-            
-            parent.appendChild(error);
-        }
-
-        toggleIcons.forEach((icon) => {
-          icon.addEventListener("click", function () {
-            const wrapper = this.closest(".input-wrapper");
-            if (!wrapper) return;
-
-            const passwordInput = wrapper.querySelector("input");
-            if (!passwordInput) return;
-
-            const type =
-              passwordInput.getAttribute("type") === "password"
-                ? "text"
-                : "password";
-            passwordInput.setAttribute("type", type);
-
-            // Toggle FontAwesome classes
-            if (type === "text") {
-              this.classList.remove("fa-eye");
-              this.classList.add("fa-eye-slash");
-            } else {
-              this.classList.remove("fa-eye-slash");
-              this.classList.add("fa-eye");
-            }
-          });
+          // Toggle FontAwesome classes
+          if (type === "text") {
+            this.classList.remove("fa-eye");
+            this.classList.add("fa-eye-slash");
+          } else {
+            this.classList.remove("fa-eye-slash");
+            this.classList.add("fa-eye");
+          }
         });
       });
-    </script>
-  </body>
+    });
+  </script>
+
+</body>
+
 </html>

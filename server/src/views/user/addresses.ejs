@@ -184,14 +184,14 @@
         <div class="modal-content">
           <button class="modal-close" id="closeAddModal">&times;</button>
           <h3>Add New Address</h3>
-          <form class="profile-form" id="addAddressForm">
+          <form class="profile-form" id="addAddressForm" novalidate>
             <div class="form-group">
               <label>Address Name (e.g., Home, Office)</label>
-              <input type="text" placeholder="Home" name="addressName" />
+              <input type="text" placeholder="Home" name="addressName" required minlength="3" />
             </div>
             <div class="form-group">
               <label>Full Name</label>
-              <input type="text" placeholder="John Doe" name="name" required />
+              <input type="text" placeholder="John Doe" name="name" required minlength="3" />
             </div>
             <div class="form-group">
               <label>Street Address</label>
@@ -204,12 +204,14 @@
               </div>
               <div class="form-group">
                 <label>State/Zip</label>
-                <input type="text" placeholder="State/Zip" name="pincode" required />
+                <input type="text" placeholder="Pincode" name="pincode" required pattern="^[0-9]{6}$"
+                  data-msg-pattern="Please enter a valid 6-digit pincode" />
               </div>
             </div>
             <div class="form-group">
               <label>Phone Number</label>
-              <input type="tel" placeholder="+1 234 567 8900" name="phone" required />
+              <input type="tel" placeholder="10-digit number" name="phone" required pattern="^[0-9]{10}$"
+                data-msg-pattern="Please enter a valid 10-digit phone number" />
             </div>
             <button type="submit" class="btn btn-primary btn-save" style="width: 100%">
               Save Address
@@ -223,14 +225,14 @@
         <div class="modal-content">
           <button class="modal-close" id="closeEditModal">&times;</button>
           <h3>Edit Address</h3>
-          <form class="profile-form" id="editAddressForm">
+          <form class="profile-form" id="editAddressForm" novalidate>
             <div class="form-group">
               <label>Address Name (e.g., Home, Office)</label>
-              <input type="text" name="addressName" required />
+              <input type="text" name="addressName" required minlength="3" />
             </div>
             <div class="form-group">
               <label>Full Name</label>
-              <input type="text" name="name" />
+              <input type="text" name="name" required minlength="3" />
             </div>
             <div class="form-group">
               <label>Street Address</label>
@@ -243,12 +245,14 @@
               </div>
               <div class="form-group">
                 <label>State/Zip</label>
-                <input type="text" name="pincode" required />
+                <input type="text" name="pincode" required pattern="^[0-9]{6}$"
+                  data-msg-pattern="Please enter a valid 6-digit pincode" />
               </div>
             </div>
             <div class="form-group">
               <label>Phone Number</label>
-              <input type="tel" name="phone" required />
+              <input type="tel" name="phone" required pattern="^[0-9]{10}$"
+                data-msg-pattern="Please enter a valid 10-digit phone number" />
             </div>
             <button type="submit" class="btn btn-primary btn-save" style="width: 100%">
               Update Address
@@ -312,6 +316,7 @@
         </div>
       </div>
 
+      <script src="/js/formValidator.js"></script>
       <script src="/js/user-addresses.js"></script>
 </body>
 

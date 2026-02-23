@@ -5,7 +5,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="/css/login-signup.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Fredoka:wght@300..700&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Fredoka:wght@300..700&display=swap"
+    rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
@@ -19,30 +21,38 @@
       <h1>WELCOME BACK</h1>
       <p class="subtitle">Welcome back! Please enter your details.</p>
 
-      <form action="#" method="POST">
+      <form action="#" method="POST" novalidate>
         <div class="input-group">
           <label for="email">Email</label>
-          <input type="email" id="email" placeholder="Enter your email" name="email" value="luffy@logiafun.com" required />
+          <input type="email" id="email" placeholder="Enter your email" name="email" value="luffy@logiafun.com"
+            required />
         </div>
 
         <div class="input-group">
           <label for="password">Password</label>
           <div class="password-wrapper">
-            <input type="password" id="password" placeholder="**********" value="2007" name="password" required />
+            <input type="password" id="password" placeholder="**********" value="2007" name="password" required
+              data-skip-strength />
             <div id="togglePassword" class="password-toggle-icon">
-              <svg class="eye-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg class="eye-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
                 <circle cx="12" cy="12" r="3" />
               </svg>
-              <svg class="eye-slash-icon" style="display: none" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07-2.3 2.3" />
+              <svg class="eye-slash-icon" style="display: none" xmlns="http://www.w3.org/2000/svg" width="20"
+                height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path
+                  d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07-2.3 2.3" />
                 <line x1="1" y1="1" x2="23" y2="23" />
               </svg>
             </div>
           </div>
         </div>
 
-        <p style="color: red; margin-bottom: 10px"><%=error%></p>
+        <p style="color: red; margin-bottom: 10px">
+          <%=error%>
+        </p>
 
         <div class="form-actions">
           <!-- <label class="checkbox-container">
@@ -67,60 +77,13 @@
   </div>
 
   <div class="image-section"></div>
+  <script src="/js/formValidator.js"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
       const toggleIcons = document.querySelectorAll(".password-toggle-icon");
-      const loginForm = document.querySelector('form');
-
-      // Validation Logic
-      loginForm.addEventListener('submit', function(e) {
-        // Clear previous errors
-        document.querySelectorAll('.error-text').forEach(el => el.remove());
-
-        let isValid = true;
-        const email = document.getElementById('email');
-        const password = document.getElementById('password');
-
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-        if (!email.value.trim()) {
-          showError(email, 'Email is required');
-          isValid = false;
-        } else if (!emailRegex.test(email.value.trim())) {
-          showError(email, 'Please enter a valid email address');
-          isValid = false;
-        }
-
-        if (!password.value.trim()) {
-          showError(password, 'Password is required'); // Fixed selector in showError
-          isValid = false;
-        }
-
-        if (!isValid) {
-          e.preventDefault();
-        }
-      });
-
-      function showError(input, message) {
-        const parent = input.closest('.input-group');
-        const error = document.createElement('small');
-        error.className = 'error-text';
-        error.style.color = 'red';
-        error.style.marginTop = '5px';
-        error.style.display = 'block';
-        error.innerText = message;
-
-        // If password wrapper exists, append after it, otherwise after input
-        const wrapper = parent.querySelector('.password-wrapper');
-        if (wrapper) {
-          wrapper.after(error);
-        } else {
-          input.after(error);
-        }
-      }
 
       toggleIcons.forEach((icon) => {
-        icon.addEventListener("click", function() {
+        icon.addEventListener("click", function () {
           const wrapper = this.closest(".password-wrapper");
           if (!wrapper) return;
 
@@ -129,8 +92,8 @@
 
           const type =
             passwordInput.getAttribute("type") === "password" ?
-            "text" :
-            "password";
+              "text" :
+              "password";
           passwordInput.setAttribute("type", type);
 
           const eyeIcon = this.querySelector(".eye-icon");

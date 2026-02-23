@@ -159,10 +159,6 @@ export const updateCartItemService = async (userId, itemId, newQuantity) => {
   const productAvailability = await checkProductAvailability(item.productId);
   if (!productAvailability) throw new Error("Product not available");
 
-  // You might want to also check if newQuantity <= stock here,
-  // assuming checkProductAvailability or similar service provides stock info.
-  // For now, let's assume strict stock check is handled or we rely on product active status
-  // But ideally:
   const product = await Product.findById(item.productId);
   const variant = product.variants.id(item.variantId);
   if (variant.stock < newQuantity) throw new Error("Insufficient stock");
@@ -173,4 +169,8 @@ export const updateCartItemService = async (userId, itemId, newQuantity) => {
   // Return new calculations
   const [_, calculations] = await getCartItems(userId);
   return calculations;
+};
+
+export const deleteAllItems = async (userId) => {
+  await Cart.deleteMany({ userId });
 };

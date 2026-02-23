@@ -5,11 +5,15 @@ import * as userProductControllers from "../controllers/user.product.controller.
 import * as userCartControllers from "../controllers/user.cart.controller.js";
 import * as userWishlistControllers from "../controllers/user.wishlist.controller.js";
 
+import { setLocalVariables } from "../middlewares/user.middlewares.js";
+
 import { checkUserStatus, isAuth } from "../middlewares/auth.middleware.js";
 
 import upload from "../config/multer.js";
 
 const router = express.Router();
+
+router.use(setLocalVariables);
 
 router.use(isAuth);
 router.use(checkUserStatus);
@@ -23,6 +27,8 @@ router
   .route("/user/cart")
   .get(userCartControllers.cartPage)
   .post(userCartControllers.addToCart);
+
+router.get("/user/cart/checkout", userCartControllers.checkoutPage);
 router
   .route("/user/change-email")
   .post(userControllers.changeEmail)
@@ -78,5 +84,7 @@ router
   .route("/user/cart/:itemId")
   .delete(userCartControllers.deleteCartItem)
   .patch(userCartControllers.updateCartItem);
+
+router.post("/user/cart/all", userCartControllers.clearAllItems);
 
 export default router;

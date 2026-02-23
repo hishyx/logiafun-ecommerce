@@ -33,6 +33,11 @@ document.addEventListener("DOMContentLoaded", () => {
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
+      // RUN VALIDATION
+      if (typeof FormValidator !== 'undefined' && !FormValidator.validateForm(form)) {
+        return;
+      }
+
       if (saveBtn) {
         saveBtn.disabled = true;
         saveBtn.textContent = "Saving...";
@@ -288,22 +293,8 @@ document.addEventListener("DOMContentLoaded", () => {
     passwordChangeForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const currentPassword = passwordChangeForm.currentPassword.value.trim();
-      const newPassword = passwordChangeForm.newPassword.value.trim();
-      const confirmPassword = passwordChangeForm.confirmPassword.value.trim();
-
-      if (modalPasswordError) modalPasswordError.textContent = "";
-
-      if (newPassword.length < 8) {
-        if (modalPasswordError)
-          modalPasswordError.textContent =
-            "New password must be at least 8 characters";
-        return;
-      }
-
-      if (newPassword !== confirmPassword) {
-        if (modalPasswordError)
-          modalPasswordError.textContent = "Passwords do not match";
+      // RUN VALIDATION
+      if (typeof FormValidator !== 'undefined' && !FormValidator.validateForm(passwordChangeForm)) {
         return;
       }
 
@@ -320,9 +311,9 @@ document.addEventListener("DOMContentLoaded", () => {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            currentPassword,
-            newPassword,
-            confirmPassword,
+            currentPassword: passwordChangeForm.currentPassword.value.trim(),
+            newPassword: passwordChangeForm.newPassword.value.trim(),
+            confirmPassword: passwordChangeForm.confirmPassword.value.trim(),
           }),
         });
 

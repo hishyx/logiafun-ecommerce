@@ -27,7 +27,7 @@ async function removeFromWishlist(e, itemId, isCarted) {
       if (row) {
         row.remove();
 
-        // If wishlist is empty, reload to show empty state
+        // If wishlist is empty, reload to show empty secion
         if (result.wishlistCount === 0) {
           location.reload();
         }

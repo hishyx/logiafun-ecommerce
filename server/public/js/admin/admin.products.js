@@ -2,11 +2,10 @@
  * Admin Products Management Script
  * Refactored for readability and modularity.
  */
-
 let imagePreviewContainer;
 
 document.addEventListener("DOMContentLoaded", () => {
-  // ==========================================
+  // ======================const formData = new FormData(form); ====================
   // 1. GLOBAL STATE
   // ==========================================
   const State = {
@@ -51,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // ==========================================
-  // 3. MODAL MANAGEMENT
+  // 3. MODAL MANAGEMENT (Now simpler page logic)
   // ==========================================
   const Modals = {
     open: (modal) => {
@@ -69,29 +68,11 @@ document.addEventListener("DOMContentLoaded", () => {
       DOM.getAll(".close-modal-btn").forEach((btn) => {
         btn.addEventListener("click", (e) => {
           e.preventDefault();
-          const modal = btn.closest(".modal-overlay");
-          Modals.close(modal);
+          const modal =
+            btn.closest("#cropperModal") || btn.closest(".modal-overlay");
+          if (modal) Modals.close(modal);
         });
       });
-
-      // Click outside to close
-      window.addEventListener("click", (e) => {
-        if (e.target.classList.contains("modal-overlay")) {
-          Modals.close(e.target);
-        }
-      });
-
-      // Special helper logic for Add Product button
-      const addBtn = DOM.get("addProductBtn");
-      if (addBtn) {
-        addBtn.addEventListener("click", () => {
-          State.attributes.add = [];
-          State.images.clear();
-          Attributes.render("add");
-          // Reset logic could go here
-          Modals.open("addProductModal");
-        });
-      }
     },
   };
 
@@ -217,10 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <input type="number" class="form-control" name="variants[${index}][stock]" value="${stock}" required placeholder="0">
           </div>
           <!-- Dynamic Attribute Values Container -->
-          <div class="variant-defined-attributes" style="display: contents;">
-              <!-- Inserted by syncAttributes() later, 
-                   but we can pre-populate if data exists to avoid flicker -->
-          </div>
+          <div class="variant-defined-attributes" style="display: contents;"></div>
         </div>
 
         <div class="form-group">
@@ -434,7 +412,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Validate type
         if (!file.type.startsWith("image/")) {
-          Swal.fire("Error", "Please select an image file", "error");
+          if (typeof FormValidator !== "undefined") {
+            FormValidator.showError(input, "Please select an image file");
+          } else {
+            alert("Please select an image file");
+          }
           input.value = "";
           return;
         }
@@ -536,89 +518,56 @@ document.addEventListener("DOMContentLoaded", () => {
   // 7. FORM SUBMISSION LOGIC
   // ==========================================
   const Validations = {
-    validateProductForm: (formData, mode) => {
-      const errors = [];
+    validateProductForm: (form, mode) => {
+      // Use the central validator for standard fields
+      let isValid =
+        typeof FormValidator !== "undefined"
+          ? FormValidator.validateForm(form)
+          : true;
 
-      // 1. Basic Fields
-      const name = formData.get("name");
-      const category = formData.get("categoryId");
-      const description = formData.get("description");
+      const formData = new FormData(form);
 
-      if (!name || name.trim() === "") errors.push("Product Name is required");
-      if (!category || category === "") errors.push("Category is required");
-      if (!description || description.trim() === "")
-        errors.push("Description is required");
-
-      // 2. Variants
-      // We need to check how many variants are being submitted.
-      // Since formData has keys like "variants[0][price]", we can extract indices.
       const variantIndices = new Set();
       for (const key of formData.keys()) {
         const match = key.match(/variants\[(\d+)\]/);
         if (match) variantIndices.add(match[1]);
       }
 
+      // 1. Check for variants
       if (variantIndices.size === 0) {
-        errors.push("At least one variant is required");
+        const wrapper = DOM.get(
+          mode === "add" ? "addVariantsWrapper" : "editVariantsWrapper",
+        );
+        if (typeof FormValidator !== "undefined") {
+          FormValidator.showError(wrapper, "At least one variant is required");
+        }
+        isValid = false;
       }
 
+      // 2. Check variant images
       variantIndices.forEach((index) => {
-        const price = parseFloat(formData.get(`variants[${index}][price]`));
-        const stock = parseFloat(formData.get(`variants[${index}][stock]`));
-
-        if (isNaN(price) || price <= 0) {
-          errors.push(
-            `Variant ${parseInt(index) + 1}: Price must be greater than 0`,
-          );
-        }
-        if (isNaN(stock) || stock < 0) {
-          errors.push(
-            `Variant ${parseInt(index) + 1}: Stock must be 0 or greater`,
-          );
-        }
-
-        const key = `${mode}-${index}`;
-
-        // 3. Images (Min 3)
-        // We need to check State.images for NEW images
-        // AND potentially existing images if in edit mode (though logic gets complex with deletions)
-        // For 'add' mode, it's simple: check State.images.
-
-        // Count total visible images in UI
         const container = document.querySelector(`#container-${mode}-${index}`);
-
         if (container) {
           const totalImages = container.querySelectorAll(
             ".variant-preview-item",
           ).length;
+          const selector = container.querySelector(".file-selector");
 
           if (totalImages < 3) {
-            errors.push(
-              `Variant ${parseInt(index) + 1}: Must have at least 3 images`,
-            );
-          }
-        }
-
-        // Check file types for new images
-        if (State.images.has(key)) {
-          const files = State.images.get(key);
-          const validTypes = [
-            "image/jpeg",
-            "image/png",
-            "image/webp",
-            "image/jpg",
-          ];
-          files.forEach((file) => {
-            if (!validTypes.includes(file.type)) {
-              errors.push(
-                `Variant ${parseInt(index) + 1}: Invalid file type ${file.name}. Only JPG, PNG, WEBP allowed.`,
+            if (typeof FormValidator !== "undefined") {
+              FormValidator.showError(
+                selector || container,
+                `At least 3 images required (Current: ${totalImages})`,
               );
             }
-          });
+            isValid = false;
+          } else if (typeof FormValidator !== "undefined") {
+            FormValidator.clearError(selector || container);
+          }
         }
       });
 
-      return errors;
+      return isValid;
     },
   };
 
@@ -626,32 +575,16 @@ document.addEventListener("DOMContentLoaded", () => {
     submit: async (e, mode) => {
       e.preventDefault();
       const form = e.target;
-      const submitBtn = form.querySelector('button[type="submit"]');
-      const originalText = submitBtn.innerHTML;
 
-      // Prepare FormData first to pass to validation
-      const formData = new FormData(form);
-
-      // 1. Append Attributes (backend expects array of strings)
-      State.attributes[mode].forEach((attr, i) => {
-        formData.append(`attributes[${i}]`, attr);
-      });
-
-      // 2. Append New Images (needed for validation check on file types/counts if we were looking at formData, but we look at State)
-      // We'll append them to formData AFTER validation to ensure we don't send invalid data,
-      // BUT our validation function typically inspects State for images anyway.
-
-      // Run Validation
-      const validationErrors = Validations.validateProductForm(formData, mode);
-
-      if (validationErrors.length > 0) {
-        Swal.fire({
-          title: "Validation Error",
-          html: validationErrors.join("<br>"),
-          icon: "error",
-        });
+      // RUN VALIDATION
+      if (!Validations.validateProductForm(form, mode)) {
         return;
       }
+
+      const formData = new FormData(form);
+
+      const submitBtn = form.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
 
       // Loading State
       submitBtn.innerHTML =
@@ -695,22 +628,18 @@ document.addEventListener("DOMContentLoaded", () => {
         const data = await response.json();
 
         if (response.ok) {
-          const modalId =
-            mode === "add" ? "addProductModal" : "editProductModal";
-          Modals.close(modalId);
-
           Swal.fire({
             toast: true,
             position: "top-end",
             icon: "success",
             title: `Product ${mode === "add" ? "added" : "updated"} successfully`,
             showConfirmButton: false,
-            timer: 600,
+            timer: 1000,
           });
 
           setTimeout(() => {
-            window.location.reload();
-          }, 600);
+            window.location.href = "/admin/products";
+          }, 1000);
         } else {
           // THROW ERROR TO BE CAUGHT BELOW
           throw new Error(data.message || "Failed to save product");
@@ -776,9 +705,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const imgParam =
       product.variants &&
-        product.variants.length > 0 &&
-        product.variants[0].images &&
-        product.variants[0].images.length > 0
+      product.variants.length > 0 &&
+      product.variants[0].images &&
+      product.variants[0].images.length > 0
         ? product.variants[0].images[0]
         : "https://placehold.co/40x40";
 
@@ -835,17 +764,18 @@ document.addEventListener("DOMContentLoaded", () => {
       toggleBtn.style.color = product.isActive ? "#ef4444" : "#10b981";
 
       const icon = toggleBtn.querySelector("i");
-      icon.className = `fa-solid ${product.isActive ? "fa-eye-slash" : "fa-eye"
-        }`;
+      icon.className = `fa-solid ${
+        product.isActive ? "fa-eye-slash" : "fa-eye"
+      }`;
     }
   }
 
   function generateProductRowHTML(product) {
     const imgParam =
       product.variants &&
-        product.variants.length > 0 &&
-        product.variants[0].images &&
-        product.variants[0].images.length > 0
+      product.variants.length > 0 &&
+      product.variants[0].images &&
+      product.variants[0].images.length > 0
         ? product.variants[0].images[0]
         : "https://placehold.co/40x40";
 
@@ -899,9 +829,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     <!-- Status Column -->
     <td>
-      ${product.isActive
-        ? `<span class="status-badge status-active"><span class="status-indicator"></span> Active</span>`
-        : `<span class="status-badge status-blocked"><span class="status-indicator"></span> Inactive</span>`
+      ${
+        product.isActive
+          ? `<span class="status-badge status-active"><span class="status-indicator"></span> Active</span>`
+          : `<span class="status-badge status-blocked"><span class="status-indicator"></span> Inactive</span>`
       }
     </td>
 
@@ -924,8 +855,9 @@ document.addEventListener("DOMContentLoaded", () => {
           data-active="${product.isActive}"
           style="color: ${product.isActive ? "#ef4444" : "#10b981"}"
         >
-          <i class="fa-solid ${product.isActive ? "fa-eye-slash" : "fa-eye"
-      }"></i>
+          <i class="fa-solid ${
+            product.isActive ? "fa-eye-slash" : "fa-eye"
+          }"></i>
         </button>
       </div>
     </td>
@@ -1078,5 +1010,85 @@ document.addEventListener("DOMContentLoaded", () => {
   Variants.init();
   Images.init();
   Forms.init();
-  EditMode.init();
+  CropperManager.init();
+
+  // Page-specific setup
+  if (window.PAGE_MODE === "add") {
+    State.attributes.add = [];
+    State.images.clear();
+    Attributes.render("add");
+    // Variants.add("add") is already called in Variants.init()
+  } else if (window.PAGE_MODE === "edit") {
+    console.log("Edit page detected. PRODUCT_DATA:", window.PRODUCT_DATA);
+    if (!window.PRODUCT_DATA) {
+      console.error(
+        "CRITICAL ERROR: window.PRODUCT_DATA is missing or empty! Check your EJS template.",
+      );
+      return;
+    }
+    const product = window.PRODUCT_DATA;
+
+    // 1. Basic Fields
+    try {
+      if (DOM.get("editProductId"))
+        DOM.get("editProductId").value = product._id;
+      if (DOM.get("editName")) DOM.get("editName").value = product.name;
+      if (DOM.get("editDescription"))
+        DOM.get("editDescription").value = product.description;
+      if (DOM.get("editDiscount"))
+        DOM.get("editDiscount").value = product.discount || 0;
+    } catch (err) {
+      console.error("Error populating basic fields:", err);
+    }
+
+    // 2. Category select
+    try {
+      const catSelect = DOM.get("editCategory");
+      if (catSelect) {
+        const catId =
+          product.category?._id || product.category || product.categoryId;
+        Array.from(catSelect.options).forEach((opt) => {
+          opt.selected = opt.value === String(catId);
+        });
+      }
+    } catch (err) {
+      console.error("Error populating category:", err);
+    }
+
+    // 3. Attributes
+    try {
+      State.attributes.edit = product.attributes
+        ? product.attributes.map((a) => (typeof a === "object" ? a.name : a))
+        : [];
+      Attributes.render("edit");
+    } catch (err) {
+      console.error("Error populating attributes:", err);
+    }
+
+    // 4. Variants
+    try {
+      const wrapper = DOM.get("editVariantsWrapper");
+      if (wrapper) {
+        wrapper.innerHTML = "";
+        console.log("Populating variants:", product.variants);
+        if (
+          product.variants &&
+          Array.isArray(product.variants) &&
+          product.variants.length > 0
+        ) {
+          console.log(
+            `Rendering ${product.variants.length} existing variants...`,
+          );
+          product.variants.forEach((variant) => Variants.add("edit", variant));
+        } else {
+          console.warn("No variants found in data, adding an empty one.");
+          Variants.add("edit");
+        }
+      } else {
+        console.error("editVariantsWrapper not found!");
+      }
+    } catch (err) {
+      console.error("Error populating variants:", err);
+    }
+  }
 });

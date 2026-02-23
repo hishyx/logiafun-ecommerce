@@ -1,4 +1,5 @@
 import * as userCartServices from "../services/user.cart.services.js";
+import { getUserAddresses } from "../services/user.services.js";
 
 export const addToCart = async (req, res) => {
   try {
@@ -55,7 +56,7 @@ export const updateCartItem = async (req, res) => {
     const calculations = await userCartServices.updateCartItemService(
       userId,
       itemId,
-      Number(quantity)
+      Number(quantity),
     );
 
     res.status(200).json({
@@ -68,3 +69,30 @@ export const updateCartItem = async (req, res) => {
   }
 };
 
+export const checkoutPage = async (req, res) => {
+  try {
+    let userAddresses = await getUserAddresses(req.user._id);
+
+    if (userAddresses && userAddresses.length) {
+      userAddresses.sort((a, b) => b.isDefault - a.isDefault);
+    }
+
+    res.render("user/checkout", {
+      addresses: userAddresses,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+export const clearAllItems = async (req, res) => {
+  try {
+    await userCartServices.deleteAllItems(req.user._id);
+
+    console.log("delted");
+
+    res.sendStatus(200);
+  } catch (err) {
+    console.log(err);
+  }
+};

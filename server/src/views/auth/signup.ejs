@@ -1,298 +1,164 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Create Your Account - Sign Up</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="/css/login-signup.css" />
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="/js/validation.js"></script>
-  </head>
-  <body>
-    <div class="form-section">
-      <div class="logo-container">
-        <a href="index.html" class="logo">logia<span>Fun</span></a>
-      </div>
 
-      <div class="form-container">
-        <h1>CREATE YOUR ACCOUNT</h1>
-        <p class="subtitle">
-          Join LogiaFun to explore educational toys & brain games
-        </p>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Your Account - Sign Up</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="/css/login-signup.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Removed validation.js -->
+</head>
 
-        <form action="#" method="POST">
-          <div class="input-group">
-            <label for="name">Name</label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              placeholder="Enter your full name"
-              required
-            />
-          </div>
-
-          <div class="input-group">
-            <label for="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              placeholder="Enter your email"
-              required
-            />
-          </div>
-
-          <div class="input-group">
-            <label for="phone">Phone number</label>
-            <input
-              type="tel"
-              id="phone"
-              name="phone"
-              placeholder="Enter your phone number"
-            />
-          </div>
-
-          <div class="input-group">
-            <label for="password">Password</label>
-            <div class="password-wrapper">
-              <input
-                type="password"
-                id="password"
-                placeholder="*************"
-                name="password"
-                required
-              />
-              <div class="password-toggle-icon">
-                <svg
-                  class="eye-icon"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                  <circle cx="12" cy="12" r="3" />
-                </svg>
-                <svg
-                  class="eye-slash-icon"
-                  style="display: none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path
-                    d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07-2.3 2.3"
-                  />
-                  <line x1="1" y1="1" x2="23" y2="23" />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          <div class="input-group">
-            <label for="confirm-password">Confirm password</label>
-            <div class="password-wrapper">
-              <input
-                type="password"
-                id="confirm-password"
-                placeholder="*************"
-                name="confirm_password"
-                required
-              />
-              <div class="password-toggle-icon">
-                <svg
-                  class="eye-icon"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                  <circle cx="12" cy="12" r="3" />
-                </svg>
-                <svg
-                  class="eye-slash-icon"
-                  style="display: none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path
-                    d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07-2.3 2.3"
-                  />
-                  <line x1="1" y1="1" x2="23" y2="23" />
-                </svg>
-              </div>
-            </div>
-          </div>
-          <p style="color: red; margin-bottom: 10px"><%=error%></p>
-
-          <div
-            id="signupLoader"
-            class="loader"
-            style="display: none; margin: 15px auto"
-          ></div>
-
-          <button type="submit" id="signupBtn" class="btn-primary">
-            Sign Up
-          </button>
-
-          <button
-            type="button"
-            class="btn-google"
-            onclick="window.location.href = '/auth/google'"
-          >
-            <img src="/images/google.png" alt="Google" width="20" />
-            Continue with google
-          </button>
-
-          <p class="footer-text">
-            Already have an account?
-            <a href="login.html" style="color: #ff4d4d">Sign in !</a>
-          </p>
-        </form>
-      </div>
+<body>
+  <div class="form-section">
+    <div class="logo-container">
+      <a href="index.html" class="logo">logia<span>Fun</span></a>
     </div>
 
-    <div class="image-section"></div>
+    <div class="form-container">
+      <h1>CREATE YOUR ACCOUNT</h1>
+      <p class="subtitle">
+        Join LogiaFun to explore educational toys & brain games
+      </p>
 
-    </script>
-    <script>
-      const signupForm = document.querySelector("form");
-      const signupBtn = document.getElementById("signupBtn");
-      const loader = document.getElementById("signupLoader");
+      <form action="#" method="POST" novalidate>
+        <div class="input-group">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" placeholder="Enter your full name" required minlength="3" />
+        </div>
 
-      signupForm.addEventListener("submit", (e) => {
-        // Clear previous errors
-        document.querySelectorAll('.error-text').forEach(el => el.remove());
-        
-        let isValid = true;
-        const name = document.getElementById('name');
-        const email = document.getElementById('email');
-        const phone = document.getElementById('phone');
-        const password = document.getElementById('password');
-        const confirmPassword = document.getElementById('confirm-password');
-        
-        // Name Validation
-        if (!name.value.trim() || name.value.trim().length < 3) {
-           showError(name, 'Name must be at least 3 characters long');
-           isValid = false;
+        <div class="input-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="Enter your email" required />
+        </div>
+
+        <div class="input-group">
+          <label for="phone">Phone number</label>
+          <input type="tel" id="phone" name="phone" placeholder="Enter your phone number" required data-digits
+            data-length="10" />
+        </div>
+
+        <div class="input-group">
+          <label for="password">Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="password" placeholder="*************" name="password" required minlength="8" />
+            <div class="password-toggle-icon">
+              <svg class="eye-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              <svg class="eye-slash-icon" style="display: none" xmlns="http://www.w3.org/2000/svg" width="20"
+                height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path
+                  d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07-2.3 2.3" />
+                <line x1="1" y1="1" x2="23" y2="23" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="confirm-password">Confirm password</label>
+          <div class="password-wrapper">
+            <input type="password" id="confirm-password" placeholder="*************" name="confirm_password" required
+              data-match="#password" />
+            <div class="password-toggle-icon">
+              <svg class="eye-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              <svg class="eye-slash-icon" style="display: none" xmlns="http://www.w3.org/2000/svg" width="20"
+                height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path
+                  d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07-2.3 2.3" />
+                <line x1="1" y1="1" x2="23" y2="23" />
+              </svg>
+            </div>
+          </div>
+        </div>
+        <p style="color: red; margin-bottom: 10px">
+          <%=error%>
+        </p>
+
+        <div id="signupLoader" class="loader" style="display: none; margin: 15px auto"></div>
+
+        <button type="submit" id="signupBtn" class="btn-primary">
+          Sign Up
+        </button>
+
+        <button type="button" class="btn-google" onclick="window.location.href = '/auth/google'">
+          <img src="/images/google.png" alt="Google" width="20" />
+          Continue with google
+        </button>
+
+        <p class="footer-text">
+          Already have an account?
+          <a href="login.html" style="color: #ff4d4d">Sign in !</a>
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <div class="image-section"></div>
+
+  <script src="/js/formValidator.js"></script>
+  <script>
+    const signupForm = document.querySelector("form");
+    const signupBtn = document.getElementById("signupBtn");
+    const loader = document.getElementById("signupLoader");
+
+    signupForm.addEventListener("submit", (e) => {
+      // Logic to show loader if validation passed
+      setTimeout(() => {
+        if (!e.defaultPrevented) {
+          signupBtn.disabled = true;
+          signupBtn.textContent = "Signing up...";
+          loader.style.display = "block";
         }
+      }, 0);
+    });
+  </script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const toggleIcons = document.querySelectorAll(".password-toggle-icon");
 
-        // Email Validation
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email.value.trim())) {
-           showError(email, 'Please enter a valid email address');
-           isValid = false;
-        }
+      toggleIcons.forEach((icon) => {
+        icon.addEventListener("click", function () {
+          const wrapper = this.closest(".password-wrapper");
+          if (!wrapper) return;
 
-        // Phone Validation (Optional but if entered must be 10 digits)
-        if (phone.value.trim() && !/^\d{10}$/.test(phone.value.trim())) {
-           showError(phone, 'Phone number must be exactly 10 digits');
-           isValid = false;
-        }
+          const passwordInput = wrapper.querySelector("input");
+          if (!passwordInput) return;
 
-        // Password Validation
-        if (password.value.length < 8) {
-           showError(password, 'Password must be at least 8 characters long');
-           isValid = false;
-        }
+          const type =
+            passwordInput.getAttribute("type") === "password"
+              ? "text"
+              : "password";
+          passwordInput.setAttribute("type", type);
 
-        // Confirm Password Validation
-        if (password.value !== confirmPassword.value) {
-           showError(confirmPassword, 'Passwords do not match');
-           isValid = false;
-        }
+          const eyeIcon = this.querySelector(".eye-icon");
+          const eyeSlashIcon = this.querySelector(".eye-slash-icon");
 
-        if (!isValid) {
-          e.preventDefault();
-          return;
-        }
-
-        // If valid, show loader
-        signupBtn.disabled = true;
-        signupBtn.textContent = "Signing up...";
-        loader.style.display = "block";
-      });
-
-      function showError(input, message) {
-        const parent = input.closest('.input-group') || input.parentElement; // ensuring correct parent selection
-        const error = document.createElement('small');
-        error.className = 'error-text';
-        error.style.color = 'red';
-        error.style.marginTop = '5px';
-        error.style.display = 'block';
-        error.innerText = message;
-        
-        // If password wrapper exists, append after it, otherwise after input
-         const wrapper = parent.querySelector('.password-wrapper');
-         if(wrapper) {
-             wrapper.after(error);
-         } else {
-             input.after(error);
-         }
-      }
-    </script>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const toggleIcons = document.querySelectorAll(".password-toggle-icon");
-
-        toggleIcons.forEach((icon) => {
-          icon.addEventListener("click", function () {
-            const wrapper = this.closest(".password-wrapper");
-            if (!wrapper) return;
-
-            const passwordInput = wrapper.querySelector("input");
-            if (!passwordInput) return;
-
-            const type =
-              passwordInput.getAttribute("type") === "password"
-                ? "text"
-                : "password";
-            passwordInput.setAttribute("type", type);
-
-            const eyeIcon = this.querySelector(".eye-icon");
-            const eyeSlashIcon = this.querySelector(".eye-slash-icon");
-
-            if (eyeIcon && eyeSlashIcon) {
-              if (type === "text") {
-                eyeIcon.style.display = "none";
-                eyeSlashIcon.style.display = "block";
-              } else {
-                eyeIcon.style.display = "block";
-                eyeSlashIcon.style.display = "none";
-              }
+          if (eyeIcon && eyeSlashIcon) {
+            if (type === "text") {
+              eyeIcon.style.display = "none";
+              eyeSlashIcon.style.display = "block";
+            } else {
+              eyeIcon.style.display = "block";
+              eyeSlashIcon.style.display = "none";
             }
-          });
+          }
         });
       });
-    </script>
-  </body>
+    });
+  </script>
+</body>
+
 </html>

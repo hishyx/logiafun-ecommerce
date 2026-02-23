@@ -12,7 +12,7 @@ const variantSchema = mongoose.Schema({
   images: {
     type: [String],
     validate: {
-      validator: (v) => v.length >= 3,
+      validator: (v) => v.length >= 0,
       message: "At least 3 image is required",
     },
   },

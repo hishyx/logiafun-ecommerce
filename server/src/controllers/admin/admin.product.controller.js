@@ -44,6 +44,35 @@ export const adminProductListPage = async (req, res) => {
   }
 };
 
+export const adminAddProductPage = async (req, res) => {
+  try {
+    const categories = await adminCategoryServices.getAvailableCategories();
+    res.render("admin/add-product.ejs", { categories });
+  } catch (err) {
+    console.error("Error in adminAddProductPage:", err);
+    res.status(500).render("404-not-found");
+  }
+};
+
+export const adminEditProductPage = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const product = await adminProductServices.getProductById(productId);
+    const categories = await adminCategoryServices.getAvailableCategories();
+
+    if (!product) {
+      return res.status(404).render("404-not-found");
+    }
+
+    console.log(product);
+
+    res.render("admin/edit-product.ejs", { product, categories });
+  } catch (err) {
+    console.error("Error in adminEditProductPage:", err);
+    res.status(500).render("404-not-found");
+  }
+};
+
 export const addProduct = async (req, res) => {
   try {
     const product = req.body;

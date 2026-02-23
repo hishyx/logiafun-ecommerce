@@ -42,6 +42,12 @@ router
   .post(upload.any(), adminProductControllers.addProduct)
   .patch(upload.any(), adminProductControllers.editProduct);
 
+router.get("/admin/products/add", adminProductControllers.adminAddProductPage);
+router.get(
+  "/admin/products/:productId/edit",
+  adminProductControllers.adminEditProductPage,
+);
+
 router.patch(
   "/admin/products/:productId/toggle",
   adminProductControllers.listUnlistProduct,

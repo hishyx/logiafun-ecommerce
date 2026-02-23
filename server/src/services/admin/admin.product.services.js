@@ -1,6 +1,13 @@
 import Product from "../../models/products.model.js";
 import uploadImageToCloudinary from "../../utils/cloudinary.upload.js";
 import cloudinaryFolders from "../../components/cloudinary.folders.js";
+import { hasDuplicateVariants } from "../../utils/variant.utils.js";
+
+export const getProductById = async (productId) => {
+  const product = await Product.findById(productId).lean();
+
+  return product;
+};
 
 export const getAllProducts = async ({ page, limit, sort, search, filter }) => {
   page = parseInt(page);
@@ -71,7 +78,13 @@ export const createProduct = async (productData, productImages) => {
 
   productData.variants.forEach((variant) => {
     variant.images = [];
+
+    console.log(variant.values);
   });
+
+  if (hasDuplicateVariants(productData.variants)) {
+    throw new Error("Duplicate variant attribute combination found");
+  }
 
   for (let image of productImages) {
     const index = image.fieldname.split("[")[1].split("]")[0];
@@ -79,6 +92,17 @@ export const createProduct = async (productData, productImages) => {
     productData.variants[index].images.push(
       await uploadImageToCloudinary(image, cloudinaryFolders.PRODUCT),
     );
+  }
+
+  // Basic Validation
+  if (!productData.name || productData.name.trim().length === 0) {
+    throw new Error("Product name is required");
+  }
+  if (!productData.categoryId) {
+    throw new Error("Please select a category");
+  }
+  if (!productData.description || productData.description.trim().length === 0) {
+    throw new Error("Description is required");
   }
 
   console.log(productData);
@@ -119,6 +143,10 @@ export const updateProduct = async (productData, productImages) => {
 
   if (!product) {
     throw new Error("Product not found");
+  }
+
+  if (hasDuplicateVariants(productData.variants)) {
+    throw new Error("Duplicate variant attribute combination found");
   }
 
   product.name = productData.name;

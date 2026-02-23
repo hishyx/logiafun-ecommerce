@@ -289,13 +289,23 @@ document.querySelector("tbody").addEventListener("click", async function (e) {
 async function submitCategory(event) {
   event.preventDefault();
 
-  if (!croppedBlob) {
-    Swal.fire("Error", "Please upload and crop an image", "error");
+  const form = event.target;
+  const formData = new FormData(form);
+  const name = formData.get("name")?.trim();
+  const description = formData.get("description")?.trim();
+
+  // Centralized Validation
+  if (typeof FormValidator !== 'undefined' && !FormValidator.validateForm(form)) {
     return;
   }
 
-  const form = event.target;
-  const formData = new FormData(form);
+  if (!croppedBlob) {
+    if (typeof FormValidator !== 'undefined') {
+      const wrapper = form.querySelector('.file-upload-wrapper');
+      FormValidator.showError(wrapper, "Please upload and crop an image");
+    }
+    return;
+  }
 
   // Replace the file input with the cropped blob
   formData.set("image", croppedBlob, "category-image.jpg");
@@ -343,6 +353,13 @@ async function submitEditCategory(event) {
 
   const form = event.target;
   const formData = new FormData(form);
+  const name = formData.get("name")?.trim();
+  const description = formData.get("description")?.trim();
+
+  // Centralized Validation
+  if (typeof FormValidator !== 'undefined' && !FormValidator.validateForm(form)) {
+    return;
+  }
   const id = formData.get("categoryId");
 
   const submitBtn = form.querySelector('button[type="submit"]');
@@ -436,20 +453,18 @@ function addCategoryRow(category) {
             <td>${category.description}</td>
             <td>${category.sold} Sold</td>
             <td>
-                ${
-                  category.stock > 10
-                    ? `<span class="badge-stock stock-in">${category.stock} In Stock</span>`
-                    : category.stock > 0
-                      ? `<span class="badge-stock stock-low">${category.stock} Left</span>`
-                      : `<span class="badge-stock stock-out">Out of Stock</span>`
-                }
+                ${category.stock > 10
+      ? `<span class="badge-stock stock-in">${category.stock} In Stock</span>`
+      : category.stock > 0
+        ? `<span class="badge-stock stock-low">${category.stock} Left</span>`
+        : `<span class="badge-stock stock-out">Out of Stock</span>`
+    }
             </td>
             <td>
-                ${
-                  category.isActive
-                    ? `<span class="status-badge status-active"><span class="status-indicator"></span> Active</span>`
-                    : `<span class="status-badge status-blocked"><span class="status-indicator"></span> Inactive</span>`
-                }
+                ${category.isActive
+      ? `<span class="status-badge status-active"><span class="status-indicator"></span> Active</span>`
+      : `<span class="status-badge status-blocked"><span class="status-indicator"></span> Inactive</span>`
+    }
             </td>
             <td>
                 <button class="action-btn edit-category-btn"

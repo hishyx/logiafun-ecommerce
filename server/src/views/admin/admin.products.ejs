@@ -25,6 +25,7 @@
       align-items: center;
       gap: 0.5rem;
       transition: all 0.2s;
+      text-decoration: none;
     }
 
     .btn-primary:hover {
@@ -32,6 +33,7 @@
       transform: translateY(-1px);
     }
 
+    /* Restored Missing CSS for Product Table */
     .action-btn {
       background: white;
       border: 1px solid #e2e8f0;
@@ -45,6 +47,7 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      text-decoration: none;
     }
 
     .action-btn:hover {
@@ -53,7 +56,6 @@
       border-color: #cbd5e1;
     }
 
-    /* Product Specific Overrides */
     .product-img {
       width: 48px;
       height: 48px;
@@ -101,177 +103,31 @@
       color: #991b1b;
     }
 
-    /* Modal Styles Match */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      display: none;
-      justify-content: center;
+    .status-badge {
+      display: inline-flex;
       align-items: center;
-      z-index: 1000;
-      backdrop-filter: blur(4px);
+      gap: 0.5rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
     }
 
-    .modal-overlay.active {
-      display: flex;
-      animation: fadeIn 0.3s ease;
+    .status-active {
+      background: #eff6ff;
+      color: #1e40af;
     }
 
-    .modal-container {
-      background: white;
-      width: 100%;
-      max-width: 650px;
-      /* Slightly wider for products */
-      border-radius: 16px;
-      padding: 2rem;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-      transform: scale(0.95);
-      opacity: 0;
-      transition: all 0.3s ease;
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-
-    .modal-container.modal-xl {
-      width: 95%;
-      max-width: 1400px;
-      /* Or larger if needed */
-      max-height: 95vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .modal-container.modal-xl form {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      height: 100%;
-      /* Ensure form takes full height if content is short, for footer positioning */
-    }
-
-    .modal-container.modal-xl .modal-body {
-      flex: 1;
-      overflow-y: auto;
-    }
-
-
-    .modal-overlay.active .modal-container {
-      transform: scale(1);
-      opacity: 1;
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.5rem;
-    }
-
-    .modal-title {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: #0f172a;
-    }
-
-    .close-modal {
-      background: none;
-      border: none;
-      font-size: 1.25rem;
-      cursor: pointer;
-      color: #94a3b8;
-      transition: color 0.2s;
-      padding: 0.5rem;
-      border-radius: 50%;
-    }
-
-    .close-modal:hover {
-      color: #ef4444;
+    .status-blocked {
       background: #fef2f2;
+      color: #991b1b;
     }
 
-    .form-group {
-      margin-bottom: 1.25rem;
-    }
-
-    .form-label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-      color: #334155;
-      font-size: 0.9rem;
-    }
-
-    .form-control {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      transition: all 0.2s;
-      color: #0f172a;
-    }
-
-    .form-control:focus {
-      outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-
-    .variants-wrapper {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-
-    .variant-item {
-      border: 1px solid #e2e8f0;
-      padding: 15px;
-      border-radius: 8px;
-      background-color: #f8fafc;
-      position: relative;
-    }
-
-    .remove-variant-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      color: #ef4444;
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 0.9rem;
-    }
-
-    .add-variant-btn {
-      margin-top: 10px;
-      width: 100%;
-      padding: 0.6rem;
-      background-color: #f1f5f9;
-      border: 1px dashed #cbd5e1;
-      color: #475569;
-      cursor: pointer;
-      border-radius: 8px;
-      font-weight: 500;
-      transition: all 0.2s;
-    }
-
-    .add-variant-btn:hover {
-      background-color: #e2e8f0;
-      color: #0f172a;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-
-      to {
-        opacity: 1;
-      }
+    .status-indicator {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
     }
   </style>
 </head>
@@ -411,9 +267,10 @@
                 </option> -->
               </select>
             </div>
-            <button class="btn-primary" id="addProductBtn" style="padding: 0.5rem 1rem; margin-left: 10px">
+            <a href="/admin/products/add" class="btn-primary" id="addProductBtn"
+              style="padding: 0.5rem 1rem; margin-left: 10px">
               <i class="fa-solid fa-plus"></i> Add Product
-            </button>
+            </a>
           </div>
         </div>
 
@@ -483,10 +340,10 @@
                     </td>
 
                     <td>
-                      <button class="action-btn edit-product-btn" title="Edit" data-id="<%= product._id %>"
-                        data-product='<%= JSON.stringify(product) %>'>
+                      <a href="/admin/products/<%= product._id %>/edit" class="action-btn edit-product-btn"
+                        title="Edit">
                         <i class="fa-regular fa-pen-to-square"></i>
-                      </button>
+                      </a>
 
                       <button class="action-btn toggle-product-btn" title="<%= product.isActive ? 'Unlist' : 'List' %>"
                         data-id="<%= product._id %>" data-active="<%= product.isActive %>"
@@ -537,558 +394,55 @@
       </div>
     </main>
   </div>
-  <!-- Add Product Modal -->
-  <div class="modal-overlay" id="addProductModal">
-    <div class="modal-container modal-xl">
-      <div class="modal-header">
-        <h3 class="modal-title">Add New Product</h3>
-        <button class="close-modal close-modal-btn">
-          <i class="fa-solid fa-times"></i>
-        </button>
-      </div>
-      <form id="addProductForm" action="/admin/products" method="POST" enctype="multipart/form-data">
-        <div class="form-group">
-          <label class="form-label" for="addName">Product Name</label>
-          <input type="text" class="form-control" id="addName" name="name" required placeholder="Enter product name">
-        </div>
 
-        <div class="form-group">
-          <label class="form-label" for="addCategory">Category</label>
-          <select class="form-control" id="addCategory" name="categoryId" required>
-            <option value="" disabled selected>Select Category</option>
-            <%if(categories && categories.length!=0){%>
-              <% categories.forEach(category=>{%>
-                <option value="<%=category._id%>" id="category-<%=category._id%>">
-                  <%=category.name%>
-                </option>
-                <%=category.name%>
-                  </option>
-                  <%})%>
-                    <%}%>
-          </select>
-        </div>
 
-        <!-- Product Attributes Section (Global for Product) -->
-        <h4 style="margin: 1.5rem 0 0.5rem; color: #334155; font-size: 1rem;">Product Attributes</h4>
-        <small style="display:block; margin-bottom: 1rem; color: #64748b;">Define attributes like Color, Size. These
-          will be available for all variants.</small>
 
-        <div id="addProductAttributes" class="attributes-wrapper" style="margin-bottom: 1.5rem;">
-          <!-- Populated by JS -->
-        </div>
-
-        <div class="form-row" style="margin-bottom: 1.5rem; align-items: flex-end;">
-          <div class="form-group" style="margin-bottom: 0; flex: 1;">
-            <label class="form-label">Add New Attribute</label>
-            <input type="text" id="addAttrInput" class="form-control" placeholder="e.g. Color">
-          </div>
-          <button type="button" id="addProdAttrBtn" class="btn-secondary" style="height: 42px;">
-            <i class="fa-solid fa-plus"></i> Add
-          </button>
-        </div>
-
-        <!-- Dynamic Variants Section -->
-        <h4 style="margin: 1.5rem 0 1rem; color: #334155; font-size: 1rem;">Product Variants</h4>
-        <div id="addVariantsWrapper" class="variants-wrapper">
-          <!-- Populated by JS -->
-        </div>
-        <button type="button" id="addVariantBtn" class="add-variant-btn">
-          <i class="fa-solid fa-plus"></i> Add Another Variant
-        </button>
-
-
-        <label class="form-label" for="addDiscount" style="margin-top: 10px;">Discount percentage (Optional)</label>
-        <input type="text" class="form-control" id="addDiscount" name="discount">
-
-
-        <div class="form-group" style="margin-top: 1.5rem;">
-          <label class="form-label" for="addDescription">Description</label>
-          <textarea class="form-control" id="addDescription" name="description" rows="3" required
-            placeholder="Product description"></textarea>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn-secondary close-modal-btn"
-            style="padding: 0.6rem 1.2rem; border: 1px solid #e2e8f0; border-radius: 8px; background: white;">Cancel</button>
-          <button type="submit" class="btn-primary">Add Product</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Edit Product Modal -->
-  <div class="modal-overlay" id="editProductModal">
-    <div class="modal-container modal-xl">
-      <div class="modal-header">
-        <h3 class="modal-title">Edit Product</h3>
-        <button class="close-modal close-modal-btn">
-          <i class="fa-solid fa-times"></i>
-        </button>
-      </div>
-      <form id="editProductForm" action="/admin/products" method="PATCH" enctype="multipart/form-data">
-        <input type="hidden" id="editProductId" name="id">
-
-        <div class="form-group">
-          <label class="form-label" for="editName">Product Name</label>
-          <input type="text" class="form-control" id="editName" name="name" required>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="editCategory">Category</label>
-          <select class="form-control" id="editCategory" name="categoryId" required>
-            <option value="" disabled>Select Category</option>
-            <%if(categories && categories.length!=0){%>
-              <% categories.forEach(category=>{%>
-                <option value="<%=category._id%>">
-                  <%=category.name%>
-                </option>
-                <%})%>
-                  <%}%>
-          </select>
-        </div>
-
-        <!-- Product Attributes Section (Global for Product) -->
-        <h4 style="margin: 1.5rem 0 0.5rem; color: #334155; font-size: 1rem;">Product Attributes</h4>
-        <div id="editProductAttributes" class="attributes-wrapper" style="margin-bottom: 1.5rem;">
-          <!-- Populated by JS -->
-        </div>
-
-        <div class="form-row" style="margin-bottom: 1.5rem; align-items: flex-end;">
-          <div class="form-group" style="margin-bottom: 0; flex: 1;">
-            <label class="form-label">Add New Attribute</label>
-            <input type="text" id="editAttrInput" class="form-control" placeholder="e.g. Color">
-          </div>
-          <button type="button" id="editProdAttrBtn" class="btn-secondary" style="height: 42px;">
-            <i class="fa-solid fa-plus"></i> Add
-          </button>
-        </div>
-
-        <!-- Dynamic Variants Section -->
-        <h4 style="margin: 1.5rem 0 1rem; color: #334155; font-size: 1rem;">Product Variants</h4>
-        <div id="editVariantsWrapper" class="variants-wrapper">
-          <!-- Populated by JS -->
-        </div>
-        <button type="button" id="editAddVariantBtn" class="add-variant-btn">
-          <i class="fa-solid fa-plus"></i> Add Another Variant
-        </button>
-
-
-        <label class="form-label" for="editDiscount" style="margin-top: 10px;">Discount percentage (Optional)</label>
-        <input type="text" class="form-control" id="editDiscount" name="discount">
-
-        <div class="form-group" style="margin-top: 1.5rem;">
-          <label class="form-label" for="editDescription">Description</label>
-          <textarea class="form-control" id="editDescription" name="description" rows="3" required></textarea>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn-secondary close-modal-btn"
-            style="padding: 0.6rem 1.2rem; border: 1px solid #e2e8f0; border-radius: 8px; background: white;">Cancel</button>
-          <button type="submit" class="btn-primary">Save Changes</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-
-
-  <style>
-    /* Modal Styles */
-    .modal-overlay {
-      display: none;
-      /* Hidden by default */
-      position: fixed;
-      z-index: 10000;
-      /* Increased z-index */
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      /* Prevent body scroll interaction */
-      background-color: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(4px);
-      align-items: center;
-      /* Flexbox alignment */
-      justify-content: center;
-      /* Flexbox alignment */
-    }
-
-    .modal-overlay.active {
-      display: flex !important;
-      /* Force flex display when active */
-    }
-
-    .modal-container {
-      background-color: #fff;
-      margin: auto;
-      padding: 0;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 600px;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-      animation: modalSlideIn 0.3s ease-out;
-    }
-
-    @keyframes modalSlideIn {
-      from {
-        transform: translateY(-20px);
-        opacity: 0;
-      }
-
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-
-    .modal-header {
-      padding: 20px 24px;
-      border-bottom: 1px solid #e5e7eb;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .modal-title {
-      margin: 0;
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: #111827;
-    }
-
-    .close-modal {
-      background: none;
-      border: none;
-      color: #9ca3af;
-      font-size: 24px;
-      font-weight: bold;
-      cursor: pointer;
-      line-height: 1;
-      padding: 0;
-    }
-
-    .close-modal:hover {
-      color: #111827;
-    }
-
-    form {
-      padding: 24px;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-
-    @media (max-width: 640px) {
-      .form-row {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .form-label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 500;
-      color: #374151;
-      font-size: 0.95rem;
-    }
-
-    .form-control {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1px solid #d1d5db;
-      border-radius: 6px;
-      font-family: inherit;
-      font-size: 0.95rem;
-      transition: border-color 0.15s;
-    }
-
-    .form-control:focus {
-      outline: none;
-      border-color: #4f46e5;
-      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-    }
-
-    textarea.form-control {
-      resize: vertical;
-    }
-
-    .modal-footer {
-      display: flex;
-      justify-content: flex-end;
-      gap: 1rem;
-      margin-top: 2rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid #f1f5f9;
-    }
-
-    .modal-footer button {
-      min-width: 100px;
-    }
-
-    .btn-secondary {
-      background-color: #fff;
-      border: 1px solid #d1d5db;
-      color: #374151;
-      padding: 8px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 500;
-    }
-
-    .btn-secondary:hover {
-      background-color: #f9fafb;
-    }
-
-    /* New Variant Styles */
-    .variants-wrapper {
-      border: 1px solid #e5e7eb;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 15px;
-      background-color: #f9fafb;
-    }
-
-    .variant-item {
-      border: 1px solid #e5e7eb;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 15px;
-      position: relative;
-      background-color: #fff;
-    }
-
-    .variant-item:last-of-type {
-      margin-bottom: 0;
-    }
-
-    .remove-variant-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: none;
-      border: none;
-      color: #ef4444;
-      font-size: 1.1rem;
-      cursor: pointer;
-      padding: 5px;
-      line-height: 1;
-    }
-
-    .remove-variant-btn:hover {
-      color: #dc2626;
-    }
-
-    .add-variant-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background-color: #f0f4f8;
-      color: #334155;
-      border: 1px solid #cbd5e1;
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: background-color 0.2s, color 0.2s;
-    }
-  </style>
-
-  <style>
-    /* Image Manager Styles */
-    .image-manager {
-      border: 1px dashed #cbd5e1;
-      padding: 15px;
-      border-radius: 8px;
-      background: #fff;
-    }
-
-    .preview-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    .preview-item {
-      position: relative;
-      width: 80px;
-      height: 80px;
-      border-radius: 6px;
-      overflow: hidden;
-      border: 1px solid #e2e8f0;
-    }
-
-    .preview-item img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .remove-image-btn {
-      position: absolute;
-      top: 2px;
-      right: 2px;
-      background: rgba(239, 68, 68, 0.9);
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 18px;
-      height: 18px;
-      font-size: 10px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .upload-btn-wrapper {
-      position: relative;
-      overflow: hidden;
-      display: inline-block;
-    }
-
-    .btn-upload {
-      border: 1px solid #cbd5e1;
-      color: #475569;
-      background-color: white;
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-size: 0.9rem;
-      font-weight: 500;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .btn-upload:hover {
-      background-color: #f8fafc;
-      color: #0f172a;
-    }
-
-    .upload-btn-wrapper input[type=file] {
-      font-size: 100px;
-      position: absolute;
-      left: 0;
-      top: 0;
-      opacity: 0;
-      cursor: pointer;
-      width: 100%;
-      height: 100%;
-    }
-
-    /* Added for Refactor */
-    .attribute-badge {
-      display: inline-flex;
-      align-items: center;
-      background: #e2e8f0;
-      color: #334155;
-      padding: 4px 10px;
-      border-radius: 20px;
-      margin-right: 8px;
-      font-weight: 500;
-      font-size: 0.9rem;
-    }
-
-    .attribute-badge .fa-times {
-      margin-left: 6px;
-      cursor: pointer;
-      color: #64748b;
-      font-size: 0.8rem;
-    }
-
-    .attribute-badge .fa-times:hover {
-      color: #ef4444;
-    }
-
-    /* Existing preview item overwrite to match JS preference if needed, 
-       but keeping 80px is better for UI. JS was setting 60px. 
-       Let's stick to the CSS 80px unless user complains, or I can force 60px here.
-       The user wants "exact same functionality", so visually it should be similar.
-       I will add a modifier for variant previews.
-    */
-    .variant-preview-item {
-      position: relative;
-      width: 60px;
-      height: 60px;
-      margin-right: 10px;
-      margin-bottom: 10px;
-      border-radius: 6px;
-      border: 1px solid #e2e8f0;
-    }
-
-    .variant-preview-item img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 6px;
-    }
-
-
-    .swal2-container {
-      z-index: 20000 !important;
-    }
-
-    .swal2-popup {
-      z-index: 20001 !important;
-    }
-  </style>
-
-  <div class="modal-overlay" id="cropperModal">
-    <div class="modal-container" style="max-width: 800px;">
-      <div class="modal-header">
-        <h3 class="modal-title">Crop Image</h3>
-        <button class="close-modal close-modal-btn">
-          <i class="fa-solid fa-times"></i>
-        </button>
-      </div>
-      <div class="cropper-container">
-        <img id="cropperImage" src="" alt="Image to crop">
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="action-btn close-modal-btn">Cancel</button>
-        <button type="button" class="btn-primary" id="cropImageBtn">Crop & Save</button>
-      </div>
-    </div>
-  </div>
-
-  <style>
-    /* Scoped Styles for Cropper in Products */
-    #cropperModal .modal-container {
-      max-width: 900px;
-      width: 95%;
-      display: flex;
-      flex-direction: column;
-      max-height: 90vh;
-    }
-
-    #cropperModal .cropper-container {
-      height: 600px;
-      background: #0f172a;
-      /* Dark background for better contrast */
-      overflow: hidden;
-      border-radius: 4px;
-      margin-bottom: 1rem;
-    }
-
-    #cropperImage {
-      max-width: 100%;
-      display: block;
-    }
-  </style>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="/js/admin/admin.products.js"></script>
   <script src="/js/admin/admin.pagination.search.js"></script>
+  <script>
+    // Product toggle logic
+    document.addEventListener("DOMContentLoaded", () => {
+      const productTableBody = document.querySelector(".data-table tbody");
+      if (productTableBody) {
+        productTableBody.addEventListener("click", async function (e) {
+          const toggleBtn = e.target.closest(".toggle-product-btn");
+          if (toggleBtn) {
+            e.preventDefault();
+            const id = toggleBtn.dataset.id;
+            const currentActive = toggleBtn.dataset.active === "true";
+            const action = currentActive ? "unlist" : "list";
+
+            const result = await Swal.fire({
+              title: `Are you sure?`,
+              text: `Do you want to ${action} this product?`,
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonColor: currentActive ? "#ef4444" : "#10b981",
+              cancelButtonColor: "#64748b",
+              confirmButtonText: `Yes, ${action} it!`,
+            });
+
+            if (!result.isConfirmed) return;
+
+            try {
+              const response = await fetch(`/admin/products/${id}/toggle`, {
+                method: "PATCH",
+              });
+              const data = await response.json();
+              if (response.ok) {
+                location.reload();
+              } else {
+                Swal.fire("Error", data.message || "Failed to update product", "error");
+              }
+            } catch (error) {
+              console.error(error);
+              Swal.fire("Error", "Something went wrong", "error");
+            }
+          }
+        });
+      }
+    });
+  </script>
 </body>
 
 </html>

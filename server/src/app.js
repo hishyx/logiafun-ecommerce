@@ -39,23 +39,6 @@ app.use(flash());
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-// Routes
-app.use(async (req, res, next) => {
-  try {
-    res.locals.user = req.user || null;
-
-    if (req.user) {
-      res.locals.cartCount = await getCartCount(req.user._id);
-    } else {
-      res.locals.cartCount = 0;
-    }
-
-    next();
-  } catch (err) {
-    next(err);
-  }
-});
-
 app.use("/", authRoute);
 app.use("/", adminRoute);
 app.use("/", userRoute);

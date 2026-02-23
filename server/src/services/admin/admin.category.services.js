@@ -56,9 +56,29 @@ export const getProductCategories = async ({
 };
 
 export const addCategory = async (categoryInfo) => {
+  // Simple Validation
+  if (!categoryInfo.name || categoryInfo.name.trim().length === 0) {
+    throw new Error("Category name is required");
+  }
+  if (categoryInfo.name.trim().length < 3) {
+    throw new Error("Category name must be at least 3 characters long");
+  }
+  if (!categoryInfo.description || categoryInfo.description.trim().length === 0) {
+    throw new Error("Description is required");
+  }
+
+  const oldCategory = await Category.findOne({
+    name: {
+      $regex: `^${categoryInfo.name.trim()}$`,
+      $options: "i",
+    },
+  });
+
+  if (oldCategory) throw new Error("Category with same name already exists");
+
   const category = await Category.create({
-    name: categoryInfo.name,
-    description: categoryInfo.description,
+    name: categoryInfo.name.trim(),
+    description: categoryInfo.description.trim(),
     thumbnail: await uploadImageToCloudinary(categoryInfo.thumbnail),
   });
 
@@ -76,9 +96,30 @@ export const toggleListUnlistCategory = async (categoryId) => {
   return category;
 };
 export const updateCategory = async (categoryId, newData) => {
+  // Simple Validation
+  if (!newData.name || newData.name.trim().length === 0) {
+    throw new Error("Category name is required");
+  }
+  if (newData.name.trim().length < 3) {
+    throw new Error("Category name must be at least 3 characters long");
+  }
+  if (!newData.description || newData.description.trim().length === 0) {
+    throw new Error("Description is required");
+  }
+
+  // Check if another category has the same name
+  const existingCategory = await Category.findOne({
+    name: { $regex: `^${newData.name.trim()}$`, $options: "i" },
+    _id: { $ne: categoryId }
+  });
+
+  if (existingCategory) {
+    throw new Error("Another category with this name already exists");
+  }
+
   const update = {
-    name: newData.name,
-    description: newData.description,
+    name: newData.name.trim(),
+    description: newData.description.trim(),
   };
 
   if (newData.thumbnail) {
