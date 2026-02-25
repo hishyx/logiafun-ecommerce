@@ -2,326 +2,764 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Checkout - logiaFun</title>
-    <link rel="stylesheet" href="/css/home.css" />
-    <link rel="stylesheet" href="/css/cart.css" />
-    <style>
-        .checkout-container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1.5rem;
-            display: grid;
-            grid-template-columns: 1.5fr 1fr;
-            gap: 2rem;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout - logiaFun</title>
+  <link rel="stylesheet" href="/css/home.css" />
+  <link rel="stylesheet" href="/css/cart.css" />
+  <style>
+    .checkout-container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 2rem;
+    }
 
-        .checkout-section {
-            background: var(--white);
-            padding: 2rem;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 2rem;
-        }
+    .checkout-section {
+      background: var(--white);
+      padding: 2rem;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 2rem;
+    }
 
-        .checkout-title {
-            font-family: "Fredoka", sans-serif;
-            font-size: 1.5rem;
-            color: var(--primary);
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 0.75rem;
-        }
+    .checkout-title {
+      font-family: "Fredoka", sans-serif;
+      font-size: 1.5rem;
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
 
-        .checkout-title-text {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
+    .checkout-title-text {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
 
-        .payment-options {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
+    /* Order Items Section Styles */
+    .order-items-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
 
-        .payment-option {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            border: 1px solid #eee;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
+    .order-item {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid #f1f5f9;
+    }
 
-        .payment-option:hover {
-            border-color: var(--primary);
-            background: var(--bg-light);
-        }
+    .order-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
 
-        .payment-option input {
-            cursor: pointer;
-        }
+    .order-item-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 12px;
+      object-fit: cover;
+      background: #f8fafc;
+      border: 1px solid #f1f5f9;
+    }
 
-        .order-summary-card {
-            background: var(--bg-light);
-            padding: 2rem;
-            border-radius: var(--radius-lg);
-            position: sticky;
-            top: 100px;
-        }
+    .order-item-details {
+      flex: 1;
+    }
 
-        .summary-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-            color: var(--text-light);
-        }
+    .order-item-name {
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 0.25rem;
+      display: block;
+    }
 
-        .summary-total {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid #ddd;
-            font-weight: 700;
-            font-size: 1.25rem;
-            color: var(--primary);
-        }
+    .order-item-meta {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      display: flex;
+      gap: 1rem;
+    }
 
-        .place-order-btn {
-            width: 100%;
-            margin-top: 2rem;
-            padding: 1rem;
-            font-size: 1.1rem;
-        }
+    .order-item-price {
+      font-weight: 700;
+      color: var(--primary);
+      font-size: 1.1rem;
+    }
 
-        /* Address Selection Styles */
-        .address-selection-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem;
-        }
+    /* PREMIUM QUANTITY VISIBILITY */
+    .order-item-img-container {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      flex-shrink: 0;
+    }
 
-        .address-select-card {
-            border: 2px solid #eee;
-            border-radius: 12px;
-            padding: 1.25rem;
-            cursor: pointer;
-            transition: var(--transition);
-            position: relative;
-            display: flex;
-            align-items: flex-start;
-            gap: 1rem;
-        }
+    .premium-quantity-badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      padding: 4px 8px;
+      background: var(--primary);
+      color: white;
+      font-size: 0.8rem;
+      font-weight: 700;
+      border-radius: 20px;
+      min-width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      border: 2px solid white;
+      z-index: 10;
+      font-family: 'Inter', sans-serif;
+    }
 
-        .address-select-card:hover {
-            border-color: var(--secondary);
-            background: var(--bg-light);
-        }
+    .order-item-quantity-text {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      color: var(--primary);
+      font-size: 0.95rem;
+      margin-top: 0.25rem;
+    }
 
-        .address-select-card.selected {
-            border-color: var(--primary);
-            background: rgba(30, 58, 95, 0.03);
-        }
+    .order-item-quantity-label {
+      background: rgba(30, 58, 95, 0.08);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
 
-        .address-select-card input[type="radio"] {
-            margin-top: 0.25rem;
-            cursor: pointer;
-        }
+    .payment-options {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
 
-        .address-badge {
-            font-size: 0.75rem;
-            background: var(--bg-light);
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            display: inline-block;
-        }
+    .payment-option {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
 
-        .address-info {
-            flex: 1;
-        }
+    .payment-option:hover {
+      border-color: var(--primary);
+      background: var(--bg-light);
+    }
 
-        .address-info strong {
-            display: block;
-            margin-bottom: 0.25rem;
-            font-size: 1.1rem;
-        }
+    .payment-option input {
+      cursor: pointer;
+    }
 
-        .address-info p {
-            margin: 0;
-            color: var(--text-light);
-            font-size: 0.95rem;
-            line-height: 1.4;
-        }
+    .order-summary-card {
+      background: var(--bg-light);
+      padding: 2rem;
+      border-radius: var(--radius-lg);
+      position: sticky;
+      top: 100px;
+    }
 
-        .add-new-address-inline {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-            border: 2px dashed #ddd;
-            border-radius: 12px;
-            color: var(--text-muted);
-            text-decoration: none;
-            transition: var(--transition);
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      color: var(--text-light);
+    }
 
-        .add-new-address-inline:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-            background: var(--bg-light);
-        }
+    .summary-total {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #ddd;
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: var(--primary);
+    }
 
-        @media (max-width: 992px) {
-            .checkout-container {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    .place-order-btn {
+      width: 100%;
+      margin-top: 2rem;
+      padding: 1rem;
+      font-size: 1.1rem;
+    }
+
+    /* Address Selection Styles */
+    .address-selection-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .address-select-card {
+      border: 2px solid #eee;
+      border-radius: 12px;
+      padding: 1.25rem;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .address-select-card:hover {
+      border-color: var(--secondary);
+      background: var(--bg-light);
+    }
+
+    .address-select-card.selected {
+      border-color: var(--primary);
+      background: rgba(30, 58, 95, 0.03);
+    }
+
+    .address-select-card input[type="radio"] {
+      margin-top: 0.25rem;
+      cursor: pointer;
+    }
+
+    .address-badge {
+      font-size: 0.75rem;
+      background: var(--bg-light);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: inline-block;
+    }
+
+    .address-info {
+      flex: 1;
+    }
+
+    .address-info strong {
+      display: block;
+      margin-bottom: 0.25rem;
+      font-size: 1.1rem;
+    }
+
+    .address-info p {
+      margin: 0;
+      color: var(--text-light);
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+
+    .add-new-address-inline {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 1.25rem;
+      border: 2px dashed var(--primary);
+      border-radius: 12px;
+      color: var(--primary);
+      background: rgba(30, 58, 95, 0.05);
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      gap: 0.75rem;
+      margin-top: 1rem;
+      font-family: inherit;
+    }
+
+    .add-new-address-inline:hover {
+      background: rgba(30, 58, 95, 0.1);
+      border-style: solid;
+      transform: translateY(-2px);
+    }
+
+    /* Modal Styles Refined */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-content {
+      background: var(--white);
+      width: 90%;
+      max-width: 500px;
+      padding: 2.5rem;
+      border-radius: 24px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      position: relative;
+      transform: translateY(30px) scale(0.95);
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .modal-overlay.active .modal-content {
+      transform: translateY(0) scale(1);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1.25rem;
+      right: 1.25rem;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-light);
+      border: none;
+      border-radius: 50%;
+      font-size: 1.5rem;
+      color: var(--text-light);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .modal-close:hover {
+      background: #fee2e2;
+      color: #ef4444;
+      transform: rotate(90deg);
+    }
+
+    .modal-content h3 {
+      font-family: 'Fredoka', sans-serif;
+      font-size: 1.75rem;
+      color: var(--primary);
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-dark);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 0.875rem 1.25rem;
+      border: 2px solid #f1f5f9;
+      border-radius: 12px;
+      background: #f8fafc;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .form-group input:focus {
+      border-color: var(--primary);
+      background: var(--white);
+      box-shadow: 0 0 0 4px rgba(30, 58, 95, 0.1);
+      outline: none;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    .btn-save {
+      width: 100%;
+      padding: 1rem;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+      margin-top: 1rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-save:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(30, 58, 95, 0.3);
+    }
+
+    .address-select-card {
+      position: relative;
+      /* For the edit button */
+    }
+
+    .address-card-edit {
+      position: absolute;
+      top: 1.25rem;
+      right: 1.25rem;
+      padding: 0.5rem;
+      border-radius: 8px;
+      color: var(--primary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: transparent;
+      border: 1px solid transparent;
+    }
+
+    .address-card-edit:hover {
+      background: var(--bg-light);
+      border-color: #eee;
+    }
+
+    @media (max-width: 992px) {
+      .checkout-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .add-new-address-inline:hover {
+      background: rgba(30, 58, 95, 0.1);
+      border-style: solid;
+      transform: translateY(-2px);
+    }
+
+    .stock-reduction-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background-color: #fff7ed;
+      color: #c2410c;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 1px solid #ffedd5;
+      margin-top: 0.6rem;
+      animation: fadeIn 0.3s ease;
+      width: fit-content;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-5px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
 </head>
 
 <body>
-    <!-- Header -->
-    <%- include('../partials/header.ejs')%>
+  <!-- Header -->
+  <%- include('../partials/header.ejs')%>
 
-        <main>
-            <div class="container">
-                <h1 style="margin: 2rem 0; font-family: 'Fredoka', sans-serif; color: var(--primary);">Checkout</h1>
+  <main>
+    <div class="container">
+      <h1 style="margin: 2rem 0; font-family: 'Fredoka', sans-serif; color: var(--primary);">Checkout</h1>
 
-                <div class="checkout-container">
-                    <div class="checkout-main">
-                        <!-- Shipping Address -->
-                        <div class="checkout-section">
-                            <div class="checkout-title">
-                                <div class="checkout-title-text">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2">
-                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                                        <circle cx="12" cy="10" r="3"></circle>
-                                    </svg>
-                                    Shipping Address
-                                </div>
-                                <a href="/user/addresses" class="btn-link"
-                                    style="font-size: 0.9rem; color: var(--accent);">Manage Addresses</a>
-                            </div>
+      <div class="checkout-container">
+        <div class="checkout-main">
+          <!-- Order Items Section -->
+          <div class="checkout-section">
+            <h2 class="checkout-title">
+              <div class="checkout-title-text">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                  <path d="M3 6h18"></path>
+                  <path d="M16 10a4 4 0 0 1-8 0"></path>
+                </svg>
+                Order Items
+              </div>
+            </h2>
+            <div class="order-items-list">
 
-                            <div class="address-selection-grid">
-                                <% if (addresses && addresses.length> 0) { %>
-                                    <% addresses.forEach((address, index)=> { %>
-                                        <label class="address-select-card <%= address.isDefault ? 'selected' : '' %>">
-                                            <input type="radio" name="selectedAddress" value="<%= address._id %>"
-                                                <%=address.isDefault ? 'checked' : '' %>
-                                            onchange="this.closest('.address-selection-grid').querySelectorAll('.address-select-card').forEach(c
-                                            => c.classList.remove('selected'));
-                                            this.closest('.address-select-card').classList.add('selected');">
-                                            <div class="address-info">
-                                                <span class="address-badge">
-                                                    <%= address.addressName %>
-                                                </span>
-                                                <strong>
-                                                    <%= address.name %>
-                                                </strong>
-                                                <p>
-                                                    <%= address.street %>
-                                                </p>
-                                                <p>
-                                                    <%= address.city %>, <%= address.pincode %>
-                                                </p>
-                                                <p>Phone: <%= address.phone %>
-                                                </p>
-                                            </div>
-                                        </label>
-                                        <% }) %>
-                                            <% } else { %>
-                                                <p style="text-align: center; color: var(--text-muted); padding: 2rem;">
-                                                    No addresses found. Please add a shipping address.</p>
-                                                <% } %>
-
-                                                    <a href="/user/addresses" class="add-new-address-inline">
-                                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                                            stroke="currentColor" stroke-width="2">
-                                                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                                                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                                                        </svg>
-                                                        Add New Address
-                                                    </a>
-                            </div>
-                        </div>
-
-                        <!-- Payment Method -->
-                        <div class="checkout-section">
-                            <h2 class="checkout-title">
-                                <div class="checkout-title-text">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2">
-                                        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-                                        <line x1="1" y1="10" x2="23" y2="10"></line>
-                                    </svg>
-                                    Payment Method
-                                </div>
-                            </h2>
-
-                            <div class="payment-options">
-                                <label class="payment-option">
-                                    <input type="radio" name="payment" value="cod" checked>
-                                    <span>Cash on Delivery (COD)</span>
-                                </label>
-                                <label class="payment-option">
-                                    <input type="radio" name="payment" value="online">
-                                    <span>Online Payment (Razorpay)</span>
-                                </label>
-                                <label class="payment-option">
-                                    <input type="radio" name="payment" value="wallet">
-                                    <span>Wallet</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="checkout-sidebar">
-                        <div class="order-summary-card">
-                            <h2 class="checkout-title">Order Summary</h2>
-
-                            <div class="summary-item">
-                                <span>Subtotal</span>
-                                <span>₹0.00</span>
-                            </div>
-                            <div class="summary-item">
-                                <span>Shipping</span>
-                                <span>Free</span>
-                            </div>
-                            <div class="summary-item">
-                                <span>Tax</span>
-                                <span>₹0.00</span>
-                            </div>
-
-                            <div class="summary-total">
-                                <span>Total</span>
-                                <span>₹0.00</span>
-                            </div>
-
-                            <button class="btn btn-primary place-order-btn">
-                                Place Order
-                            </button>
-                        </div>
-                    </div>
+              <%cartItems.forEach(item=>{%>
+              <div class="order-item">
+                <div class="order-item-img-container">
+                  <img src="<%=item.product.variants.images[0]%>" alt="<%=item.product.name%>" class="order-item-img">
+                  <div class="premium-quantity-badge">
+                    <%=item.items.quantity%>
+                  </div>
                 </div>
-            </div>
-        </main>
+                <div class="order-item-details">
+                  <span class="order-item-name">
+                    <%=item.product.name%>
+                  </span>
+                  <div class="order-item-meta">
+                    <div class="order-item-quantity-text">
+                      <span class="order-item-quantity-label">quantity</span>
+                      <span>
+                        <%=item.items.quantity%>
+                      </span>
+                    </div>
+                    <!-- <span style="display: flex; align-items: center; gap: 0.5rem;">
+                      <span class="order-item-quantity-label">Color</span>
+                      <span>Silver</span>
+                    </span> -->
+                  </div>
+                  <% if (item.items.quantityChange) { %>
+                  <div class="stock-reduction-badge">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                      </path>
+                      <line x1="12" y1="9" x2="12" y2="13"></line>
+                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    Quantity reduced due to limited stock
+                  </div>
+                  <% } %>
+                </div>
+                <div class="order-item-price">₹<%=item.product.variants.price%>
+                </div>
+              </div>
+              <%})%>
 
-        <!-- Footer -->
-        <%- include('../partials/footer') %>
-            <script src="/js/formValidator.js"></script>
+            </div>
+          </div>
+
+          <!-- Shipping Address -->
+          <div class="checkout-section">
+            <div class="checkout-title">
+              <div class="checkout-title-text">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                Shipping Address
+              </div>
+              <a href="/user/addresses" class="btn-link" style="font-size: 0.9rem; color: var(--accent);">Manage
+                Addresses</a>
+            </div>
+
+            <div class="address-selection-grid">
+              <% if (addresses && addresses.length> 0) { %>
+              <% addresses.forEach((address, index)=> { %>
+              <label class="address-select-card <%= address.isDefault ? 'selected' : '' %>" data-id="<%= address._id %>">
+                <input type="radio" name="selectedAddress" value="<%= address._id %>" <%= address.isDefault ? "checked" : "" %>>
+                <div class="address-info">
+                  <span class="address-badge">
+                    <%= address.addressName %>
+                  </span>
+                  <strong>
+                    <%= address.name %>
+                  </strong>
+                  <p class="address-street">
+                    <%= address.street %>
+                  </p>
+                  <p>
+                    <span class="address-city">
+                      <%= address.city %>
+                    </span>, <span class="address-pincode">
+                      <%= address.pincode %>
+                    </span>
+                  </p>
+                  <p>Phone: <span class="address-phone">
+                      <%= address.phone %>
+                    </span>
+                  </p>
+                </div>
+                <button type="button" class="address-card-edit" onclick="event.preventDefault(); openEditModalFromCard('<%= address._id %>')">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                  </svg>
+                </button>
+              </label>
+              <% }) %>
+              <% } else { %>
+              <p style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                No addresses found. Please add a shipping address.</p>
+              <% } %>
+
+              <button type="button" class="add-new-address-inline" onclick="openAddModal()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Add New Address
+              </button>
+            </div>
+          </div>
+
+          <!-- Payment Method -->
+          <div class="checkout-section">
+            <h2 class="checkout-title">
+              <div class="checkout-title-text">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                  <line x1="1" y1="10" x2="23" y2="10"></line>
+                </svg>
+                Payment Method
+              </div>
+            </h2>
+
+            <div class="payment-options">
+              <label class="payment-option">
+                <input type="radio" name="payment" value="cod" checked>
+                <span>Cash on Delivery (COD)</span>
+              </label>
+              <label class="payment-option">
+                <input type="radio" name="payment" value="online">
+                <span>Online Payment (Razorpay)</span>
+              </label>
+              <label class="payment-option">
+                <input type="radio" name="payment" value="wallet">
+                <span>Wallet</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="checkout-sidebar">
+          <div class="order-summary-card">
+            <h2 class="checkout-title">Order Summary</h2>
+
+            <div class="summary-item">
+              <span>Subtotal</span>
+              <span>₹<%=calculations.subtotal%></span>
+            </div>
+            <div class="summary-item">
+              <span>Discount</span>
+              <span>₹<%=calculations.discount%></span>
+            </div>
+            <div class="summary-item">
+              <span>Shipping</span>
+              <span>Free</span>
+            </div>
+
+
+            <div class="summary-total">
+              <span>Total</span>
+              <span>₹<%=calculations.total%></span>
+            </div>
+
+            <button class="btn btn-primary place-order-btn" onclick="placeOrder()">
+              Place Order
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <%- include('../partials/footer') %>
+
+
+  <!--Modales-->
+
+  <!-- Add Address Modal -->
+  <div class="modal-overlay" id="addAddressModal">
+    <div class="modal-content">
+      <button class="modal-close" id="closeAddModal">&times;</button>
+      <h3>Add New Address</h3>
+      <form class="profile-form" id="addAddressForm" novalidate>
+        <div class="form-group">
+          <label>Address Name (e.g., Home, Office)</label>
+          <input type="text" placeholder="Home" name="addressName" required minlength="3" />
+        </div>
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" placeholder="John Doe" name="name" required minlength="3" />
+        </div>
+        <div class="form-group">
+          <label>Street Address</label>
+          <input type="text" placeholder="123 Street Name" name="street" required />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>City</label>
+            <input type="text" placeholder="City" name="city" required />
+          </div>
+          <div class="form-group">
+            <label>State/Zip</label>
+            <input type="text" placeholder="Pincode" name="pincode" required pattern="^[0-9]{6}$" data-msg-pattern="Please enter a valid 6-digit pincode" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" placeholder="10-digit number" name="phone" required pattern="^[0-9]{10}$" data-msg-pattern="Please enter a valid 10-digit phone number" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-save" style="width: 100%">
+          Save Address
+        </button>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- Edit Address Modal -->
+  <div class="modal-overlay" id="editAddressModal">
+    <div class="modal-content">
+      <button class="modal-close" id="closeEditModal">&times;</button>
+      <h3>Edit Address</h3>
+      <form class="profile-form" id="editAddressForm" novalidate>
+        <div class="form-group">
+          <label>Address Name (e.g., Home, Office)</label>
+          <input type="text" name="addressName" required minlength="3" />
+        </div>
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" name="name" required minlength="3" />
+        </div>
+        <div class="form-group">
+          <label>Street Address</label>
+          <input type="text" name="street" required />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>City</label>
+            <input type="text" name="city" required />
+          </div>
+          <div class="form-group">
+            <label>State/Zip</label>
+            <input type="text" name="pincode" required pattern="^[0-9]{6}$" data-msg-pattern="Please enter a valid 6-digit pincode" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" name="phone" required pattern="^[0-9]{10}$" data-msg-pattern="Please enter a valid 10-digit phone number" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-save" style="width: 100%">
+          Update Address
+        </button>
+      </form>
+    </div>
+  </div>
+
+
+  <script src="/js/helpers/formValidator.js"></script>
+  <script src="/js/checkout.js"></script>
 </body>
 
 </html>

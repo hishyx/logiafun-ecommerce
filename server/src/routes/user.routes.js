@@ -4,6 +4,9 @@ import * as userControllers from "../controllers/user.controller.js";
 import * as userProductControllers from "../controllers/user.product.controller.js";
 import * as userCartControllers from "../controllers/user.cart.controller.js";
 import * as userWishlistControllers from "../controllers/user.wishlist.controller.js";
+import * as userCheckoutControllers from "../controllers/user.checkout.controller.js";
+import * as userOrderControllers from "../controllers/user.orders.controller.js";
+import * as orderFailedController from "../controllers/user/order.controller.js";
 
 import { setLocalVariables } from "../middlewares/user.middlewares.js";
 
@@ -28,7 +31,13 @@ router
   .get(userCartControllers.cartPage)
   .post(userCartControllers.addToCart);
 
-router.get("/user/cart/checkout", userCartControllers.checkoutPage);
+router
+  .route("/user/cart/checkout")
+  .get(userCheckoutControllers.checkoutPage)
+  .post(userCheckoutControllers.placeOrder);
+
+router.get("/user/orders", userOrderControllers.orderPage);
+
 router
   .route("/user/change-email")
   .post(userControllers.changeEmail)
@@ -80,11 +89,20 @@ router
   .route("/user/wishlist/:itemId")
   .delete(userWishlistControllers.removeWishlistItem);
 
+router.delete("/user/cart/clearAll", userCartControllers.clearAllItems);
+
 router
   .route("/user/cart/:itemId")
   .delete(userCartControllers.deleteCartItem)
   .patch(userCartControllers.updateCartItem);
 
-router.post("/user/cart/all", userCartControllers.clearAllItems);
+router.get(
+  "/order/success/:orderNumber",
+  userOrderControllers.orderSuccessPage,
+);
+
+router.get("/user/orders/:orderId", userOrderControllers.orderDetailsPage);
+
+router.get("/order/failed", orderFailedController.orderFailedPage);
 
 export default router;

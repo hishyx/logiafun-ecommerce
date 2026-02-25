@@ -6,6 +6,7 @@ import upload from "../config/multer.js";
 import * as adminUserControllers from "../controllers/admin/admin.user.controller.js";
 import * as adminProductControllers from "../controllers/admin/admin.product.controller.js";
 import * as adminCategoryControllers from "../controllers/admin/admin.categories.controller.js";
+import * as adminOrderControllers from "../controllers/admin/admin.order.controller.js";
 
 const router = express.Router();
 
@@ -13,6 +14,12 @@ router.use("/admin", isAdmin);
 router.use("/admin", checkAdminStatus);
 
 router.get("/admin/users", adminUserControllers.adminUserListPage);
+
+router.get("/admin/orders", adminOrderControllers.adminOrderListPage);
+router
+  .route("/admin/orders/:orderId")
+  .get(adminOrderControllers.adminOrderDetailsPage)
+  .patch(adminOrderControllers.updateAdminOrderStatus);
 
 router
   .route("/admin/categories")

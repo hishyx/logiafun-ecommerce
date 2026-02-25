@@ -2,375 +2,373 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Add Product - Admin Panel</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link rel="stylesheet" href="/css/admin/main.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" />
-    <style>
-        /* Reuse styles from admin.products.ejs */
-        .form-container {
-            background: white;
-            padding: 2rem;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            max-width: 1000px;
-            margin: 0 auto;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Product - Admin Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/css/admin/main.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" />
+  <style>
+    /* Reuse styles from admin.products.ejs */
+    .form-container {
+      background: white;
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      max-width: 1000px;
+      margin: 0 auto;
+    }
 
-        .form-header {
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #e2e8f0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    .form-header {
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-        .form-group {
-            margin-bottom: 1.25rem;
-        }
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
 
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: #334155;
-            font-size: 0.9rem;
-        }
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #334155;
+      font-size: 0.9rem;
+    }
 
-        .form-control {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            transition: all 0.2s;
-            color: #0f172a;
-        }
+    .form-control {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+      color: #0f172a;
+    }
 
-        .variants-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+    .variants-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
 
-        .variant-item {
-            border: 1px solid #e2e8f0;
-            padding: 15px;
-            border-radius: 8px;
-            background-color: #f8fafc;
-            position: relative;
-            margin-bottom: 15px;
-        }
+    .variant-item {
+      border: 1px solid #e2e8f0;
+      padding: 15px;
+      border-radius: 8px;
+      background-color: #f8fafc;
+      position: relative;
+      margin-bottom: 15px;
+    }
 
-        .remove-variant-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            color: #ef4444;
-            background: none;
-            border: none;
-            cursor: pointer;
-        }
+    .remove-variant-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      color: #ef4444;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
 
-        .add-variant-btn {
-            width: 100%;
-            padding: 0.8rem;
-            background-color: #f1f5f9;
-            border: 1px dashed #cbd5e1;
-            color: #475569;
-            cursor: pointer;
-            border-radius: 8px;
-            font-weight: 500;
-            margin-top: 10px;
-        }
+    .add-variant-btn {
+      width: 100%;
+      padding: 0.8rem;
+      background-color: #f1f5f9;
+      border: 1px dashed #cbd5e1;
+      color: #475569;
+      cursor: pointer;
+      border-radius: 8px;
+      font-weight: 500;
+      margin-top: 10px;
+    }
 
-        .btn-primary {
-            background-color: #0f172a;
-            color: white;
-            border: none;
-            padding: 0.8rem 2rem;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-        }
+    .btn-primary {
+      background-color: #0f172a;
+      color: white;
+      border: none;
+      padding: 0.8rem 2rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
 
-        .btn-secondary {
-            background-color: white;
-            border: 1px solid #e2e8f0;
-            padding: 0.8rem 2rem;
-            border-radius: 8px;
-            color: #64748b;
-            text-decoration: none;
-            display: inline-block;
-        }
+    .btn-secondary {
+      background-color: white;
+      border: 1px solid #e2e8f0;
+      padding: 0.8rem 2rem;
+      border-radius: 8px;
+      color: #64748b;
+      text-decoration: none;
+      display: inline-block;
+    }
 
-        /* Image Manager Styles */
-        .image-upload-container {
-            border: 1px dashed #cbd5e1;
-            padding: 15px;
-            border-radius: 8px;
-            background: #fff;
-            margin-top: 10px;
-        }
+    /* Image Manager Styles */
+    .image-upload-container {
+      border: 1px dashed #cbd5e1;
+      padding: 15px;
+      border-radius: 8px;
+      background: #fff;
+      margin-top: 10px;
+    }
 
-        .variant-preview-item {
-            position: relative;
-            width: 80px;
-            height: 80px;
-            border-radius: 6px;
-            overflow: hidden;
-            border: 1px solid #e2e8f0;
-            display: inline-block;
-            margin-right: 10px;
-            margin-bottom: 10px;
-        }
+    .variant-preview-item {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+      display: inline-block;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
 
-        .variant-preview-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+    .variant-preview-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
-        .remove-image-btn {
-            position: absolute;
-            top: 2px;
-            right: 2px;
-            background: rgba(239, 68, 68, 0.9);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-        }
+    .remove-image-btn {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      background: rgba(239, 68, 68, 0.9);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+    }
 
-        .attribute-badge {
-            display: inline-flex;
-            align-items: center;
-            background: #e2e8f0;
-            color: #334155;
-            padding: 4px 12px;
-            border-radius: 20px;
-            margin-right: 8px;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
+    .attribute-badge {
+      display: inline-flex;
+      align-items: center;
+      background: #e2e8f0;
+      color: #334155;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-right: 8px;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
 
-        .attribute-badge i {
-            margin-left: 8px;
-            cursor: pointer;
-        }
+    .attribute-badge i {
+      margin-left: 8px;
+      cursor: pointer;
+    }
 
-        #cropperModal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-        }
+    #cropperModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+    }
 
-        #cropperModal.active {
-            display: flex;
-        }
+    #cropperModal.active {
+      display: flex;
+    }
 
-        .cropper-content {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 800px;
-        }
+    .cropper-content {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 800px;
+    }
 
-        .cropper-area {
-            height: 500px;
-            background: #000;
-            margin-bottom: 1rem;
-            border-radius: 8px;
-            overflow: hidden;
-        }
+    .cropper-area {
+      height: 500px;
+      background: #000;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      overflow: hidden;
+    }
 
-        #cropperImage {
-            max-width: 100%;
-            display: block;
-        }
-    </style>
+    #cropperImage {
+      max-width: 100%;
+      display: block;
+    }
+  </style>
 </head>
 
 <body>
-    <div class="admin-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="logo-area">
-                <h2>LogiaFun <span class="badge">Admin</span></h2>
-            </div>
-            <nav class="sidebar-nav">
-                <ul>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="fa-solid fa-chart-line"></i>
-                            <span>Dashboard</span>
-                        </a>
-                    </li>
-                    <li class="nav-item active">
-                        <a href="/admin/products" class="nav-link">
-                            <i class="fa-solid fa-box"></i>
-                            <span>Products</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/admin/categories" class="nav-link">
-                            <i class="fa-solid fa-layer-group"></i>
-                            <span>Categories</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="fa-solid fa-cart-shopping"></i>
-                            <span>Orders</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/admin/users" class="nav-link">
-                            <i class="fa-solid fa-users"></i>
-                            <span>Users</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="fa-solid fa-image"></i>
-                            <span>Banners</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="fa-solid fa-gear"></i>
-                            <span>Settings</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-            <div class="sidebar-footer">
-                <form action="/admin/logout" method="POST" class="logout-form">
-                    <button type="submit" class="nav-link logout logout-btn">
-                        <i class="fa-solid fa-right-from-bracket"></i>
-                        <span>Logout</span>
-                    </button>
-                </form>
-            </div>
-        </aside>
+  <div class="admin-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo-area">
+        <h2>LogiaFun <span class="badge">Admin</span></h2>
+      </div>
+      <nav class="sidebar-nav">
+        <ul>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="fa-solid fa-chart-line"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item active">
+            <a href="/admin/products" class="nav-link">
+              <i class="fa-solid fa-box"></i>
+              <span>Products</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/admin/categories" class="nav-link">
+              <i class="fa-solid fa-layer-group"></i>
+              <span>Categories</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/admin/orders" class="nav-link">
+              <i class="fa-solid fa-cart-shopping"></i>
+              <span>Orders</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/admin/users" class="nav-link">
+              <i class="fa-solid fa-users"></i>
+              <span>Users</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="fa-solid fa-image"></i>
+              <span>Banners</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="fa-solid fa-gear"></i>
+              <span>Settings</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <div class="sidebar-footer">
+        <form action="/admin/logout" method="POST" class="logout-form">
+          <button type="submit" class="nav-link logout logout-btn">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
+          </button>
+        </form>
+      </div>
+    </aside>
 
-        <main class="main-content">
-            <header class="top-bar">
-                <div class="page-title">
-                    <h1>Add New Product</h1>
-                </div>
-            </header>
-
-            <div class="content-body" style="padding: 2rem;">
-                <div class="form-container">
-                    <div class="form-header">
-                        <h3>Product Details</h3>
-                        <a href="/admin/products" class="btn-secondary">Back to List</a>
-                    </div>
-
-                    <form id="addProductForm" action="/admin/products" method="POST" enctype="multipart/form-data"
-                        novalidate>
-                        <div class="form-group">
-                            <label class="form-label">Product Name</label>
-                            <input type="text" class="form-control" name="name" placeholder="Enter product name"
-                                required minlength="3">
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Category</label>
-                            <select class="form-control" name="categoryId" required>
-                                <option value="" disabled selected>Select Category</option>
-                                <% categories.forEach(category=> { %>
-                                    <option value="<%= category._id %>">
-                                        <%= category.name %>
-                                    </option>
-                                    <% }) %>
-                            </select>
-                        </div>
-
-                        <h4 style="margin: 1.5rem 0 0.5rem; color: #334155; font-size: 1rem;">Product Attributes</h4>
-                        <div id="addProductAttributes" class="attributes-wrapper" style="margin-bottom: 1rem;"></div>
-
-                        <div style="display: flex; gap: 10px; margin-bottom: 2rem;">
-                            <input type="text" id="addAttrInput" class="form-control" placeholder="e.g. Color">
-                            <button type="button" id="addProdAttrBtn" class="btn-secondary"
-                                style="padding: 0 1.5rem;">Add Attribute</button>
-                        </div>
-
-                        <h4 style="margin: 1.5rem 0 1rem; color: #334155; font-size: 1rem;">Product Variants</h4>
-                        <div id="addVariantsWrapper" class="variants-wrapper"></div>
-                        <button type="button" id="addVariantBtn" class="add-variant-btn">
-                            <i class="fa-solid fa-plus"></i> Add Another Variant
-                        </button>
-
-                        <div class="form-group" style="margin-top: 1.5rem;">
-                            <label class="form-label">Discount percentage (Optional)</label>
-                            <input type="number" class="form-control" name="discount" placeholder="0" min="0" max="100">
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Description</label>
-                            <textarea class="form-control" name="description" rows="5" placeholder="Product description"
-                                required></textarea>
-                        </div>
-
-                        <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
-                            <a href="/admin/products" class="btn-secondary">Cancel</a>
-                            <button type="submit" class="btn-primary">Create Product</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Cropper Modal -->
-    <div id="cropperModal">
-        <div class="cropper-content">
-            <div class="form-header">
-                <h3>Crop Image</h3>
-                <button type="button" class="close-modal-btn"
-                    style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
-            </div>
-            <div class="cropper-area">
-                <img id="cropperImage" src="">
-            </div>
-            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
-                <button type="button" class="btn-secondary close-modal-btn">Cancel</button>
-                <button type="button" id="cropImageBtn" class="btn-primary">Crop & Save</button>
-            </div>
+    <main class="main-content">
+      <header class="top-bar">
+        <div class="page-title">
+          <h1>Add New Product</h1>
         </div>
-    </div>
+      </header>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="/js/formValidator.js"></script>
-    <script src="/js/admin/admin.products.js"></script>
-    <script>
-        // Set mode for JS
-        window.PAGE_MODE = 'add';
-    </script>
+      <div class="content-body" style="padding: 2rem;">
+        <div class="form-container">
+          <div class="form-header">
+            <h3>Product Details</h3>
+            <a href="/admin/products" class="btn-secondary">Back to List</a>
+          </div>
+
+          <form id="addProductForm" action="/admin/products" method="POST" enctype="multipart/form-data" novalidate>
+            <div class="form-group">
+              <label class="form-label">Product Name</label>
+              <input type="text" class="form-control" name="name" placeholder="Enter product name" required
+                minlength="3">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <select class="form-control" name="categoryId" required>
+                <option value="" disabled selected>Select Category</option>
+                <% categories.forEach(category=> { %>
+                  <option value="<%= category._id %>">
+                    <%= category.name %>
+                  </option>
+                  <% }) %>
+              </select>
+            </div>
+
+            <h4 style="margin: 1.5rem 0 0.5rem; color: #334155; font-size: 1rem;">Product Attributes</h4>
+            <div id="addProductAttributes" class="attributes-wrapper" style="margin-bottom: 1rem;"></div>
+
+            <div style="display: flex; gap: 10px; margin-bottom: 2rem;">
+              <input type="text" id="addAttrInput" class="form-control" placeholder="e.g. Color">
+              <button type="button" id="addProdAttrBtn" class="btn-secondary" style="padding: 0 1.5rem;">Add
+                Attribute</button>
+            </div>
+
+            <h4 style="margin: 1.5rem 0 1rem; color: #334155; font-size: 1rem;">Product Variants</h4>
+            <div id="addVariantsWrapper" class="variants-wrapper"></div>
+            <button type="button" id="addVariantBtn" class="add-variant-btn">
+              <i class="fa-solid fa-plus"></i> Add Another Variant
+            </button>
+
+            <div class="form-group" style="margin-top: 1.5rem;">
+              <label class="form-label">Discount percentage (Optional)</label>
+              <input type="number" class="form-control" name="discount" placeholder="0" min="0" max="100">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Description</label>
+              <textarea class="form-control" name="description" rows="5" placeholder="Product description"
+                required></textarea>
+            </div>
+
+            <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+              <a href="/admin/products" class="btn-secondary">Cancel</a>
+              <button type="submit" class="btn-primary">Create Product</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Cropper Modal -->
+  <div id="cropperModal">
+    <div class="cropper-content">
+      <div class="form-header">
+        <h3>Crop Image</h3>
+        <button type="button" class="close-modal-btn"
+          style="background:none; border:none; font-size:1.5rem; cursor:pointer;">&times;</button>
+      </div>
+      <div class="cropper-area">
+        <img id="cropperImage" src="">
+      </div>
+      <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+        <button type="button" class="btn-secondary close-modal-btn">Cancel</button>
+        <button type="button" id="cropImageBtn" class="btn-primary">Crop & Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="/js/helpers/formValidator.js"></script>
+  <script src="/js/admin/admin.products.js"></script>
+  <script>
+    // Set mode for JS
+    window.PAGE_MODE = 'add';
+  </script>
 </body>
 
 </html>

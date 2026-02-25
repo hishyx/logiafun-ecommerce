@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Orders - logiaFun</title>
+  <link rel="stylesheet" href="/css/home.css" />
+  <link rel="stylesheet" href="/css/profile.css" />
+  <style>
+    .orders-header {
+      margin-bottom: 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .orders-title {
+      font-family: "Fredoka", sans-serif;
+      font-size: 2.5rem;
+      color: var(--primary);
+      margin: 0;
+    }
+
+    .order-tabs {
+      display: flex;
+      gap: 0.5rem;
+      background: #f1f5f9;
+      padding: 0.4rem;
+      border-radius: 12px;
+      width: fit-content;
+    }
+
+    .order-tab {
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-light);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .order-tab.active {
+      background: var(--white);
+      color: var(--primary);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .order-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .order-card {
+      background: var(--white);
+      border-radius: 16px;
+      border: 1px solid #f1f5f9;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .order-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      border-color: #e2e8f0;
+    }
+
+    .order-card-header {
+      padding: 1.25rem 1.5rem;
+      background: #fcfdfe;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .order-meta {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .meta-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .meta-value {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .status-badge {
+      padding: 0.4rem 1rem;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* Pending */
+    .status-pending {
+      background: #fef9c3;
+      color: #ca8a04;
+    }
+
+    /* Processing */
+    .status-processing {
+      background: #fff7ed;
+      color: #d97706;
+    }
+
+    /* In Transit */
+    .status-in_transit {
+      background: #eff6ff;
+      color: #2563eb;
+    }
+
+    /* Delivered */
+    .status-delivered {
+      background: #ecfdf5;
+      color: #059669;
+    }
+
+    /* Cancelled */
+    .status-cancelled {
+      background: #fef2f2;
+      color: #dc2626;
+    }
+
+    /* Returned */
+    .status-returned {
+      background: #f5f3ff;
+      color: #7c3aed;
+    }
+
+    .status-cancelled {
+      background: #fef2f2;
+      color: #dc2626;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .order-content {
+      padding: 1.5rem;
+    }
+
+    .order-item-row {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    .order-item-img {
+      width: 90px;
+      height: 90px;
+      border-radius: 12px;
+      object-fit: cover;
+      background: #f8fafc;
+      border: 1px solid #f1f5f9;
+    }
+
+    .order-item-info {
+      flex: 1;
+    }
+
+    .order-item-name {
+      font-family: "Fredoka", sans-serif;
+      font-size: 1.1rem;
+      color: var(--primary);
+      margin-bottom: 0.4rem;
+      display: block;
+    }
+
+    .order-item-desc {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 0.75rem;
+      line-height: 1.4;
+      max-width: 500px;
+    }
+
+    .order-item-price {
+      font-weight: 700;
+      color: var(--text-dark);
+      font-size: 1.05rem;
+    }
+
+    .order-card-footer {
+      padding: 1.25rem 1.5rem;
+      background: #ffffff;
+      border-top: 1px solid #f1f5f9;
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+    }
+
+    .order-btn {
+      padding: 0.6rem 1.2rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid #e2e8f0;
+      color: var(--text-light);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: #f8fafc;
+    }
+
+    .btn-fill {
+      background: var(--primary);
+      color: var(--white);
+      border: none;
+    }
+
+    .btn-fill:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(30, 58, 95, 0.2);
+    }
+
+    @media (max-width: 600px) {
+      .orders-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .order-tabs {
+        width: 100%;
+        overflow-x: auto;
+      }
+
+      .order-meta {
+        gap: 1rem;
+      }
+
+      .order-item-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .order-item-img {
+        width: 100%;
+        height: 200px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header -->
+  <%- include('../partials/header.ejs')%>
+
+    <main>
+      <div class="profile-container">
+        <!-- Sidebar -->
+        <aside class="profile-sidebar">
+          <div class="profile-user-info">
+            <div class="profile-avatar-large"><img src="<%=user.profileImage%>"></div>
+            <div>
+              <div class="profile-user-name">
+                <%=user.name%>
+              </div>
+              <div class="profile-user-email">
+                <%=user.email%>
+              </div>
+            </div>
+          </div>
+          <nav class="sidebar-menu">
+            <a href="/user/profile" class="sidebar-link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              Profile
+            </a>
+            <a href="/user/addresses" class="sidebar-link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+              Addresses
+            </a>
+            <a href="/user/orders" class="sidebar-link active">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="1" y="3" width="15" height="13" />
+                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+                <circle cx="5.5" cy="18.5" r="2.5" />
+                <circle cx="18.5" cy="18.5" r="2.5" />
+              </svg>
+              My Orders
+            </a>
+            <a href="/user/wishlist" class="sidebar-link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path
+                  d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                </path>
+              </svg>
+              Wishlist
+            </a>
+            <a href="#" class="sidebar-link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="5" width="20" height="14" rx="2" />
+                <line x1="2" y1="10" x2="22" y2="10" />
+              </svg>
+              Wallet
+            </a>
+            <form action="/user/logout" method="POST" style="display: inline">
+              <button type="submit" class="sidebar-link logout-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Log Out
+              </button>
+            </form>
+          </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <section class="profile-content">
+          <div class="orders-header">
+            <h1 class="orders-title">My Orders</h1>
+            <div class="order-tabs">
+              <div class="order-tab active">All</div>
+              <div class="order-tab">Processing</div>
+              <div class="order-tab">Shipped</div>
+              <div class="order-tab">Delivered</div>
+            </div>
+          </div>
+
+          <div class="order-list">
+
+            <!-- Order 2 -->
+
+            <%orders.forEach(order=>{%>
+              <div class="order-card">
+                <div class="order-card-header">
+                  <div class="order-meta">
+                    <div class="meta-item">
+                      <span class="meta-label">Order Placed</span>
+                      <span class="meta-value">
+                        <%=new Date(order.createdAt).toLocaleDateString("en-US", {month: "short" ,day: "numeric"
+                          ,year: "numeric" })%>
+                      </span>
+                    </div>
+                    <div class="meta-item">
+                      <span class="meta-label">Total Amount</span>
+                      <span class="meta-value">₹<%=order.totalAmount%></span>
+                    </div>
+                    <div class="meta-item">
+                      <span class="meta-label">Order #</span>
+                      <span class="meta-value">
+                        <%=order.orderNumber%>
+                      </span>
+                    </div>
+                    <div class="meta-item">
+                      <span class="meta-label">Items</span>
+                      <span class="meta-value">
+                        <%=order.items.length%>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="status-badge status-<%= order.orderStatus %>">
+                    <span class="status-dot"></span>
+                    <%= order.orderStatus.charAt(0).toUpperCase() + order.orderStatus.slice(1) %>
+                  </div>
+                </div>
+                <div class="order-content">
+                  <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <% order.items.slice(0, 3).forEach(item=> { %>
+                      <div
+                        style="width: 50px; height: 50px; border-radius: 8px; overflow: hidden; border: 1px solid #f1f5f9; background: #f8fafc; flex-shrink: 0;">
+                        <img src="<%=item.product.image%>" alt="<%=item.product.name%>"
+                          style="width: 100%; height: 100%; object-fit: cover;">
+                      </div>
+                      <% }) %>
+
+                        <% if (order.items.length> 3) { %>
+                          <div
+                            style="height: 50px; padding: 0 0.75rem; border-radius: 8px; border: 1px solid #f1f5f9; background: #f8fafc; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; color: var(--text-light); flex-shrink: 0;">
+                            +<%= order.items.length - 3 %> more
+                          </div>
+                          <% } %>
+                  </div>
+
+                  <div class="order-card-footer"
+                    style="padding: 1rem 0 0 0; margin-top: 1rem; border-top: 1px solid #f1f5f9;">
+                    <button class="order-btn btn-outline">Track Package</button>
+                    <a href="/user/orders/<%= order._id %>" class="order-btn btn-fill"
+                      style="text-decoration: none;">View Details</a>
+                  </div>
+                </div>
+                <%})%>
+
+
+
+                  <!-- Order 3 -->
+              </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <%- include('../partials/footer') %>
+
+      <script>
+        // Simple tab switching UI logic
+        document.querySelectorAll('.order-tab').forEach(tab => {
+          tab.addEventListener('click', () => {
+            document.querySelector('.order-tab.active').classList.remove('active');
+            tab.classList.add('active');
+          });
+        });
+      </script>
+</body>
+
+</html>

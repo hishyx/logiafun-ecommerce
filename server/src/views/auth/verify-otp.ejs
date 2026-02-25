@@ -5,9 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Verify Code - LogiaFun</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Fredoka:wght@300..700&display=swap"
-    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Fredoka:wght@300..700&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <style>
     @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Fredoka:wght@300..700&display=swap");
@@ -331,8 +329,7 @@
 
       <form method="POST" novalidate>
         <div class="input-group">
-          <input class="otp-input" type="text" name="otp" data-length="6" data-digits placeholder="000000" required
-            autofocus />
+          <input class="otp-input" type="text" name="otp" data-length="6" data-digits placeholder="000000" required autofocus />
 
           <input type="hidden" id="resendCooldown" value="<%= resendCooldown %>" />
         </div>
@@ -407,7 +404,9 @@
       try {
         const res = await fetch("/auth/signup/resend-otp", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json"
+          },
         });
 
         const data = await res.json();
@@ -427,7 +426,7 @@
       }
     });
   </script>
-  <script src="/js/formValidator.js"></script>
+  <script src="/js/helpers/formValidator.js"></script>
 
 </body>
 

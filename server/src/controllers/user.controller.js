@@ -139,7 +139,7 @@ export const addAddress = async (req, res) => {
   try {
     const newAddress = await createNewAddress(req.user._id, req.body);
 
-    res.status(201).json({
+    res.status(200).json({
       address: newAddress,
     });
   } catch (err) {
@@ -202,6 +202,8 @@ export const changeProfilePicture = async (req, res) => {
   }
 };
 
-// getdefaultadress=()=>{
-//   const addresses=await Addresses.find({isDefault:true})
-// }
+export const orderPage = async (req, res) => {
+  res.render("user/orders", {
+    user: req.user,
+  });
+};

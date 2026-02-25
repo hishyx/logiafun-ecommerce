@@ -239,7 +239,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="/admin/orders" class="nav-link">
               <i class="fa-solid fa-cart-shopping"></i>
               <span>Orders</span>
             </a>
@@ -302,7 +302,7 @@
               <select class="form-control" id="editCategory" name="categoryId" required>
                 <% categories.forEach(category=> { %>
                 <option value="<%= category._id %>" <%=product.category &&
-                                        product.category._id.toString()===category._id.toString() ? 'selected' : '' %>>
+                    product.category._id.toString()===category._id.toString() ? 'selected' : '' %>>
                   <%= category.name %>
                 </option>
                 <% }) %>
@@ -314,7 +314,8 @@
 
             <div style="display: flex; gap: 10px; margin-bottom: 2rem;">
               <input type="text" id="editAttrInput" class="form-control" placeholder="e.g. Color">
-              <button type="button" id="editProdAttrBtn" class="btn-secondary" style="padding: 0 1.5rem;">Add Attribute</button>
+              <button type="button" id="editProdAttrBtn" class="btn-secondary" style="padding: 0 1.5rem;">Add
+                Attribute</button>
             </div>
 
             <h4 style="margin: 1.5rem 0 1rem; color: #334155; font-size: 1rem;">Product Variants</h4>
@@ -364,7 +365,7 @@
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
-  <script src="/js/formValidator.js"></script>
+  <script src="/js/helpers/formValidator.js"></script>
   <script>
     // Set mode and product data for JS BEFORE loading the script
     window.PAGE_MODE = 'edit';

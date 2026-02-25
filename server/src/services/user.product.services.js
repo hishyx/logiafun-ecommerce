@@ -59,9 +59,14 @@ export const getAllProducts = async ({
     priceConditions.push({
       $gt: [
         {
-          $multiply: [
-            { $arrayElemAt: ["$variants.price", 0] },
-            { $subtract: [1, { $divide: ["$discount", 100] }] },
+          $round: [
+            {
+              $multiply: [
+                { $arrayElemAt: ["$variants.price", 0] },
+                { $subtract: [1, { $divide: ["$discount", 100] }] },
+              ],
+            },
+            0,
           ],
         },
         minPrice,
@@ -72,9 +77,14 @@ export const getAllProducts = async ({
     priceConditions.push({
       $lt: [
         {
-          $multiply: [
-            { $arrayElemAt: ["$variants.price", 0] },
-            { $subtract: [1, { $divide: ["$discount", 100] }] },
+          $round: [
+            {
+              $multiply: [
+                { $arrayElemAt: ["$variants.price", 0] },
+                { $subtract: [1, { $divide: ["$discount", 100] }] },
+              ],
+            },
+            0,
           ],
         },
         maxPrice,
@@ -100,16 +110,21 @@ export const getAllProducts = async ({
     {
       $addFields: {
         discountedPrice: {
-          $multiply: [
-            { $arrayElemAt: ["$variants.price", 0] },
+          $round: [
             {
-              $subtract: [
-                1,
+              $multiply: [
+                { $arrayElemAt: ["$variants.price", 0] },
                 {
-                  $divide: [{ $ifNull: ["$discount", 0] }, 100],
+                  $subtract: [
+                    1,
+                    {
+                      $divide: [{ $ifNull: ["$discount", 0] }, 100],
+                    },
+                  ],
                 },
               ],
             },
+            0,
           ],
         },
       },
@@ -191,4 +206,22 @@ export const getRelatedProducts = async (categoryId, productId) => {
   ]);
 
   return relatedProducts;
+};
+
+export const reduceProductStock = async (
+  productId,
+  variantId,
+  soldQuantity,
+) => {
+  const product = await Product.findById(productId);
+  if (!product) throw new Error("Product not found");
+
+  const variant = product.variants.id(variantId);
+  if (!variant) throw new Error("Variant not found");
+
+  variant.stock -= soldQuantity;
+
+  await product.save();
+
+  return product;
 };

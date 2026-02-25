@@ -4,7 +4,6 @@ import bcrypt from "bcrypt";
 import uploadImageToCloudinary from "../utils/cloudinary.upload.js";
 import cloudinaryFolders from "../components/cloudinary.folders.js";
 
-
 export const updateUser = async (userId, userData) => {
   const user = await User.findById(userId);
   if (!user) throw new Error("User not found");
@@ -86,15 +85,36 @@ export const changeDefaultAddress = async (userId, addressId) => {
   );
 };
 
+export const getAddressDetails = async (userId, addressId) => {
+  const address = await Address.findOne(
+    { _id: addressId, userId }, // filter
+    {
+      addressName: 1,
+      name: 1,
+      phone: 1,
+      street: 1,
+      city: 1,
+      pincode: 1,
+      _id: 0, // exclude mongo _id
+    },
+  ).lean();
+
+  if (!address) {
+    throw new Error("Address not found");
+  }
+
+  return address;
+};
+
 export const UploadProfilePic = async (imageFile, userId) => {
   // 1. multer puts the file here
   if (!imageFile) {
     throw new Error("No image recieved");
   }
 
-  const uploadedURL=await uploadImageToCloudinary(imageFile,{
-    folder:cloudinaryFolders.PROFILE
-  })
+  const uploadedURL = await uploadImageToCloudinary(imageFile, {
+    folder: cloudinaryFolders.PROFILE,
+  });
 
   // 3. save url in DB
   await User.findByIdAndUpdate(userId, {

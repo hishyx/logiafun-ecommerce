@@ -29,8 +29,7 @@
           <label for="email">Email Address</label>
           <div class="input-wrapper">
             <i class="fa-regular fa-envelope"></i>
-            <input type="email" id="email" name="email" value="admin@logiafun.com" placeholder="admin@logiafun.com"
-              required />
+            <input type="email" id="email" name="email" value="admin@logiafun.com" placeholder="admin@logiafun.com" required />
           </div>
         </div>
 
@@ -38,8 +37,7 @@
           <label for="password">Password</label>
           <div class="input-wrapper">
             <i class="fa-solid fa-lock"></i>
-            <input type="password" id="password" name="password" value="2007" placeholder="••••••••" required
-              data-skip-strength />
+            <input type="password" id="password" name="password" value="2007" placeholder="••••••••" required data-skip-strength />
             <i class="fa-solid fa-eye password-toggle-icon" id="togglePassword"></i>
           </div>
         </div>
@@ -67,13 +65,13 @@
       </div>
     </div>
   </div>
-  <script src="/js/formValidator.js"></script>
+  <script src="/js/helpers/formValidator.js"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function() {
       const toggleIcons = document.querySelectorAll(".password-toggle-icon");
 
       toggleIcons.forEach((icon) => {
-        icon.addEventListener("click", function () {
+        icon.addEventListener("click", function() {
           const wrapper = this.closest(".input-wrapper");
           if (!wrapper) return;
 
@@ -81,9 +79,9 @@
           if (!passwordInput) return;
 
           const type =
-            passwordInput.getAttribute("type") === "password"
-              ? "text"
-              : "password";
+            passwordInput.getAttribute("type") === "password" ?
+            "text" :
+            "password";
           passwordInput.setAttribute("type", type);
 
           // Toggle FontAwesome classes

@@ -101,7 +101,7 @@ if (addToCartButton) {
         badge.innerText = addToCartResult.cartCount;
       }
     } else {
-      console.log("Not added")
+      console.log("Not added");
       showToast(addToCartResult.message);
     }
   });
@@ -151,7 +151,7 @@ async function updateCartQuantity(itemId, change, inputElement) {
       } else {
         showToast(result.message || "Failed to update cart");
         // Revert on failure
-        inputElement.value = currentQuantity;
+        inputElement.value = result.newQuantity;
       }
     } catch (error) {
       console.error("Error updating cart:", error);

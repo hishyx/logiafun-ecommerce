@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Management - LogiaFun Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/css/admin/main.css" />
+  <style>
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      width: 140px;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      border: 1px solid transparent;
+      cursor: pointer;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      text-align: center;
+      text-align-last: center;
+      transition: all 0.2s ease;
+    }
+
+    .status-badge:focus {
+      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .see-details-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: transparent;
+      color: #0f172a;
+      text-decoration: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      white-space: nowrap;
+      border: 2px solid #0f172a;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .see-details-btn i {
+      font-size: 0.9rem;
+      transition: transform 0.3s ease;
+    }
+
+    .see-details-btn:hover {
+      background: #0f172a;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+    }
+
+    .see-details-btn:hover i {
+      transform: translateX(3px);
+    }
+
+    .status-delivered {
+      background: #f0fdf4 !important;
+      color: #16a34a !important;
+      border-color: #bbf7d0 !important;
+    }
+
+    .status-processing {
+      background: #fff7ed !important;
+      color: #d97706 !important;
+      border-color: #ffedd5 !important;
+    }
+
+    .status-shipped {
+      background: #eff6ff !important;
+      color: #2563eb !important;
+      border-color: #dbeafe !important;
+    }
+
+    .status-pending {
+      background: #fefce8 !important;
+      color: #ca8a04 !important;
+      border-color: #fef08a !important;
+    }
+
+    .status-cancelled {
+      background: #fef2f2 !important;
+      color: #dc2626 !important;
+      border-color: #fee2e2 !important;
+    }
+
+    .order-id {
+      font-weight: 700;
+      color: #0f172a;
+      font-family: 'Fredoka', sans-serif;
+    }
+
+    .customer-info .name {
+      display: block;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 2px;
+    }
+
+    .customer-info .email {
+      font-size: 0.8rem;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .data-table tr:hover {
+      background: #f8fafc !important;
+    }
+
+    .data-table td {
+      border-bottom: 1px solid #f1f5f9;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="admin-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo-area">
+        <h2>LogiaFun <span class="badge">Admin</span></h2>
+      </div>
+
+      <nav class="sidebar-nav">
+        <ul>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="fa-solid fa-chart-line"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/admin/products" class="nav-link">
+              <i class="fa-solid fa-box"></i>
+              <span>Products</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/admin/categories" class="nav-link">
+              <i class="fa-solid fa-layer-group"></i>
+              <span>Categories</span>
+            </a>
+          </li>
+          <li class="nav-item active">
+            <a href="/admin/orders" class="nav-link">
+              <i class="fa-solid fa-cart-shopping"></i>
+              <span>Orders</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/admin/users" class="nav-link">
+              <i class="fa-solid fa-users"></i>
+              <span>Users</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="fa-solid fa-image"></i>
+              <span>Banners</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="fa-solid fa-gear"></i>
+              <span>Settings</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <div class="sidebar-footer">
+        <form action="/admin/logout" method="POST" class="logout-form">
+          <button type="submit" class="nav-link logout logout-btn">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
+          </button>
+        </form>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="top-bar">
+        <div class="mobile-toggle">
+          <i class="fa-solid fa-bars"></i>
+        </div>
+        <div class="page-title">
+          <h1>Order Management</h1>
+        </div>
+        <div class="user-profile">
+          <div class="notification-icon">
+            <i class="fa-regular fa-bell"></i>
+            <span class="dot"></span>
+          </div>
+          <div class="profile-info">
+            <img src="https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff" alt="Admin" />
+            <span>Admin</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content Body -->
+      <div class="content-body">
+        <!-- Controls Area -->
+        <div class="controls-area">
+          <div class="search-wrapper">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="orderSearch" placeholder="Search orders..." />
+          </div>
+
+          <div class="actions-wrapper">
+            <div class="sort-wrapper">
+              <label>Filter By:</label>
+              <select id="filterBy">
+                <option value="all">All</option>
+                <option value="delivered">Delivered</option>
+                <option value="processing">Processing</option>
+                <option value="shipped">Shipped</option>
+                <option value="pending">Pending</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+            <div class="sort-wrapper">
+              <label>Sort By:</label>
+              <select id="sortBy">
+                <option value="latest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Date</th>
+                <th>Customer</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% orders.forEach(order=> { %>
+
+              <% const statusClass=order.orderStatus.toLowerCase(); %>
+
+              <tr>
+                <!-- ORDER NUMBER -->
+                <td>
+                  <span class="order-id" data-order-id="<%= order._id %>">#<%= order.orderNumber %></span>
+                </td>
+
+                <!-- DATE -->
+                <td>
+                  <%= new Date(order.createdAt).toLocaleDateString(undefined, { year: 'numeric' , month: 'short' ,
+                        day: 'numeric' }) %>
+                </td>
+
+                <!-- CUSTOMER INFO -->
+                <td>
+                  <div class="customer-info" style="display:flex; flex-direction:column;">
+                    <span class="name">
+                      <%= order.address.name %>
+                    </span>
+
+                    <span class="email">
+                      +91 - <%= order.address.phone %>
+                    </span>
+                  </div>
+                </td>
+
+                <!-- TOTAL -->
+                <td>
+                  <span style="font-weight:500; color:#0f172a;">
+                    ₹<%= order.totalAmount %>
+                  </span>
+                </td>
+
+                <!-- STATUS -->
+                <td>
+                  <select class="status-badge status-<%= statusClass %>" data-order-id="<%= order._id %>" data-previous-status="<%= order.orderStatus %>" onchange="updateOrderStatus(this, '<%= order._id %>')">
+
+                    <%
+var uniqueOptions = [];
+uniqueOptions.push(order.orderStatus);
+
+if (order.statusTransitions) {
+  for (var i = 0; i < order.statusTransitions.length; i++) {
+    if (uniqueOptions.indexOf(order.statusTransitions[i]) === -1) {
+      uniqueOptions.push(order.statusTransitions[i]);
+    }
+  }
+}
+%>
+
+                    <% for (var i = 0; i < uniqueOptions.length; i++) { %>
+                    <option value="<%= uniqueOptions[i] %>" <%= order.orderStatus === uniqueOptions[i] ? 'selected' : '' %>>
+                      <%= uniqueOptions[i] %>
+                    </option>
+                    <% } %>
+
+                  </select>
+                </td>
+
+                <!-- ACTIONS -->
+                <td>
+                  <a href="/admin/orders/<%= order._id %>" class="see-details-btn" title="See Order Details">
+                    <span>See Order Details</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                  </a>
+                </td>
+              </tr>
+
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    function updateOrderStatus(selectElement, orderId) {
+      const newStatus = selectElement.value;
+      const previousStatus = selectElement.getAttribute('data-previous-status');
+
+
+      if (newStatus === previousStatus) return;
+
+
+      Swal.fire({
+        title: 'Update Order Status?',
+        text: `Change status from "${previousStatus}" to "${newStatus}"?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#0f172a',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Yes, update it!',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          selectElement.setAttribute('data-previous-status', newStatus);
+          selectElement.className = 'status-badge status-' + newStatus.toLowerCase();
+
+
+          await updateOrderStatusForReal(orderId, newStatus)
+
+          Swal.fire({
+            title: 'Updated!',
+            text: `Order status changed to ${newStatus}`,
+            icon: 'success',
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 1000,
+            timerProgressBar: true
+          }).then(() => {
+            location.reload();
+          });
+
+        } else {
+          selectElement.value = previousStatus;
+          selectElement.className = 'status-badge status-' + previousStatus.toLowerCase();
+        }
+      });
+    }
+
+
+    async function updateOrderStatusForReal(orderId, newStatus) {
+
+      try {
+
+        const res = fetch(`/admin/orders/${orderId}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            orderId,
+            newStatus
+          })
+        })
+
+
+      } catch (err) {
+
+        console.log(err)
+      }
+
+    }
+  </script>
+</body>
+
+</html>

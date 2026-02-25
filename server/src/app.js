@@ -7,7 +7,6 @@ import nocache from "nocache";
 import methodOverride from "method-override";
 import preventHTMLCache from "./middlewares/prevent.cache.js";
 import errorHandler from "./middlewares/error.handling.middleware.js";
-import { getCartCount } from "./services/user.cart.services.js";
 
 //importing routers
 

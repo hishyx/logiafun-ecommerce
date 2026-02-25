@@ -673,7 +673,7 @@
 
             <div class="price-wrapper">
               <span class="current-price" id="current-price">
-                ₹<%= product.variants[0].price - (product.discount / 100) * product.variants[0].price %>
+                ₹<%= Math.round(product.variants[0].price - (product.discount / 100) * product.variants[0].price) %>
               </span>
 
               <%if(product.discount!==0 && product.discount!==null){%>
@@ -791,7 +791,7 @@
                         <%= relatedProd.name %>
                       </h3>
                       <div class="current-price">
-                        ₹<%= ( relatedProd.variants[0].price * (1 - (relatedProd.discount || 0) / 100) ).toFixed(2) %>
+                        ₹<%= Math.round( relatedProd.variants[0].price * (1 - (relatedProd.discount || 0) / 100) ) %>
                       </div>
                     </div>
                   </a>

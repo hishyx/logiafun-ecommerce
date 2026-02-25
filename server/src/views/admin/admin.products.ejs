@@ -267,8 +267,7 @@
                 </option> -->
               </select>
             </div>
-            <a href="/admin/products/add" class="btn-primary" id="addProductBtn"
-              style="padding: 0.5rem 1rem; margin-left: 10px">
+            <a href="/admin/products/add" class="btn-primary" id="addProductBtn" style="padding: 0.5rem 1rem; margin-left: 10px">
               <i class="fa-solid fa-plus"></i> Add Product
             </a>
           </div>
@@ -277,91 +276,87 @@
         <!-- Product Table -->
         <div class="table-container">
           <% if (typeof products !=='undefined' && products.length> 0) { %>
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Product</th>
-                  <th>Category</th>
-                  <th>Price</th>
-                  <th>Stock</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
 
-              <tbody>
-                <% products.forEach(product=> { %>
-                  <tr>
-                    <td>
-                      <div class="product-cell">
-                        <img src="<%= product.variants[0].images[0] || '/images/product-placeholder.png' %>"
-                          alt="Product" class="product-img" onerror="this.src='https://placehold.co/40x40'" />
+            <tbody>
+              <% products.forEach(product=> { %>
+              <tr>
+                <td>
+                  <div class="product-cell">
+                    <img src="<%= product.variants[0].images[0] || '/images/product-placeholder.png' %>" alt="Product" class="product-img" onerror="this.src='https://placehold.co/40x40'" />
 
-                        <div class="product-info">
-                          <span>
-                            <%= product.name %>
-                          </span>
-                          <small>ID: <%= product._id %></small>
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      <%= product.category ? product.category.name : "No Category" %>
-                    </td>
+                    <div class="product-info">
+                      <span>
+                        <%= product.name %>
+                      </span>
+                      <small>ID: <%= product._id %></small>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <%= product.category ? product.category.name : "No Category" %>
+                </td>
 
-                    <td>
-                      ₹<%= product.variants[0]?.price?.toFixed(2) %>
-                    </td>
+                <td>
+                  ₹<%= product.variants[0]?.price?.toFixed(2) %>
+                </td>
 
-                    <td>
-                      <% if (product.stock===0) { %>
-                        <span class="badge-stock stock-out">Out of Stock</span>
-                        <% } else if (product.stock <=10) { %>
-                          <span class="badge-stock stock-low">
-                            <%= product.stock %> Left
-                          </span>
-                          <% } else { %>
-                            <span class="badge-stock stock-in">
-                              <%= product.stock %> In Stock
-                            </span>
-                            <% } %>
-                    </td>
+                <td>
+                  <% if (product.stock===0) { %>
+                  <span class="badge-stock stock-out">Out of Stock</span>
+                  <% } else if (product.stock <=10) { %>
+                  <span class="badge-stock stock-low">
+                    <%= product.stock %> Left
+                  </span>
+                  <% } else { %>
+                  <span class="badge-stock stock-in">
+                    <%= product.stock %> In Stock
+                  </span>
+                  <% } %>
+                </td>
 
-                    <td>
-                      <% if (product.isActive) { %>
-                        <span class="status-badge status-active">
-                          <span class="status-indicator"></span> Active
-                        </span>
-                        <% } else { %>
-                          <span class="status-badge status-blocked">
-                            <span class="status-indicator"></span> Inactive
-                          </span>
-                          <% } %>
-                    </td>
+                <td>
+                  <% if (product.isActive) { %>
+                  <span class="status-badge status-active">
+                    <span class="status-indicator"></span> Active
+                  </span>
+                  <% } else { %>
+                  <span class="status-badge status-blocked">
+                    <span class="status-indicator"></span> Inactive
+                  </span>
+                  <% } %>
+                </td>
 
-                    <td>
-                      <a href="/admin/products/<%= product._id %>/edit" class="action-btn edit-product-btn"
-                        title="Edit">
-                        <i class="fa-regular fa-pen-to-square"></i>
-                      </a>
+                <td>
+                  <a href="/admin/products/<%= product._id %>/edit" class="action-btn edit-product-btn" title="Edit">
+                    <i class="fa-regular fa-pen-to-square"></i>
+                  </a>
 
-                      <button class="action-btn toggle-product-btn" title="<%= product.isActive ? 'Unlist' : 'List' %>"
-                        data-id="<%= product._id %>" data-active="<%= product.isActive %>"
-                        style="color: <%= product.isActive ? '#ef4444' : '#10b981' %>">
-                        <i class="fa-solid <%= product.isActive ? 'fa-eye-slash' : 'fa-eye' %>"></i>
-                      </button>
-                    </td>
-                  </tr>
-                  <% }) %>
-              </tbody>
-            </table>
-            <% } else { %>
-              <div class="empty-state" style="padding: 3rem; text-align: center; color: #64748b;">
-                <i class="fa-solid fa-box-open" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
-                <h3>No products found</h3>
-                <p>Try adjusting your search or filters to find what you're looking for.</p>
-              </div>
-              <% } %>
+                  <button class="action-btn toggle-product-btn" title="<%= product.isActive ? 'Unlist' : 'List' %>" data-id="<%= product._id %>" data-active="<%= product.isActive %>" style="color: <%= product.isActive ? '#ef4444' : '#10b981' %>">
+                    <i class="fa-solid <%= product.isActive ? 'fa-eye-slash' : 'fa-eye' %>"></i>
+                  </button>
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+          <% } else { %>
+          <div class="empty-state" style="padding: 3rem; text-align: center; color: #64748b;">
+            <i class="fa-solid fa-box-open" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+            <h3>No products found</h3>
+            <p>Try adjusting your search or filters to find what you're looking for.</p>
+          </div>
+          <% } %>
         </div>
 
         <!-- Pagination -->
@@ -369,15 +364,15 @@
           <div class="pagination-info">
             Showing
             <%= total===0 ? 0 : ((page - 1) * limit + 1) %>
-              -
-              <%= Math.min(page * limit, total) %>
-                of
-                <%= total %>
+            -
+            <%= Math.min(page * limit, total) %>
+            of
+            <%= total %>
           </div>
           <div class="pagination-controls">
             <button class="page-btn" <%=page===1 || totalPages===0 ? "disabled" : "" %> onclick="goToPage(<%= page - 1
                 %>)">
-                <i class="fa-solid fa-chevron-left"></i>
+              <i class="fa-solid fa-chevron-left"></i>
             </button>
 
             <div class="page-numbers">
@@ -387,7 +382,7 @@
             </div>
             <button class="page-btn" <%=page===totalPages || totalPages===0 ? "disabled" : "" %> onclick="goToPage(<%=
                 page + 1 %>)">
-                <i class="fa-solid fa-chevron-right"></i>
+              <i class="fa-solid fa-chevron-right"></i>
             </button>
           </div>
         </div>
@@ -399,12 +394,13 @@
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="/js/admin/admin.pagination.search.js"></script>
+
   <script>
     // Product toggle logic
     document.addEventListener("DOMContentLoaded", () => {
       const productTableBody = document.querySelector(".data-table tbody");
       if (productTableBody) {
-        productTableBody.addEventListener("click", async function (e) {
+        productTableBody.addEventListener("click", async function(e) {
           const toggleBtn = e.target.closest(".toggle-product-btn");
           if (toggleBtn) {
             e.preventDefault();

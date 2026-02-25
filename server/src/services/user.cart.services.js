@@ -2,6 +2,7 @@ import Cart from "../models/cart.model.js";
 import Product from "../models/products.model.js";
 import { checkProductAvailability } from "./user.product.services.js";
 import { StringIdToObjectId } from "../utils/convert.to.objectId.js";
+import AppError from "../utils/app.error.js";
 
 export const addProductToCartService = async (productData, userId) => {
   console.log(productData);
@@ -34,7 +35,7 @@ export const addProductToCartService = async (productData, userId) => {
   await cart.save();
 };
 
-export const getCartItems = async (userId) => {
+export const getCartItems = async (userId, isOrder) => {
   console.log("user id is : ", userId);
   const cart = await Cart.aggregate([
     {
@@ -76,9 +77,14 @@ export const getCartItems = async (userId) => {
     {
       $addFields: {
         discountedPrice: {
-          $multiply: [
-            "$product.variants.price",
-            { $subtract: [1, { $divide: ["$product.discount", 100] }] },
+          $round: [
+            {
+              $multiply: [
+                "$product.variants.price",
+                { $subtract: [1, { $divide: ["$product.discount", 100] }] },
+              ],
+            },
+            0,
           ],
         },
       },
@@ -101,14 +107,45 @@ export const getCartItems = async (userId) => {
     )
       continue;
 
+    //Count and quantity check
+
+    item.items.quantityChange = false;
+
+    if (item.items.quantity > item.product.variants.stock) {
+      if (isOrder)
+        throw new Error(
+          "One of the product you have ordered is out of stock pls check again",
+        );
+
+      item.items.quantity = item.product.variants.stock;
+      item.items.quantityChange = true;
+
+      await Cart.findOneAndUpdate(
+        {
+          userId,
+          "items.productId": item.items.productId,
+          "items.variantId": item.items.variantId,
+        },
+        {
+          $set: {
+            "items.$.quantity": item.product.variants.stock,
+          },
+        },
+      );
+    }
+
     const quantity = item.items.quantity;
     const originalPrice = item.product.variants.price;
     const finalPrice = item.discountedPrice || originalPrice;
 
-    calculations.subtotal += originalPrice * quantity;
-    calculations.total += finalPrice * quantity;
+    //Calculations
 
-    calculations.discount += (originalPrice - finalPrice) * quantity;
+    calculations.subtotal += Math.round(originalPrice * quantity);
+    calculations.total += Math.round(finalPrice * quantity);
+
+    calculations.discount += Math.round(
+      (originalPrice - finalPrice) * quantity,
+    );
   }
 
   const cartItems = cart;
@@ -117,8 +154,8 @@ export const getCartItems = async (userId) => {
 };
 
 export const getCartCount = async (userId) => {
-  const [items] = await getCartItems(userId);
-  return items.length;
+  const cart = await Cart.findOne({ userId });
+  if (cart) return cart.items.length;
 };
 
 export const removeItemFromCart = async (userId, itemId) => {
@@ -161,7 +198,11 @@ export const updateCartItemService = async (userId, itemId, newQuantity) => {
 
   const product = await Product.findById(item.productId);
   const variant = product.variants.id(item.variantId);
-  if (variant.stock < newQuantity) throw new Error("Insufficient stock");
+  if (variant.stock < newQuantity) {
+    throw new AppError("Insufficient stock", 400, {
+      newQuantity: variant.stock,
+    });
+  }
 
   cart.items[itemIndex].quantity = newQuantity;
   await cart.save();
@@ -172,5 +213,22 @@ export const updateCartItemService = async (userId, itemId, newQuantity) => {
 };
 
 export const deleteAllItems = async (userId) => {
+  console.log("Inside clear all service");
+
   await Cart.deleteMany({ userId });
+};
+
+export const getAvailableCartItems = async (userId, isOrder) => {
+  const [cartItems, calculations] = await getCartItems(userId, isOrder);
+
+  console.log(cartItems);
+
+  const availableCartItems = cartItems.filter(
+    (item) =>
+      item.product.isActive &&
+      item.category.isActive &&
+      item.product.variants.stock != 0,
+  );
+
+  return [availableCartItems, calculations];
 };

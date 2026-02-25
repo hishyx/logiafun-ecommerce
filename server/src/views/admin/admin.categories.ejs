@@ -171,6 +171,15 @@
       border-collapse: collapse;
     }
 
+    .data-table td {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+      color: #334155;
+      font-size: 0.95rem;
+      text-align: left;
+    }
+
     .data-table th {
       background: #f8fafc;
       padding: 1rem 1.5rem;
@@ -179,14 +188,7 @@
       color: #475569;
       font-size: 0.875rem;
       border-bottom: 1px solid #e2e8f0;
-    }
-
-    .data-table td {
-      padding: 1rem 1.5rem;
-      border-bottom: 1px solid #f1f5f9;
-      vertical-align: middle;
-      color: #334155;
-      font-size: 0.95rem;
+      white-space: nowrap;
     }
 
     .data-table tr:last-child td {
@@ -415,7 +417,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a href="#" class="nav-link">
+            <a href="/admin/orders" class="nav-link">
               <i class="fa-solid fa-cart-shopping"></i>
               <span>Orders</span>
             </a>
@@ -515,14 +517,15 @@
               <tr>
                 <th>Category Name</th>
                 <th>Description</th>
-                <th>Total Products</th>
+                <th>Inventory & Stats</th>
                 <th>Status</th>
-                <th>Actions</th>
+                <th style="text-align: right;">Actions</th>
               </tr>
             </thead>
             <tbody>
               <% categories.forEach((category, index)=> { %>
                 <tr>
+                  <!-- Category Name -->
                   <td>
                     <div class="product-cell">
                       <img src="<%= category.thumbnail %>" alt="Category" class="product-img"
@@ -536,28 +539,34 @@
                     </div>
                   </td>
 
+                  <!-- Description -->
                   <td>
-                    <%=category.description%>
+                    <div class="description-cell" title="<%= category.description %>">
+                      <%= category.description %>
+                    </div>
                   </td>
 
+                  <!-- Inventory & Stats -->
                   <td>
-                    <%= category.sold %> Sold
-                  </td>
-
-                  <td>
-                    <% if (category.stock> 10) { %>
-                      <span class="badge-stock stock-in">
-                        <%= category.stock %> In Stock
-                      </span>
-                      <% } else if (category.stock> 0) { %>
-                        <span class="badge-stock stock-low">
-                          <%= category.stock %> Left
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                      <% if (category.stock> 10) { %>
+                        <span class="badge-stock stock-in" style="width: fit-content;">
+                          <%= category.stock %> In Stock
                         </span>
-                        <% } else { %>
-                          <span class="badge-stock stock-out">Out of Stock</span>
-                          <% } %>
+                        <% } else if (category.stock> 0) { %>
+                          <span class="badge-stock stock-low" style="width: fit-content;">
+                            <%= category.stock %> Left
+                          </span>
+                          <% } else { %>
+                            <span class="badge-stock stock-out" style="width: fit-content;">Out of Stock</span>
+                            <% } %>
+                              <small style="color: #64748b; font-weight: 500;">
+                                <%= category.sold %> Sold
+                              </small>
+                    </div>
                   </td>
 
+                  <!-- Status -->
                   <td>
                     <% if (category.isActive) { %>
                       <span class="status-badge status-active">
@@ -570,18 +579,22 @@
                         <% } %>
                   </td>
 
-                  <td>
-                    <button class="action-btn edit-category-btn" title="Edit" data-id="<%= category._id %>"
-                      data-name="<%= category.name %>" data-description="<%= category.description %>"
-                      data-thumbnail="<%= category.thumbnail %>">
-                      <i class="fa-regular fa-pen-to-square"></i>
-                    </button>
+                  <!-- Actions -->
+                  <td style="text-align: right;">
+                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                      <button class="action-btn edit-category-btn" title="Edit" data-id="<%= category._id %>"
+                        data-name="<%= category.name %>" data-description="<%= category.description %>"
+                        data-thumbnail="<%= category.thumbnail %>">
+                        <i class="fa-regular fa-pen-to-square"></i>
+                      </button>
 
-                    <button class="action-btn toggle-category-btn" title="<%= category.isActive ? 'Unlist' : 'List' %>"
-                      data-id="<%= category._id %>" data-active="<%= category.isActive %>"
-                      style="color: <%- category.isActive ? '#ef4444' : '#10b981' %>">
-                      <i class="fa-solid <%= category.isActive ? 'fa-eye-slash' : 'fa-eye' %>"></i>
-                    </button>
+                      <button class="action-btn toggle-category-btn"
+                        title="<%= category.isActive ? 'Unlist' : 'List' %>" data-id="<%= category._id %>"
+                        data-active="<%= category.isActive %>"
+                        style="color: <%- category.isActive ? '#ef4444' : '#10b981' %>">
+                        <i class="fa-solid <%= category.isActive ? 'fa-eye-slash' : 'fa-eye' %>"></i>
+                      </button>
+                    </div>
                   </td>
                 </tr>
                 <% }) %>
@@ -733,7 +746,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="/js/formValidator.js"></script>
+  <script src="/js/helpers/formValidator.js"></script>
   <script src="/js/admin/admin.categories.js"></script>
   <script src="/js/admin/admin.pagination.search.js"></script>
 </body>
