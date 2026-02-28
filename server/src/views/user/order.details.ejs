@@ -253,101 +253,56 @@
       margin-top: 1.5rem;
     }
 
-    /* Modal Styles */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(4px);
+    /* VERY SIMPLE CANCELLATION POPUP STYLES */
+    .cancel-box {
       display: none;
-      justify-content: center;
-      align-items: center;
+      /* Hidden by default */
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 400px;
+      background-color: white;
+      border: 2px solid #000;
+      padding: 20px;
       z-index: 1000;
-      animation: fadeIn 0.2s ease-out;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
     }
 
-    .modal-content {
-      background: var(--surface);
-      border-radius: var(--radius-lg);
-      padding: 2rem;
-      max-width: 500px;
-      width: 90%;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-      transform: scale(0.95);
-      transition: var(--transition);
+    .cancel-box h2 {
+      margin-top: 0;
+      font-size: 1.5rem;
     }
 
-    .modal-overlay.active {
-      display: flex;
-    }
-
-    .modal-overlay.active .modal-content {
-      transform: scale(1);
-    }
-
-    .modal-header {
-      margin-bottom: 1.5rem;
-    }
-
-    .modal-title {
-      font-size: 1.25rem;
-      font-weight: 800;
-      color: var(--primary);
-    }
-
-    .modal-body textarea {
+    .cancel-box textarea {
       width: 100%;
-      min-height: 120px;
-      padding: 1rem;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border);
-      font-family: inherit;
-      resize: vertical;
-      margin-top: 0.5rem;
-      transition: var(--transition);
+      height: 100px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
     }
 
-    .modal-body textarea:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    }
-
-    .modal-footer {
+    .cancel-btn-group {
       display: flex;
       justify-content: flex-end;
-      gap: 1rem;
-      margin-top: 2rem;
+      gap: 10px;
     }
 
-    .btn-action {
-      padding: 0.75rem 1.5rem;
-      border-radius: var(--radius-md);
-      font-weight: 600;
+    .popup-btn {
+      padding: 8px 16px;
       cursor: pointer;
-      border: none;
-      transition: var(--transition);
     }
 
-    .btn-secondary {
-      background: #f1f5f9;
-      color: #64748b;
-    }
-
-    .btn-secondary:hover {
-      background: #e2e8f0;
-    }
-
-    .btn-danger {
-      background: #ef4444;
+    .btn-confirm {
+      background-color: red;
       color: white;
+      border: none;
     }
 
-    .btn-danger:hover {
-      background: #dc2626;
+    .btn-close {
+      background-color: #eee;
+      border: 1px solid #ccc;
     }
 
     @keyframes fadeIn {
@@ -364,6 +319,28 @@
       .order-grid {
         grid-template-columns: 1fr;
       }
+    }
+
+    .download-invoice-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.6rem 1.25rem;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      width: fit-content;
+      text-decoration: none;
+    }
+
+    .download-invoice-btn:hover {
+      background: #1e293b;
+      transform: translateY(-1px);
     }
   </style>
 </head>
@@ -397,6 +374,22 @@
         %>"></i>
             <%= currentStatus %>
           </div>
+
+          <!-- Added Download Invoice Button UI -->
+          <button class="download-invoice-btn" id="download-invoice-btn" onclick="downloadInvoice('<%=order._id%>')">
+            <i class="fa-solid fa-file-pdf"></i>
+            Download Invoice
+          </button>
+
+          <% if ((currentStatus==='cancelled' || currentStatus==='returned' ) && order.statusChangeReason) { %>
+            <div
+              style="margin-top: 0.5rem; font-size: 0.9rem; color: <%= currentStatus === 'cancelled' ? '#dc2626' : '#7c3aed' %>; font-weight: 500;">
+              <strong>
+                <%= currentStatus==='cancelled' ? 'Cancellation' : 'Return' %> Reason:
+              </strong>
+              <%= order.statusChangeReason %>
+            </div>
+            <% } %>
       </div>
 
       <div class="order-grid">
@@ -419,8 +412,18 @@
                     </h3>
                     <div class="item-meta">
                       <span>Quantity: <%= item.quantity %></span>
-                      <span style="font-weight: 600; color: var(--primary);">₹<%= item.product.price %>
-                      </span>
+                      <div style="text-align: right;">
+                        <% if (item.product.discountPercent> 0) { %>
+                          <div
+                            style="font-size: 0.75rem; color: var(--text-secondary); text-decoration: line-through; margin-bottom: 2px;">
+                            ₹<%= item.product.originalPrice %>
+                          </div>
+                          <div style="font-size: 0.75rem; color: var(--success); font-weight: 600; margin-bottom: 2px;">
+                            <%= item.product.discountPercent %>% OFF
+                          </div>
+                          <% } %>
+                            <span style="font-weight: 600; color: var(--primary);">₹<%= item.product.price %></span>
+                      </div>
                     </div>
                     <div class="order-status-badge status-<%= item.status %>"
                       style="width: fit-content; margin-top: 0.5rem; padding: 0.25rem 0.75rem; font-size: 0.75rem;">
@@ -430,12 +433,28 @@
                   %>"></i>
                       <%= item.status.charAt(0).toUpperCase() + item.status.slice(1) %>
                     </div>
-                    <% if(item.status !=='cancelled' && item.status !=='delivered' && item.status !=='returned' ) { %>
-                      <button class="btn-cancel btn-cancel-item" data-item-id="<%= item._id %>"
-                        data-item-name="<%= item.product.name %>">
-                        <i class="fa-solid fa-xmark"></i> Cancel Item
-                      </button>
+                    <% if ((item.status==='cancelled' || item.status==='returned' ) && item.statusChangeReason) { %>
+                      <div
+                        style="margin-top: 0.25rem; font-size: 0.75rem; color: <%= item.status === 'cancelled' ? '#dc2626' : '#7c3aed' %>; font-weight: 500;">
+                        <strong>
+                          <%= item.status==='cancelled' ? 'Cancellation' : 'Return' %> Reason:
+                        </strong>
+                        <%= item.statusChangeReason %>
+                      </div>
                       <% } %>
+                        <% if (transitions[item.status]) { %>
+                          <% if (transitions[item.status].includes("cancelled")) { %>
+                            <button class="btn-cancel"
+                              onclick="openCancelItem('<%= item._id %>', '<%= item.product.name %>')">
+                              <i class="fa-solid fa-xmark"></i> Cancel Item
+                            </button>
+                            <% } else if (transitions[item.status].includes("returned")) { %>
+                              <button class="btn-cancel" style="border-color: #7c3aed; color: #7c3aed;"
+                                onclick="openReturnItem('<%= item._id %>', '<%= item.product.name %>')">
+                                <i class="fa-solid fa-rotate-left"></i> Return Item
+                              </button>
+                              <% } %>
+                                <% } %>
                   </div>
                 </div>
                 <% }) %>
@@ -494,34 +513,44 @@
               </div>
             </div>
 
-            <% if(order.items.some(item=> item.status !== 'cancelled' && item.status !== 'delivered' && item.status !==
-              'returned')) { %>
-              <button class="btn-cancel btn-cancel-order" id="cancelOrderBtn">
-                <i class="fa-solid fa-ban"></i> Cancel Entire Order
-              </button>
-              <% } %>
+            <% const canCancelEntireOrder=order.items.every(item=>
+              item.status === "cancelled" || (transitions[item.status] &&
+              transitions[item.status].includes("cancelled"))
+              );
+              const canReturnEntireOrder = order.orderStatus === "delivered" && order.items.every(item =>
+              item.status === "delivered" || (transitions[item.status] && transitions[item.status].includes("returned"))
+              );
+              %>
+
+              <% if (canCancelEntireOrder && currentStatus !=='cancelled' && currentStatus !=='delivered' &&
+                currentStatus !=='returned' ) { %>
+                <button class="btn-cancel btn-cancel-order" onclick="openCancelOrder()">
+                  <i class="fa-solid fa-ban"></i> Cancel Entire Order
+                </button>
+                <% } else if (canReturnEntireOrder && currentStatus==='delivered' ) { %>
+                  <button class="btn-cancel btn-cancel-order" style="border-color: #7c3aed; color: #7c3aed;"
+                    onclick="openReturnOrder()">
+                    <i class="fa-solid fa-rotate-left"></i> Return Entire Order
+                  </button>
+                  <% } %>
           </div>
         </div>
       </div>
     </main>
 
-    <!-- Cancellation Modal -->
-    <div class="modal-overlay" id="cancelModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2 class="modal-title">Cancel <span id="cancelTargetText">Order</span></h2>
-          <p style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
-            Please let us know the reason for cancellation.
-          </p>
-        </div>
-        <div class="modal-body">
-          <label style="font-weight: 600; font-size: 0.9rem;">Cancellation Reason</label>
-          <textarea id="cancelReason" placeholder="Enter your reason here..."></textarea>
-        </div>
-        <div class="modal-footer">
-          <button class="btn-action btn-secondary" id="closeModalBtn">Keep Order</button>
-          <button class="btn-action btn-danger" id="confirmCancelBtn">Confirm Cancellation</button>
-        </div>
+    <!-- Simple Cancellation/Return Popup -->
+    <div id="cancelPopup" class="cancel-box">
+      <h2 id="cancelTitle">Cancel Order</h2>
+      <p id="cancelDesc">Please enter your cancellation reason:</p>
+
+      <textarea id="cancelReasonText" placeholder="Write reason here..."></textarea>
+
+      <div class="cancel-btn-group">
+        <!-- Button to close the popup without doing anything -->
+        <button class="popup-btn btn-close" onclick="closeCancelBox()">Keep Order</button>
+
+        <!-- Button to proceed with cancellation -->
+        <button class="popup-btn btn-confirm" id="confirmButton" onclick="confirmAction()">Confirm</button>
       </div>
     </div>
 
@@ -529,90 +558,120 @@
 
       <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
       <script>
-        document.addEventListener('DOMContentLoaded', () => {
-          const modal = document.getElementById('cancelModal');
-          const cancelTargetText = document.getElementById('cancelTargetText');
-          const cancelReason = document.getElementById('cancelReason');
-          let currentCancelType = null; // 'order' or 'item'
-          let currentItemId = null;
+        // Variables to store what we are doing
+        let currentId = "";
+        let actionType = ""; // 'cancel' or 'return'
+        let targetType = ""; // 'order' or 'item'
 
-          // Open modal for entire order
-          const cancelOrderBtn = document.getElementById('cancelOrderBtn');
-          if (cancelOrderBtn) {
-            cancelOrderBtn.addEventListener('click', () => {
-              currentCancelType = 'order';
-              cancelTargetText.textContent = 'Entire Order';
-              modal.classList.add('active');
-            });
+        // Function to open popup for ENTIRE ORDER CANCELLATION
+        function openCancelOrder() {
+          actionType = "cancel";
+          targetType = "order";
+          currentId = "<%= order._id %>";
+          document.getElementById("cancelTitle").innerText = "Cancel Entire Order";
+          document.getElementById("cancelDesc").innerText = "Please enter your cancellation reason:";
+          document.getElementById("confirmButton").innerText = "Confirm Cancel";
+          document.getElementById("confirmButton").style.backgroundColor = "red";
+          document.getElementById("cancelPopup").style.display = "block";
+        }
+
+        // Function to open popup for SPECIFIC ITEM CANCELLATION
+        function openCancelItem(itemId, itemName) {
+          actionType = "cancel";
+          targetType = "item";
+          currentId = itemId;
+          document.getElementById("cancelTitle").innerText = "Cancel: " + itemName;
+          document.getElementById("cancelDesc").innerText = "Please enter your cancellation reason:";
+          document.getElementById("confirmButton").innerText = "Confirm Cancel";
+          document.getElementById("confirmButton").style.backgroundColor = "red";
+          document.getElementById("cancelPopup").style.display = "block";
+        }
+
+        // Function to open popup for ENTIRE ORDER RETURN
+        function openReturnOrder() {
+          actionType = "return";
+          targetType = "order";
+          currentId = "<%= order._id %>";
+          document.getElementById("cancelTitle").innerText = "Return Entire Order";
+          document.getElementById("cancelDesc").innerText = "Please enter your return reason:";
+          document.getElementById("confirmButton").innerText = "Confirm Return";
+          document.getElementById("confirmButton").style.backgroundColor = "#7c3aed";
+          document.getElementById("cancelPopup").style.display = "block";
+        }
+
+        // Function to open popup for SPECIFIC ITEM RETURN
+        function openReturnItem(itemId, itemName) {
+          actionType = "return";
+          targetType = "item";
+          currentId = itemId;
+          document.getElementById("cancelTitle").innerText = "Return: " + itemName;
+          document.getElementById("cancelDesc").innerText = "Please enter your return reason:";
+          document.getElementById("confirmButton").innerText = "Confirm Return";
+          document.getElementById("confirmButton").style.backgroundColor = "#7c3aed";
+          document.getElementById("cancelPopup").style.display = "block";
+        }
+
+        // Function to close the popup
+        function closeCancelBox() {
+          document.getElementById("cancelPopup").style.display = "none";
+          document.getElementById("cancelReasonText").value = ""; // Clear text
+        }
+
+        // Function to handle the actual logic
+        async function confirmAction() {
+          const reason = document.getElementById("cancelReasonText").value;
+
+          if (reason.trim() === "") {
+            alert("Please provide a reason!");
+            return;
           }
 
-          // Open modal for specific item
-          document.querySelectorAll('.btn-cancel-item').forEach(btn => {
-            btn.addEventListener('click', () => {
-              currentCancelType = 'item';
-              currentItemId = btn.dataset.itemId;
-              cancelTargetText.textContent = btn.dataset.itemName;
-              modal.classList.add('active');
-            });
-          });
+          let url = "";
+          let method = "PATCH";
+          let body = {};
 
-          // Close modal
-          const closeModal = () => {
-            modal.classList.remove('active');
-            cancelReason.value = '';
-            currentCancelType = null;
-            currentItemId = null;
-          };
+          if (targetType === "order") {
+            url = actionType === "cancel" ? '/user/orders' : '/user/orders/return';
+            body = {
+              orderId: currentId,
+              reason: reason
+            };
+          } else {
+            url = actionType === "cancel" ?
+              `/user/orders/<%= order._id %>/items/${currentId}` :
+              `/user/orders/<%= order._id %>/items/${currentId}/return`;
+            body = {
+              reason: reason
+            };
+          }
 
-          document.getElementById('closeModalBtn').addEventListener('click', closeModal);
-          modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal();
-          });
-
-          // Confirm Cancellation
-          document.getElementById('confirmCancelBtn').addEventListener('click', async () => {
-            const reason = cancelReason.value.trim();
-            if (!reason) {
-              Swal.fire({
-                icon: 'warning',
-                title: 'Reason Required',
-                text: 'Please provide a reason for cancellation.',
-                confirmButtonColor: '#3b82f6'
-              });
-              return;
-            }
-
-            // Final Confirmation
-            const result = await Swal.fire({
-              title: 'Are you sure?',
-              text: `Do you really want to cancel this ${currentCancelType === 'order' ? 'order' : 'item'}?`,
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonColor: '#ef4444',
-              cancelButtonColor: '#64748b',
-              confirmButtonText: 'Yes, cancel it!'
+          try {
+            const response = await fetch(url, {
+              method: method,
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(body)
             });
 
-            if (result.isConfirmed) {
-              // Here you would normally make an API call
-              // For now, we'll just show a success message as per "Static UI" request (mostly)
-              // though typically cancellations are functional. 
-              // If the user wants functional cancellation, I'd need the endpoint.
-              // Since the prompt said "frontend-only task", I'll stop at the interaction.
-
-              Swal.fire({
-                title: 'Cancellation Requested',
-                text: 'Your cancellation request has been submitted.',
-                icon: 'success',
-                confirmButtonColor: '#3b82f6'
-              }).then(() => {
-                closeModal();
-                // Optional: reload or update UI
-                // location.reload(); 
-              });
+            if (response.ok) {
+              alert(`${targetType === 'order' ? 'Order' : 'Item'} ${actionType === 'cancel' ? 'cancelled' : 'returned'} successfully!`);
+              location.reload();
+            } else {
+              const data = await response.json();
+              alert("Error: " + (data.message || `Failed to ${actionType} ${targetType}`));
             }
-          });
-        });
+          } catch (error) {
+            console.error("Error:", error);
+            alert(`Something went wrong while ${actionType === 'cancel' ? 'cancelling' : 'returning'} the ${targetType}.`);
+          }
+        }
+
+        function downloadInvoice(orderId) {
+
+          console.log(orderId)
+          window.location.href = `/order/invoice/${orderId}`;
+        }
       </script>
 </body>
 

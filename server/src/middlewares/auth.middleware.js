@@ -1,4 +1,5 @@
 import User from "../models/user.model.js";
+import Order from "../models/order.model.js";
 
 export const isAuth = (req, res, next) => {
   console.log("isAuth hit:", req.originalUrl);
@@ -88,4 +89,38 @@ export const safeTokenMatches = (req, res, next) => {
   }
 
   next();
+};
+
+export const checkAuthUniversaly = async (req, res, next) => {
+  console.log("Unversal prevent middleware reached");
+  try {
+    console.log("orderId received:", req.params.orderId);
+    const { orderId } = req.params;
+
+    const order = await Order.findById(orderId);
+
+    console.log("req.user:", req.user);
+    console.log("order.userId:", order.userId.toString());
+
+    if (!order) {
+      return res.status(404).send("Order not found");
+    }
+
+    // Allow admin
+    if (req.session?.admin) {
+      req.order = order;
+      return next();
+    }
+
+    // Allow owner
+    if (req.user && order.userId.toString() === req.user._id.toString()) {
+      req.order = order;
+      return next();
+    }
+
+    return res.status(403).send("Unauthorized");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Authorization failed");
+  }
 };

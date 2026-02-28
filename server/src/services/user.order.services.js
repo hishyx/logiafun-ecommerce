@@ -5,6 +5,8 @@ import {
   generateOrderNumber,
 } from "../utils/order.helper.js";
 
+import statusTransitions from "../components/order.status.transitions.js";
+
 import { getAddressDetails } from "./user.services.js";
 
 import { reduceProductStock } from "./user.product.services.js";
@@ -43,6 +45,8 @@ export const createOrder = async (userId, orderData) => {
         variantId,
         name: orderProduct?.product?.name,
         image: orderProduct?.product?.variants?.images[0],
+        originalPrice,
+        discountPercent,
         price: currentPrice,
       },
       quantity,
@@ -101,4 +105,117 @@ export const getOrderDetails = async (orderId, orderNumber) => {
   console.log("Order result:", order);
 
   return order;
+};
+
+export const cancelEntireOrder = async (orderId, reason) => {
+  const order = await Order.findById(orderId);
+
+  if (!order) throw new Error("Order not found");
+
+  const availableTransitions = statusTransitions[order.orderStatus];
+
+  if (!availableTransitions?.includes("cancelled")) {
+    throw new Error("Can't change the status because it's invalid");
+  }
+
+  order.items.forEach((item) => {
+    const itemTransitions = statusTransitions[item.status];
+
+    if (itemTransitions?.includes("cancelled")) {
+      item.status = "cancelled";
+      item.statusChangeReason = reason;
+    }
+  });
+
+  // update order status
+  order.orderStatus = "cancelled";
+  order.statusChangeReason = reason;
+
+  await order.save();
+};
+
+export const cancelSpecificOrderItem = async (orderId, itemId, reason) => {
+  console.log("Order id is : ", orderId);
+
+  const order = await Order.findById(orderId);
+
+  console.log("order from service is : ", order);
+
+  const item = order.items.id(itemId);
+
+  if (statusTransitions[item.status].includes("cancelled")) {
+    item.status = "cancelled";
+    item.statusChangeReason = reason;
+
+    const allItemsCancelled =
+      order.items.length > 0 &&
+      order.items.every((item) => item.status === "cancelled");
+
+    if (allItemsCancelled) {
+      order.orderStatus = "cancelled";
+      order.statusChangeReason = "All items cancelled individually";
+    }
+  } else {
+    throw new Error("Invalid status");
+  }
+
+  await order.save();
+};
+
+export const returnEntireOrder = async (orderId, reason) => {
+  const order = await Order.findById(orderId);
+
+  if (!order) throw new Error("Order not found");
+
+  const availableTransitions = statusTransitions[order.orderStatus];
+
+  if (!availableTransitions?.includes("returned")) {
+    throw new Error("Can't return the order because it's not delivered");
+  }
+
+  order.items.forEach((item) => {
+    const itemTransitions = statusTransitions[item.status];
+
+    if (itemTransitions?.includes("returned")) {
+      item.returnStatus = "requested";
+      item.statusChangeReason = reason; // reusing field for return reason
+    }
+  });
+
+  // update order status
+  order.returnStatus = "requested";
+  order.statusChangeReason = reason;
+
+  await order.save();
+};
+
+export const returnSpecificOrderItem = async (orderId, itemId, reason) => {
+  const order = await Order.findById(orderId);
+
+  if (!order) throw new Error("Order not found");
+
+  const item = order.items.id(itemId);
+
+  if (statusTransitions[item.status].includes("returned")) {
+    item.returnStatus = "requested";
+    item.statusChangeReason = reason;
+
+    const allItemsReturned =
+      order.items.length > 0 &&
+      order.items.every(
+        (item) =>
+          item.status === "returned" ||
+          item.status === "cancelled" ||
+          item.returnStatus === "requested",
+      );
+
+    if (allItemsReturned) {
+      order.statusChangeReason =
+        order.items.length == 1 ? reason : "All items returned or cancelled";
+    }
+  } else {
+    throw new Error("Invalid status for return");
+  }
+
+  await order.save();
 };

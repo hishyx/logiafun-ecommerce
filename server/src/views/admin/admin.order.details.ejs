@@ -213,6 +213,96 @@
       font-size: 1.1rem;
     }
 
+    /* Return Section Styles */
+    .return-card {
+      background: #fdf2f2;
+      border: 1px solid #fee2e2;
+      border-left: 4px solid #ef4444;
+    }
+
+    .return-title {
+      color: #ef4444 !important;
+      border-bottom-color: #fee2e2 !important;
+    }
+
+    .return-btn {
+      background: #ef4444;
+      color: white;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .return-btn:hover {
+      background: #dc2626;
+      transform: translateY(-1px);
+    }
+
+    .returned-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #f1f5f9;
+      color: #475569;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+
+    .status-capsule.status-returned {
+      background: #f1f5f9 !important;
+      color: #475569 !important;
+      border-color: #e2e8f0 !important;
+    }
+
+    .full-return-notice {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #475569;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .full-return-notice i {
+      color: #64748b;
+      font-size: 1.1rem;
+    }
+
+    .download-invoice-btn {
+      background: #0f172a;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      text-decoration: none;
+    }
+
+    .download-invoice-btn:hover {
+      background: #1e293b;
+      transform: translateY(-1px);
+    }
+
     @media (max-width: 1024px) {
       .details-container {
         grid-template-columns: 1fr;
@@ -259,6 +349,18 @@
               <span>Users</span>
             </a>
           </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="fa-solid fa-image"></i>
+              <span>Banners</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="fa-solid fa-gear"></i>
+              <span>Settings</span>
+            </a>
+          </li>
         </ul>
       </nav>
       <div class="sidebar-footer">
@@ -300,53 +402,129 @@
             </p>
           </div>
           <% const statusClass=order.orderStatus.toLowerCase(); %>
-            <div class="status-capsule status-<%= statusClass %>">
+            <div class="status-capsule status-<%= statusClass %>" style="margin-right: 12px;">
               <i class="fa-solid fa-circle-check"></i>
               <%= order.orderStatus.charAt(0).toUpperCase() + order.orderStatus.slice(1) %>
             </div>
+            <!-- Added Download Invoice Button UI -->
+            <button class="download-invoice-btn" id="download-invoice-btn" onclick="downloadInvoice('<%=order._id%>')">
+              <i class="fa-solid fa-file-pdf"></i>
+              Download Invoice
+            </button>
         </div>
 
         <div class="details-container">
           <div class="main-column">
-            <div class="card">
-              <div class="card-title">
-                <i class="fa-solid fa-box-open"></i>
-                Order Items
+            <% if (order.orderStatus.toLowerCase()==='cancelled' && order.statusChangeReason) { %>
+              <div class="card" style="border-left: 4px solid #dc2626;">
+                <div class="card-title" style="color: #dc2626; border-bottom-color: #fee2e2;">
+                  <i class="fa-solid fa-circle-exclamation"></i>
+                  Cancellation Reason
+                </div>
+                <p class="info-value" style="color: #1e293b; font-size: 1rem;">
+                  <%= order.statusChangeReason %>
+                </p>
               </div>
-              <div class="product-list">
-                <% order.items.forEach(item=> { %>
-                  <div class="product-item">
-                    <img src="<%= item.product.image %>" class="product-thumb" alt="<%= item.product.name %>">
-                    <div class="product-info">
-                      <div class="product-name">
-                        <%= item.product.name %>
-                      </div>
-                      <div class="product-variant">
-                        <% if (item.variant) { %>
-                          <%= item.variant.name %>
-                            <% } else { %>
-                              No specific variant
-                              <% } %>
-                      </div>
-                    </div>
-                    <div class="product-price-qty">
-                      <span class="price">₹<%= item.product.price %></span>
-                      <span class="qty">x <%= item.quantity %></span>
-                    </div>
-                  </div>
-                  <% }) %>
-              </div>
-            </div>
+              <% } %>
 
-            <div class="card">
-              <div class="card-title">
-                <i class="fa-solid fa-truck"></i>
-                Shipping Updates
-              </div>
-              <div class="product-list">
-                <p style="color: #64748b; font-size: 0.9rem;">No tracking information available yet.</p>
-              </div>
-            </div>
+                <% const hasReturnRequest=(typeof order.returnStatus !=='undefined' && order.returnStatus==='requested'
+                  ) || (order.items && order.items.some(item=> item.returnStatus === 'requested'));
+                  const returnReason = order.statusChangeReason;
+                  %>
+
+                  <% if (hasReturnRequest) { %>
+                    <div class="card return-card">
+                      <div class="card-title return-title">
+                        <i class="fa-solid fa-rotate-left"></i>
+                        Return Request Received
+                      </div>
+                      <div class="info-group">
+                        <span class="info-label">Reason for Return</span>
+                        <span class="info-value">
+                          <%= returnReason || 'No reason provided' %>
+                        </span>
+                      </div>
+
+                      <div style="margin-top: 1rem;">
+                        <% if (order.returnStatus==='requested' ) { %>
+                          <button class="return-btn" onclick="handleAcceptReturn('<%= order._id %>')">
+                            <i class="fa-solid fa-check"></i>
+                            Accept Entire Order Return
+                          </button>
+                          <% } else { %>
+                            <p style="font-size: 0.85rem; color: #ef4444; font-weight: 500; margin-bottom: 0.75rem;">
+                              One or more items in this order have return requests.
+                            </p>
+                            <% } %>
+                      </div>
+                    </div>
+                    <% } %>
+
+                      <div class="card">
+                        <div class="card-title">
+                          <i class="fa-solid fa-box-open"></i>
+                          Order Items
+                        </div>
+                        <div class="product-list">
+                          <% order.items.forEach(item=> { %>
+                            <div class="product-item">
+                              <img src="<%= item.product.image %>" class="product-thumb" alt="<%= item.product.name %>">
+                              <div class="product-info">
+                                <div class="product-name">
+                                  <%= item.product.name %>
+                                    <% if (item.returnStatus==='returned' ) { %>
+                                      <span class="returned-badge"><i class="fa-solid fa-rotate-left"></i>
+                                        Returned</span>
+                                      <% } %>
+                                </div>
+                                <div class="product-variant">
+                                  <% if (item.variant) { %>
+                                    <%= item.variant.name %>
+                                      <% } else { %>
+                                        No specific variant
+                                        <% } %>
+                                </div>
+                              </div>
+                              <div class="product-price-qty">
+                                <% if (item.product.discountPercent> 0) { %>
+                                  <span
+                                    style="font-size: 0.75rem; color: #94a3b8; text-decoration: line-through; display: block; margin-bottom: 2px;">
+                                    ₹<%= item.product.originalPrice %>
+                                  </span>
+                                  <span
+                                    style="font-size: 0.75rem; color: #16a34a; font-weight: 600; display: block; margin-bottom: 2px;">
+                                    <%= item.product.discountPercent %>% OFF
+                                  </span>
+                                  <% } %>
+                                    <span class="price">₹<%= item.product.price %></span>
+                                    <span class="qty">x <%= item.quantity %></span>
+                                    <div class="status-capsule status-<%= item.status.toLowerCase() %>"
+                                      style="margin-top: 8px; font-size: 0.75rem; padding: 2px 10px;">
+                                      <%= item.status.charAt(0).toUpperCase() + item.status.slice(1) %>
+                                    </div>
+                              </div>
+                              <% if (item.returnStatus==='requested' ) { %>
+                                <div style="margin-left: 1rem; border-left: 1px solid #f1f5f9; padding-left: 1rem;">
+                                  <button class="return-btn" style="padding: 4px 12px; font-size: 0.75rem;"
+                                    onclick="handleAcceptReturn('<%= order._id %>', '<%= item._id %>')">
+                                    Accept Item Return
+                                  </button>
+                                </div>
+                                <% } %>
+                            </div>
+                            <% }) %>
+                        </div>
+                      </div>
+
+                      <div class="card">
+                        <div class="card-title">
+                          <i class="fa-solid fa-truck"></i>
+                          Shipping Updates
+                        </div>
+                        <div class="product-list">
+                          <p style="color: #64748b; font-size: 0.9rem;">No tracking information available yet.</p>
+                        </div>
+                      </div>
           </div>
 
           <div class="side-column">
@@ -413,12 +591,70 @@
                 <span>Total Amount</span>
                 <span>₹<%= order.totalAmount %></span>
               </div>
+
+              <% if (order.returnStatus==='returned' ) { %>
+                <div class="full-return-notice">
+                  <i class="fa-solid fa-circle-info"></i>
+                  <span>Entire order has been returned.</span>
+                </div>
+                <% } %>
             </div>
           </div>
         </div>
       </div>
     </main>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    async function handleAcceptReturn(orderId, itemId = null) {
+      const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: itemId ? "You are about to accept return for this specific item." : "You are about to accept return for the entire order.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Yes, accept return'
+      });
+
+      if (result.isConfirmed) {
+        try {
+          const response = await fetch(`/admin/orders/${orderId}/accept-return`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              itemId
+            })
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            await Swal.fire({
+              title: 'Accepted!',
+              text: data.message,
+              icon: 'success'
+            });
+            window.location.reload();
+          } else {
+            Swal.fire('Error', data.message || 'Failed to accept return', 'error');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          Swal.fire('Error', 'Something went wrong', 'error');
+        }
+      }
+    }
+
+
+    function downloadInvoice(orderId) {
+
+      console.log(orderId)
+      window.location.href = `/order/invoice/${orderId}`;
+    }
+  </script>
 </body>
 
 </html>

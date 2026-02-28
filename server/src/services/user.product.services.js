@@ -3,9 +3,9 @@ import Product from "../models/products.model.js";
 import mongoose from "mongoose";
 
 //Helper function for valid Product checking
-
 export const checkProductAvailability = async (productId) => {
   productId = new mongoose.Types.ObjectId(productId);
+
   const result = await Product.aggregate([
     {
       $match: {
@@ -13,6 +13,8 @@ export const checkProductAvailability = async (productId) => {
         isActive: true,
       },
     },
+
+    // category join
     {
       $lookup: {
         from: "categories",
@@ -22,14 +24,36 @@ export const checkProductAvailability = async (productId) => {
       },
     },
     { $unwind: "$category" },
+
+    // category must be active
     {
       $match: {
         "category.isActive": true,
       },
     },
+
+    // remove variants with stock = 0
+    {
+      $addFields: {
+        variants: {
+          $filter: {
+            input: "$variants",
+            as: "variant",
+            cond: { $gt: ["$$variant.stock", 0] },
+          },
+        },
+      },
+    },
+
+    //  ensure at least one variant remains
+    {
+      $match: {
+        "variants.0": { $exists: true },
+      },
+    },
   ]);
 
-  return result[0];
+  return result[0] || null;
 };
 
 export const getAllProducts = async ({
@@ -106,6 +130,11 @@ export const getAllProducts = async ({
   const result = await Product.aggregate([
     {
       $match: match,
+    },
+    {
+      $match: {
+        variants: { $elemMatch: { stock: { $gt: 0 } } },
+      },
     },
     {
       $addFields: {

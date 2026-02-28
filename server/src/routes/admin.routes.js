@@ -21,6 +21,11 @@ router
   .get(adminOrderControllers.adminOrderDetailsPage)
   .patch(adminOrderControllers.updateAdminOrderStatus);
 
+router.patch(
+  "/admin/orders/:orderId/accept-return",
+  adminOrderControllers.acceptReturn,
+);
+
 router
   .route("/admin/categories")
   .get(adminCategoryControllers.adminCategoryListPage)

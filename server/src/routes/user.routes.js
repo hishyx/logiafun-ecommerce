@@ -36,7 +36,20 @@ router
   .get(userCheckoutControllers.checkoutPage)
   .post(userCheckoutControllers.placeOrder);
 
-router.get("/user/orders", userOrderControllers.orderPage);
+router
+  .route("/user/orders")
+  .get(userOrderControllers.orderPage)
+  .patch(userOrderControllers.cancelOrderEntirely);
+router.patch("/user/orders/return", userOrderControllers.returnOrderEntirely);
+
+router.patch(
+  "/user/orders/:orderId/items/:itemId",
+  userOrderControllers.cancelSpecificItem,
+);
+router.patch(
+  "/user/orders/:orderId/items/:itemId/return",
+  userOrderControllers.returnSpecificItem,
+);
 
 router
   .route("/user/change-email")

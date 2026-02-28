@@ -24,6 +24,14 @@ const productSnapshotSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    originalPrice: {
+      type: Number,
+      required: true,
+    },
+    discountPercent: {
+      type: Number,
+      required: true,
+    },
   },
   { _id: false },
 );
@@ -87,7 +95,15 @@ const orderItemSchema = new mongoose.Schema(
       default: "pending",
       index: true,
     },
-
+    statusChangeReason: {
+      type: String,
+      default: null,
+    },
+    returnStatus: {
+      type: String,
+      required: false,
+      enum: ["requested", "returned"],
+    },
     shipping: shippingSchema,
   },
   { _id: true },
@@ -121,6 +137,10 @@ const orderSchema = new mongoose.Schema(
       default: "pending",
       index: true,
     },
+    statusChangeReason: {
+      type: String,
+      default: null,
+    },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -141,6 +161,12 @@ const orderSchema = new mongoose.Schema(
     payment: paymentSchema,
 
     address: addressSchema,
+
+    returnStatus: {
+      type: String,
+      required: false,
+      enum: ["requested", "returned"],
+    },
   },
   { timestamps: true },
 );

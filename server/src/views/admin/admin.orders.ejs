@@ -221,26 +221,30 @@
         <div class="controls-area">
           <div class="search-wrapper">
             <i class="fa-solid fa-magnifying-glass search-icon"></i>
-            <input type="text" id="orderSearch" placeholder="Search orders..." />
+            <input type="text" id="listSearch" value="<%= search %>" placeholder="Search orders by number..." />
+            <button id="clearSearchBtn" class="action-btn clear-btn" aria-label="Clear Search">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
           </div>
 
           <div class="actions-wrapper">
             <div class="sort-wrapper">
               <label>Filter By:</label>
               <select id="filterBy">
-                <option value="all">All</option>
-                <option value="delivered">Delivered</option>
-                <option value="processing">Processing</option>
-                <option value="shipped">Shipped</option>
-                <option value="pending">Pending</option>
-                <option value="cancelled">Cancelled</option>
+                <option value="all" <%=filter==="all" ? "selected" : "" %>>All</option>
+                <option value="pending" <%=filter==="pending" ? "selected" : "" %>>Pending</option>
+                <option value="processing" <%=filter==="processing" ? "selected" : "" %>>Processing</option>
+                <option value="shipped" <%=filter==="shipped" ? "selected" : "" %>>Shipped</option>
+                <option value="delivered" <%=filter==="delivered" ? "selected" : "" %>>Delivered</option>
+                <option value="cancelled" <%=filter==="cancelled" ? "selected" : "" %>>Cancelled</option>
+                <option value="returned" <%=filter==="returned" ? "selected" : "" %>>Returned</option>
               </select>
             </div>
             <div class="sort-wrapper">
               <label>Sort By:</label>
               <select id="sortBy">
-                <option value="latest">Newest First</option>
-                <option value="oldest">Oldest First</option>
+                <option value="latest" <%=sort==="latest" ? "selected" : "" %>>Newest First</option>
+                <option value="oldest" <%=sort==="oldest" ? "selected" : "" %>>Oldest First</option>
               </select>
             </div>
           </div>
@@ -261,83 +265,107 @@
             <tbody>
               <% orders.forEach(order=> { %>
 
-              <% const statusClass=order.orderStatus.toLowerCase(); %>
+                <% const statusClass=order.orderStatus.toLowerCase(); %>
 
-              <tr>
-                <!-- ORDER NUMBER -->
-                <td>
-                  <span class="order-id" data-order-id="<%= order._id %>">#<%= order.orderNumber %></span>
-                </td>
+                  <tr>
+                    <!-- ORDER NUMBER -->
+                    <td>
+                      <span class="order-id" data-order-id="<%= order._id %>">#<%= order.orderNumber %></span>
+                    </td>
 
-                <!-- DATE -->
-                <td>
-                  <%= new Date(order.createdAt).toLocaleDateString(undefined, { year: 'numeric' , month: 'short' ,
+                    <!-- DATE -->
+                    <td>
+                      <%= new Date(order.createdAt).toLocaleDateString(undefined, { year: 'numeric' , month: 'short' ,
                         day: 'numeric' }) %>
-                </td>
+                    </td>
 
-                <!-- CUSTOMER INFO -->
-                <td>
-                  <div class="customer-info" style="display:flex; flex-direction:column;">
-                    <span class="name">
-                      <%= order.address.name %>
-                    </span>
+                    <!-- CUSTOMER INFO -->
+                    <td>
+                      <div class="customer-info" style="display:flex; flex-direction:column;">
+                        <span class="name">
+                          <%= order.address.name %>
+                        </span>
 
-                    <span class="email">
-                      +91 - <%= order.address.phone %>
-                    </span>
-                  </div>
-                </td>
+                        <span class="email">
+                          +91 - <%= order.address.phone %>
+                        </span>
+                      </div>
+                    </td>
 
-                <!-- TOTAL -->
-                <td>
-                  <span style="font-weight:500; color:#0f172a;">
-                    ₹<%= order.totalAmount %>
-                  </span>
-                </td>
+                    <!-- TOTAL -->
+                    <td>
+                      <span style="font-weight:500; color:#0f172a;">
+                        ₹<%= order.totalAmount %>
+                      </span>
+                    </td>
 
-                <!-- STATUS -->
-                <td>
-                  <select class="status-badge status-<%= statusClass %>" data-order-id="<%= order._id %>" data-previous-status="<%= order.orderStatus %>" onchange="updateOrderStatus(this, '<%= order._id %>')">
+                    <!-- STATUS -->
+                    <td>
+                      <select class="status-badge status-<%= statusClass %>" data-order-id="<%= order._id %>"
+                        data-previous-status="<%= order.orderStatus %>"
+                        onchange="updateOrderStatus(this, '<%= order._id %>')">
 
-                    <%
-var uniqueOptions = [];
-uniqueOptions.push(order.orderStatus);
+                        <% var uniqueOptions=[]; uniqueOptions.push(order.orderStatus); if (order.statusTransitions) {
+                          for (var i=0; i < order.statusTransitions.length; i++) { if
+                          (uniqueOptions.indexOf(order.statusTransitions[i])===-1) {
+                          uniqueOptions.push(order.statusTransitions[i]); } } } %>
 
-if (order.statusTransitions) {
-  for (var i = 0; i < order.statusTransitions.length; i++) {
-    if (uniqueOptions.indexOf(order.statusTransitions[i]) === -1) {
-      uniqueOptions.push(order.statusTransitions[i]);
-    }
-  }
-}
-%>
+                          <% for (var i=0; i < uniqueOptions.length; i++) { %>
+                            <option value="<%= uniqueOptions[i] %>" <%=order.orderStatus===uniqueOptions[i] ? 'selected'
+                              : '' %>>
+                              <%= uniqueOptions[i] %>
+                            </option>
+                            <% } %>
 
-                    <% for (var i = 0; i < uniqueOptions.length; i++) { %>
-                    <option value="<%= uniqueOptions[i] %>" <%= order.orderStatus === uniqueOptions[i] ? 'selected' : '' %>>
-                      <%= uniqueOptions[i] %>
-                    </option>
-                    <% } %>
+                      </select>
+                    </td>
 
-                  </select>
-                </td>
+                    <!-- ACTIONS -->
+                    <td>
+                      <a href="/admin/orders/<%= order._id %>" class="see-details-btn" title="See Order Details">
+                        <span>See Order Details</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                      </a>
+                    </td>
+                  </tr>
 
-                <!-- ACTIONS -->
-                <td>
-                  <a href="/admin/orders/<%= order._id %>" class="see-details-btn" title="See Order Details">
-                    <span>See Order Details</span>
-                    <i class="fa-solid fa-arrow-right"></i>
-                  </a>
-                </td>
-              </tr>
-
-              <% }) %>
+                  <% }) %>
             </tbody>
           </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-area">
+          <div class="pagination-info">
+            Showing
+            <%= total===0 ? 0 : ((page - 1) * limit + 1) %>
+              -
+              <%= Math.min(page * limit, total) %>
+                of
+                <%= total %>
+          </div>
+          <div class="pagination-controls">
+            <button class="page-btn" <%=page===1 || totalPages===0 ? "disabled" : "" %> onclick="goToPage(<%= page - 1
+                %>)">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+
+            <div class="page-numbers">
+              <button class="page-btn active">
+                <%= page %>
+              </button>
+            </div>
+            <button class="page-btn" <%=page===totalPages || totalPages===0 ? "disabled" : "" %> onclick="goToPage(<%=
+                page + 1 %>)">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
         </div>
       </div>
     </main>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="/js/admin/admin.pagination.search.js"></script>
   <script>
     function updateOrderStatus(selectElement, orderId) {
       const newStatus = selectElement.value;
