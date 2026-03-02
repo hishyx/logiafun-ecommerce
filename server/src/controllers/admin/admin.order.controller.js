@@ -28,6 +28,18 @@ export const adminOrderListPage = async (req, res) => {
 
     const totalPages = Math.ceil(ordersData.total / limit);
 
+    ordersData.orders = ordersData.orders.map((order) => {
+      const transitionsForStatus = statusTransitions[order.orderStatus] || [];
+
+      return {
+        ...order,
+        statusOptions: [
+          order.orderStatus, // current status first
+          ...transitionsForStatus, // allowed next statuses
+        ],
+      };
+    });
+
     res.render("admin/admin.orders.ejs", {
       ...ordersData,
       search,

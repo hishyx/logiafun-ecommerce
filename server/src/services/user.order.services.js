@@ -14,6 +14,8 @@ import { reduceProductStock } from "./user.product.services.js";
 export const createOrder = async (userId, orderData) => {
   const [orderProducts, amounts] = await getAvailableCartItems(userId, true);
 
+  if (orderProducts.length == 0) throw new Error("The cart is empty");
+
   console.log("orderData.selectedAddress is : ", orderData.selectedAddress);
 
   const orderAddress = await getAddressDetails(

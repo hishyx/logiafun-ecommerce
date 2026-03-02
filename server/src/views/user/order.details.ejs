@@ -22,6 +22,7 @@
       --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
       --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
       --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --mobile-progress: 0%;
     }
 
     body {
@@ -301,8 +302,152 @@
     }
 
     .btn-close {
-      background-color: #eee;
-      border: 1px solid #ccc;
+      background-color: #f1f5f9;
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      font-weight: 600;
+      border-radius: var(--radius-md);
+      transition: var(--transition);
+    }
+
+    .btn-close:hover {
+      background-color: #e2e8f0;
+    }
+
+    /* Reason Display Styles */
+    .reason-container {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: #f8fafc;
+      border-left: 4px solid var(--accent);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .reason-container.cancelled {
+      border-left-color: #ef4444;
+      background: #fef2f2;
+    }
+
+    .reason-container.returned {
+      border-left-color: #7c3aed;
+      background: #f5f3ff;
+    }
+
+    .reason-label {
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+    }
+
+    .reason-text {
+      color: var(--text-main);
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    /* IMPROVED POPUP STYLES */
+    .cancel-box {
+      display: none;
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 450px;
+      background-color: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      z-index: 1000;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      border: 1px solid var(--border);
+      animation: popupFadeIn 0.3s ease-out;
+    }
+
+    @keyframes popupFadeIn {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -48%) scale(0.95);
+      }
+
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+    }
+
+    .cancel-box h2 {
+      margin-top: 0;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .cancel-box p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .cancel-box textarea {
+      width: 100%;
+      height: 120px;
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-size: 0.95rem;
+      resize: none;
+      transition: var(--transition);
+      background: #f8fafc;
+    }
+
+    .cancel-box textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: white;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .popup-btn {
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.95rem;
+      transition: var(--transition);
+      border: none;
+    }
+
+    .btn-confirm {
+      background-color: #ef4444;
+      color: white;
+    }
+
+    .btn-confirm:hover {
+      filter: brightness(0.9);
+      transform: translateY(-1px);
+    }
+
+    /* Modal Overlay */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 999;
     }
 
     @keyframes fadeIn {
@@ -341,6 +486,126 @@
     .download-invoice-btn:hover {
       background: #1e293b;
       transform: translateY(-1px);
+    }
+
+    /* Progress Bar Styles */
+    .progress-card {
+      margin-bottom: 2rem;
+      padding: 2.5rem 1.5rem;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .tracking-timeline {
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+      margin: 1.5rem 0;
+    }
+
+    .tracking-timeline::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: 5%;
+      right: 5%;
+      height: 4px;
+      background: var(--border);
+      z-index: 1;
+    }
+
+    .progress-line {
+      position: absolute;
+      top: 20px;
+      left: 5%;
+      height: 4px;
+      background: var(--accent);
+      z-index: 2;
+      transition: width 1s ease-in-out;
+    }
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 3;
+      width: 20%;
+      text-align: center;
+    }
+
+    .step-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--surface);
+      border: 4px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.75rem;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      transition: var(--transition);
+    }
+
+    .step.completed .step-icon {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    .step.active .step-icon {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--surface);
+      box-shadow: 0 0 0 5px rgba(59, 130, 246, 0.1);
+    }
+
+    .step-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+
+    .step.completed .step-label,
+    .step.active .step-label {
+      color: var(--primary);
+    }
+
+    @media (max-width: 640px) {
+      .tracking-timeline {
+        flex-direction: column;
+        gap: 1.5rem;
+        margin-left: 20px;
+        align-items: flex-start;
+      }
+
+      .tracking-timeline::before {
+        left: 20px;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        height: 100%;
+      }
+
+      .progress-line {
+        left: 20px;
+        width: 4px;
+        height: var(--mobile-progress, 0%);
+      }
+
+      .step {
+        flex-direction: row;
+        width: 100%;
+        text-align: left;
+        gap: 1rem;
+      }
+
+      .step-icon {
+        margin-bottom: 0;
+      }
     }
   </style>
 </head>
@@ -382,106 +647,166 @@
           </button>
 
           <% if ((currentStatus==='cancelled' || currentStatus==='returned' ) && order.statusChangeReason) { %>
-            <div
-              style="margin-top: 0.5rem; font-size: 0.9rem; color: <%= currentStatus === 'cancelled' ? '#dc2626' : '#7c3aed' %>; font-weight: 500;">
-              <strong>
-                <%= currentStatus==='cancelled' ? 'Cancellation' : 'Return' %> Reason:
-              </strong>
-              <%= order.statusChangeReason %>
+            <div class="reason-container <%= currentStatus %>">
+              <span class="reason-label">
+                <%= currentStatus==='cancelled' ? 'Cancellation' : 'Return' %> Reason
+              </span>
+              <span class="reason-text">
+                <%= order.statusChangeReason %>
+              </span>
             </div>
             <% } %>
       </div>
 
       <div class="order-grid">
         <div class="order-main">
-          <!-- Items Card -->
-          <div class="card">
-            <div class="card-title">
-              <i class="fa-solid fa-box-open" style="color: var(--accent);"></i>
-              Order Items
-            </div>
-            <div class="item-list">
-              <% order.items.forEach(item=> { %>
-                <div class="order-item">
-                  <div class="item-image">
-                    <img src="<%= item.product.image %>" alt="<%= item.product.name %>">
-                  </div>
-                  <div class="item-info">
-                    <h3 class="item-name">
-                      <%= item.product.name %>
-                    </h3>
-                    <div class="item-meta">
-                      <span>Quantity: <%= item.quantity %></span>
-                      <div style="text-align: right;">
-                        <% if (item.product.discountPercent> 0) { %>
-                          <div
-                            style="font-size: 0.75rem; color: var(--text-secondary); text-decoration: line-through; margin-bottom: 2px;">
-                            ₹<%= item.product.originalPrice %>
-                          </div>
-                          <div style="font-size: 0.75rem; color: var(--success); font-weight: 600; margin-bottom: 2px;">
-                            <%= item.product.discountPercent %>% OFF
-                          </div>
-                          <% } %>
-                            <span style="font-weight: 600; color: var(--primary);">₹<%= item.product.price %></span>
-                      </div>
+          <!-- Order Progress Card -->
+          <% let progress=0; const status=order.orderStatus; const stages=['pending', 'processing' , 'shipped'
+            , 'in_transit' , 'delivered' ]; if (status==='pending' ) progress=5; else if (status==='processing' )
+            progress=25; else if (status==='shipped' ) progress=50; else if (status==='in_transit' ) progress=75; else
+            if (status==='delivered' ) progress=100; const isCompleted=(s)=> {
+            const currentIdx = stages.indexOf(status);
+            const stageIdx = stages.indexOf(s);
+            return stageIdx < currentIdx; }; const isActive=(s)=> status === s;
+              %>
+
+              <% if (status !=='cancelled' && status !=='returned' ) { %>
+                <div class="progress-card" style="--mobile-progress: <%= progress %>%">
+                  <div class="tracking-timeline">
+                    <div class="progress-line"
+                      style="width: <%= progress === 100 ? '90%' : (progress > 5 ? progress + '%' : '0') %>"></div>
+
+                    <div
+                      class="step <%= isCompleted('pending') ? 'completed' : (isActive('pending') ? 'active' : '') %>">
+                      <div class="step-icon"><i
+                          class="fa-solid <%= isCompleted('pending') ? 'fa-check' : 'fa-receipt' %>"></i></div>
+                      <div class="step-label">Ordered</div>
                     </div>
-                    <div class="order-status-badge status-<%= item.status %>"
-                      style="width: fit-content; margin-top: 0.5rem; padding: 0.25rem 0.75rem; font-size: 0.75rem;">
-                      <i class="fa-solid <%= 
+
+                    <div
+                      class="step <%= isCompleted('processing') ? 'completed' : (isActive('processing') ? 'active' : '') %>">
+                      <div class="step-icon"><i
+                          class="fa-solid <%= isCompleted('processing') ? 'fa-check' : 'fa-gears' %>"></i></div>
+                      <div class="step-label">Processing</div>
+                    </div>
+
+                    <div
+                      class="step <%= isCompleted('shipped') ? 'completed' : (isActive('shipped') ? 'active' : '') %>">
+                      <div class="step-icon"><i
+                          class="fa-solid <%= isCompleted('shipped') ? 'fa-check' : 'fa-truck-fast' %>"></i></div>
+                      <div class="step-label">Shipped</div>
+                    </div>
+
+                    <div
+                      class="step <%= isCompleted('in_transit') ? 'completed' : (isActive('in_transit') ? 'active' : '') %>">
+                      <div class="step-icon"><i
+                          class="fa-solid <%= isCompleted('in_transit') ? 'fa-check' : 'fa-route' %>"></i></div>
+                      <div class="step-label">In Transit</div>
+                    </div>
+
+                    <div
+                      class="step <%= isCompleted('delivered') ? 'completed' : (isActive('delivered') ? 'active' : '') %>">
+                      <div class="step-icon"><i
+                          class="fa-solid <%= isCompleted('delivered') ? 'fa-check' : 'fa-house-chimney' %>"></i></div>
+                      <div class="step-label">Delivered</div>
+                    </div>
+                  </div>
+                </div>
+                <% } %>
+
+                  <!-- Items Card -->
+                  <div class="card">
+                    <div class="card-title">
+                      <i class="fa-solid fa-box-open" style="color: var(--accent);"></i>
+                      Order Items
+                    </div>
+                    <div class="item-list">
+                      <% order.items.forEach(item=> { %>
+                        <div class="order-item">
+                          <div class="item-image">
+                            <img src="<%= item.product.image %>" alt="<%= item.product.name %>">
+                          </div>
+                          <div class="item-info">
+                            <h3 class="item-name">
+                              <%= item.product.name %>
+                            </h3>
+                            <div class="item-meta">
+                              <span>Quantity: <%= item.quantity %></span>
+                              <div style="text-align: right;">
+                                <% if (item.product.discountPercent> 0) { %>
+                                  <div
+                                    style="font-size: 0.75rem; color: var(--text-secondary); text-decoration: line-through; margin-bottom: 2px;">
+                                    ₹<%= item.product.originalPrice %>
+                                  </div>
+                                  <div
+                                    style="font-size: 0.75rem; color: var(--success); font-weight: 600; margin-bottom: 2px;">
+                                    <%= item.product.discountPercent %>% OFF
+                                  </div>
+                                  <% } %>
+                                    <span style="font-weight: 600; color: var(--primary);">₹<%= item.product.price %>
+                                    </span>
+                              </div>
+                            </div>
+                            <div class="order-status-badge status-<%= item.status %>"
+                              style="width: fit-content; margin-top: 0.5rem; padding: 0.25rem 0.75rem; font-size: 0.75rem;">
+                              <i class="fa-solid <%= 
                     item.status === 'cancelled' ? 'fa-circle-xmark' : 
                     item.status === 'delivered' ? 'fa-circle-check' : 'fa-circle-dot' 
                   %>"></i>
-                      <%= item.status.charAt(0).toUpperCase() + item.status.slice(1) %>
-                    </div>
-                    <% if ((item.status==='cancelled' || item.status==='returned' ) && item.statusChangeReason) { %>
-                      <div
-                        style="margin-top: 0.25rem; font-size: 0.75rem; color: <%= item.status === 'cancelled' ? '#dc2626' : '#7c3aed' %>; font-weight: 500;">
-                        <strong>
-                          <%= item.status==='cancelled' ? 'Cancellation' : 'Return' %> Reason:
-                        </strong>
-                        <%= item.statusChangeReason %>
-                      </div>
-                      <% } %>
-                        <% if (transitions[item.status]) { %>
-                          <% if (transitions[item.status].includes("cancelled")) { %>
-                            <button class="btn-cancel"
-                              onclick="openCancelItem('<%= item._id %>', '<%= item.product.name %>')">
-                              <i class="fa-solid fa-xmark"></i> Cancel Item
-                            </button>
-                            <% } else if (transitions[item.status].includes("returned")) { %>
-                              <button class="btn-cancel" style="border-color: #7c3aed; color: #7c3aed;"
-                                onclick="openReturnItem('<%= item._id %>', '<%= item.product.name %>')">
-                                <i class="fa-solid fa-rotate-left"></i> Return Item
-                              </button>
+                              <%= item.status.charAt(0).toUpperCase() + item.status.slice(1) %>
+                            </div>
+                            <% if ((item.status==='cancelled' || item.status==='returned' ) && item.statusChangeReason)
+                              { %>
+                              <div class="reason-container <%= item.status %>"
+                                style="padding: 0.75rem; margin-top: 0.5rem;">
+                                <span class="reason-label" style="font-size: 0.65rem;">
+                                  <%= item.status==='cancelled' ? 'Cancellation' : 'Return' %> Reason
+                                </span>
+                                <span class="reason-text" style="font-size: 0.8rem;">
+                                  <%= item.statusChangeReason %>
+                                </span>
+                              </div>
                               <% } %>
-                                <% } %>
+                                <% if (transitions[item.status]) { %>
+                                  <% if (transitions[item.status].includes("cancelled")) { %>
+                                    <button class="btn-cancel"
+                                      onclick="openCancelItem('<%= item._id %>', '<%= item.product.name %>')">
+                                      <i class="fa-solid fa-xmark"></i> Cancel Item
+                                    </button>
+                                    <% } else if (transitions[item.status].includes("returned")) { %>
+                                      <button class="btn-cancel" style="border-color: #7c3aed; color: #7c3aed;"
+                                        onclick="openReturnItem('<%= item._id %>', '<%= item.product.name %>')">
+                                        <i class="fa-solid fa-rotate-left"></i> Return Item
+                                      </button>
+                                      <% } %>
+                                        <% } %>
+                          </div>
+                        </div>
+                        <% }) %>
+                    </div>
                   </div>
-                </div>
-                <% }) %>
-            </div>
-          </div>
 
-          <!-- Shipping Address Card -->
-          <div class="card">
-            <div class="card-title">
-              <i class="fa-solid fa-location-dot" style="color: var(--accent);"></i>
-              Shipping Address
-            </div>
-            <div class="address-info">
-              <p class="address-name">
-                <%=order.address.name %>
-              </p>
-              <p>
-                <%=order.address.street %>
-              </p>
-              <p>
-                <%= order.address.city %> - <%= order.address.pincode %>
-              </p>
-              <p><i class="fa-solid fa-phone" style="width: 20px;"></i>
-                <%=order.address.phone %>
-              </p>
-            </div>
-          </div>
+                  <!-- Shipping Address Card -->
+                  <div class="card">
+                    <div class="card-title">
+                      <i class="fa-solid fa-location-dot" style="color: var(--accent);"></i>
+                      Shipping Address
+                    </div>
+                    <div class="address-info">
+                      <p class="address-name">
+                        <%=order.address.name %>
+                      </p>
+                      <p>
+                        <%=order.address.street %>
+                      </p>
+                      <p>
+                        <%= order.address.city %> - <%= order.address.pincode %>
+                      </p>
+                      <p><i class="fa-solid fa-phone" style="width: 20px;"></i>
+                        <%=order.address.phone %>
+                      </p>
+                    </div>
+                  </div>
         </div>
 
         <div class="order-sidebar">
@@ -538,7 +863,8 @@
       </div>
     </main>
 
-    <!-- Simple Cancellation/Return Popup -->
+    <!-- Improved Cancellation/Return Popup -->
+    <div id="modalOverlay" class="modal-overlay" onclick="closeCancelBox()"></div>
     <div id="cancelPopup" class="cancel-box">
       <h2 id="cancelTitle">Cancel Order</h2>
       <p id="cancelDesc">Please enter your cancellation reason:</p>
@@ -549,7 +875,6 @@
         <!-- Button to close the popup without doing anything -->
         <button class="popup-btn btn-close" onclick="closeCancelBox()">Keep Order</button>
 
-        <!-- Button to proceed with cancellation -->
         <button class="popup-btn btn-confirm" id="confirmButton" onclick="confirmAction()">Confirm</button>
       </div>
     </div>
@@ -571,8 +896,9 @@
           document.getElementById("cancelTitle").innerText = "Cancel Entire Order";
           document.getElementById("cancelDesc").innerText = "Please enter your cancellation reason:";
           document.getElementById("confirmButton").innerText = "Confirm Cancel";
-          document.getElementById("confirmButton").style.backgroundColor = "red";
+          document.getElementById("confirmButton").style.backgroundColor = "#ef4444";
           document.getElementById("cancelPopup").style.display = "block";
+          document.getElementById("modalOverlay").style.display = "block";
         }
 
         // Function to open popup for SPECIFIC ITEM CANCELLATION
@@ -583,8 +909,9 @@
           document.getElementById("cancelTitle").innerText = "Cancel: " + itemName;
           document.getElementById("cancelDesc").innerText = "Please enter your cancellation reason:";
           document.getElementById("confirmButton").innerText = "Confirm Cancel";
-          document.getElementById("confirmButton").style.backgroundColor = "red";
+          document.getElementById("confirmButton").style.backgroundColor = "#ef4444";
           document.getElementById("cancelPopup").style.display = "block";
+          document.getElementById("modalOverlay").style.display = "block";
         }
 
         // Function to open popup for ENTIRE ORDER RETURN
@@ -597,6 +924,7 @@
           document.getElementById("confirmButton").innerText = "Confirm Return";
           document.getElementById("confirmButton").style.backgroundColor = "#7c3aed";
           document.getElementById("cancelPopup").style.display = "block";
+          document.getElementById("modalOverlay").style.display = "block";
         }
 
         // Function to open popup for SPECIFIC ITEM RETURN
@@ -609,11 +937,13 @@
           document.getElementById("confirmButton").innerText = "Confirm Return";
           document.getElementById("confirmButton").style.backgroundColor = "#7c3aed";
           document.getElementById("cancelPopup").style.display = "block";
+          document.getElementById("modalOverlay").style.display = "block";
         }
 
         // Function to close the popup
         function closeCancelBox() {
           document.getElementById("cancelPopup").style.display = "none";
+          document.getElementById("modalOverlay").style.display = "none";
           document.getElementById("cancelReasonText").value = ""; // Clear text
         }
 

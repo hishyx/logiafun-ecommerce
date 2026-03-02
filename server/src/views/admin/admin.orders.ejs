@@ -265,71 +265,61 @@
             <tbody>
               <% orders.forEach(order=> { %>
 
-                <% const statusClass=order.orderStatus.toLowerCase(); %>
+              <% const statusClass=order.orderStatus.toLowerCase(); %>
 
-                  <tr>
-                    <!-- ORDER NUMBER -->
-                    <td>
-                      <span class="order-id" data-order-id="<%= order._id %>">#<%= order.orderNumber %></span>
-                    </td>
+              <tr>
+                <!-- ORDER NUMBER -->
+                <td>
+                  <span class="order-id" data-order-id="<%= order._id %>">#<%= order.orderNumber %></span>
+                </td>
 
-                    <!-- DATE -->
-                    <td>
-                      <%= new Date(order.createdAt).toLocaleDateString(undefined, { year: 'numeric' , month: 'short' ,
+                <!-- DATE -->
+                <td>
+                  <%= new Date(order.createdAt).toLocaleDateString(undefined, { year: 'numeric' , month: 'short' ,
                         day: 'numeric' }) %>
-                    </td>
+                </td>
 
-                    <!-- CUSTOMER INFO -->
-                    <td>
-                      <div class="customer-info" style="display:flex; flex-direction:column;">
-                        <span class="name">
-                          <%= order.address.name %>
-                        </span>
+                <!-- CUSTOMER INFO -->
+                <td>
+                  <div class="customer-info" style="display:flex; flex-direction:column;">
+                    <span class="name">
+                      <%= order.address.name %>
+                    </span>
 
-                        <span class="email">
-                          +91 - <%= order.address.phone %>
-                        </span>
-                      </div>
-                    </td>
+                    <span class="email">
+                      +91 - <%= order.address.phone %>
+                    </span>
+                  </div>
+                </td>
 
-                    <!-- TOTAL -->
-                    <td>
-                      <span style="font-weight:500; color:#0f172a;">
-                        ₹<%= order.totalAmount %>
-                      </span>
-                    </td>
+                <!-- TOTAL -->
+                <td>
+                  <span style="font-weight:500; color:#0f172a;">
+                    ₹<%= order.totalAmount %>
+                  </span>
+                </td>
 
-                    <!-- STATUS -->
-                    <td>
-                      <select class="status-badge status-<%= statusClass %>" data-order-id="<%= order._id %>"
-                        data-previous-status="<%= order.orderStatus %>"
-                        onchange="updateOrderStatus(this, '<%= order._id %>')">
+                <!-- STATUS -->
+                <td>
+                  <select class="status-badge status-<%= statusClass %>" data-order-id="<%= order._id %>" data-previous-status="<%= order.orderStatus %>" onchange="updateOrderStatus(this, '<%= order._id %>')">
+                    <% order.statusOptions.forEach(function(status) { %>
+                    <option value="<%= status %>" <%= status === order.orderStatus ? 'selected' : '' %>>
+                      <%= status %>
+                    </option>
+                    <% }) %>
+                  </select>
+                </td>
 
-                        <% var uniqueOptions=[]; uniqueOptions.push(order.orderStatus); if (order.statusTransitions) {
-                          for (var i=0; i < order.statusTransitions.length; i++) { if
-                          (uniqueOptions.indexOf(order.statusTransitions[i])===-1) {
-                          uniqueOptions.push(order.statusTransitions[i]); } } } %>
+                <!-- ACTIONS -->
+                <td>
+                  <a href="/admin/orders/<%= order._id %>" class="see-details-btn" title="See Order Details">
+                    <span>See Order Details</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                  </a>
+                </td>
+              </tr>
 
-                          <% for (var i=0; i < uniqueOptions.length; i++) { %>
-                            <option value="<%= uniqueOptions[i] %>" <%=order.orderStatus===uniqueOptions[i] ? 'selected'
-                              : '' %>>
-                              <%= uniqueOptions[i] %>
-                            </option>
-                            <% } %>
-
-                      </select>
-                    </td>
-
-                    <!-- ACTIONS -->
-                    <td>
-                      <a href="/admin/orders/<%= order._id %>" class="see-details-btn" title="See Order Details">
-                        <span>See Order Details</span>
-                        <i class="fa-solid fa-arrow-right"></i>
-                      </a>
-                    </td>
-                  </tr>
-
-                  <% }) %>
+              <% }) %>
             </tbody>
           </table>
         </div>
@@ -339,15 +329,15 @@
           <div class="pagination-info">
             Showing
             <%= total===0 ? 0 : ((page - 1) * limit + 1) %>
-              -
-              <%= Math.min(page * limit, total) %>
-                of
-                <%= total %>
+            -
+            <%= Math.min(page * limit, total) %>
+            of
+            <%= total %>
           </div>
           <div class="pagination-controls">
             <button class="page-btn" <%=page===1 || totalPages===0 ? "disabled" : "" %> onclick="goToPage(<%= page - 1
                 %>)">
-                <i class="fa-solid fa-chevron-left"></i>
+              <i class="fa-solid fa-chevron-left"></i>
             </button>
 
             <div class="page-numbers">
@@ -357,7 +347,7 @@
             </div>
             <button class="page-btn" <%=page===totalPages || totalPages===0 ? "disabled" : "" %> onclick="goToPage(<%=
                 page + 1 %>)">
-                <i class="fa-solid fa-chevron-right"></i>
+              <i class="fa-solid fa-chevron-right"></i>
             </button>
           </div>
         </div>
