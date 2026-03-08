@@ -59,8 +59,26 @@ export const adminOrderDetailsPage = async (req, res) => {
   try {
     const orderId = req.params.orderId || "";
 
-    const order = await getOrderDetails(orderId);
-    console.log("The order is : ", order);
+    const orderDoc = await getOrderDetails(orderId);
+    let order = orderDoc;
+    if (orderDoc && orderDoc.toObject) {
+      order = orderDoc.toObject();
+    }
+
+    // Add available status transitions for each item
+    if (order && order.items) {
+      order.items = order.items.map((item) => {
+        const transitionsForStatus = statusTransitions[item.status] || [];
+
+        return {
+          ...item,
+          statusOptions: [
+            item.status, // current status first
+            ...transitionsForStatus, // allowed next statuses
+          ],
+        };
+      });
+    }
 
     res.render("admin/admin.order.details.ejs", { order });
   } catch (err) {
@@ -103,6 +121,30 @@ export const acceptReturn = async (req, res) => {
     res.status(500).json({
       success: false,
       message: err.message || "Internal Server Error",
+    });
+  }
+};
+
+export const updateAdminOrderItemStatus = async (req, res) => {
+  try {
+    const { orderId, itemId } = req.params;
+    const { newStatus } = req.body;
+
+    await adminOrderServices.changeAdminOrderItemStatusService(
+      orderId,
+      itemId,
+      newStatus
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Item status updated successfully",
+    });
+  } catch (err) {
+    console.error("Error in updateAdminOrderItemStatus:", err);
+    res.status(400).json({
+      success: false,
+      message: err.message || "Failed to update item status",
     });
   }
 };

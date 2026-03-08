@@ -7,6 +7,7 @@ import * as adminUserControllers from "../controllers/admin/admin.user.controlle
 import * as adminProductControllers from "../controllers/admin/admin.product.controller.js";
 import * as adminCategoryControllers from "../controllers/admin/admin.categories.controller.js";
 import * as adminOrderControllers from "../controllers/admin/admin.order.controller.js";
+import * as adminCouponControllers from "../controllers/admin/admin.coupon.controller.js";
 
 const router = express.Router();
 
@@ -24,6 +25,11 @@ router
 router.patch(
   "/admin/orders/:orderId/accept-return",
   adminOrderControllers.acceptReturn,
+);
+
+router.patch(
+  "/admin/orders/:orderId/items/:itemId/status",
+  adminOrderControllers.updateAdminOrderItemStatus
 );
 
 router
@@ -59,6 +65,14 @@ router.get(
   "/admin/products/:productId/edit",
   adminProductControllers.adminEditProductPage,
 );
+
+router
+  .route("/admin/coupons")
+  .get(adminCouponControllers.adminCouponListPage)
+  .post(adminCouponControllers.addCoupon);
+
+router.patch("/admin/coupons/:couponId", adminCouponControllers.editCoupon);
+router.patch("/admin/coupons/:couponId/toggle", adminCouponControllers.toggleCoupon);
 
 router.patch(
   "/admin/products/:productId/toggle",

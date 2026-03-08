@@ -462,7 +462,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     } else {
       // Fallback if sweetalert is missing
-      alert(message);
+      Toastify({ text: message, background: type === 'error' ? 'red' : 'green' }).showToast();
     }
   }
 });

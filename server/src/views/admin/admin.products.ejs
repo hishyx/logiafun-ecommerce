@@ -173,6 +173,12 @@
             </a>
           </li>
           <li class="nav-item">
+            <a href="/admin/coupons" class="nav-link">
+              <i class="fa-solid fa-ticket"></i>
+              <span>Coupons</span>
+            </a>
+          </li>
+          <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="fa-solid fa-image"></i>
               <span>Banners</span>
@@ -433,11 +439,11 @@
               if (response.ok) {
                 location.reload();
               } else {
-                Swal.fire("Error", data.message || "Failed to update product", "error");
+                showToast(data.message || "Failed to update product", "error");
               }
             } catch (error) {
               console.error(error);
-              Swal.fire("Error", "Something went wrong", "error");
+              showToast("Something went wrong", "error");
             }
           }
         });

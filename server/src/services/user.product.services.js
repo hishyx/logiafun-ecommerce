@@ -254,3 +254,27 @@ export const reduceProductStock = async (
 
   return product;
 };
+
+export const getProductVariantDetails = async (productId, variantId) => {
+  const product = await Product.findOne(
+    {
+      _id: productId,
+      "variants._id": variantId,
+    },
+    {
+      "variants.$": 1,
+    },
+  );
+
+  const variant = product.variants[0];
+
+  if (!product) throw new Error("No product Found");
+
+  console.log(variant);
+
+  const variantName = [...variant.attributes.entries()]
+    .map(([key, value]) => `${key} - ${value}`)
+    .join("/ ");
+
+  return { variantName };
+};

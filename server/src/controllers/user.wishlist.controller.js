@@ -20,7 +20,6 @@ export const wishlistPage = async (req, res) => {
 
 export const addToWishList = async (req, res) => {
   try {
-    req.body.quantity = Number(req.body.quantity);
     await userWishListServices.addProductToWishListService(
       req.body,
       req.user._id,

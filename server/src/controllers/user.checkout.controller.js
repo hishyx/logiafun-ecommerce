@@ -1,12 +1,18 @@
 import { getAvailableCartItems } from "../services/user.cart.services.js";
 import { getUserAddresses } from "../services/user.services.js";
 import { createOrder } from "../services/user.order.services.js";
+import {
+  getAvailableCoupons,
+  applyCouponService,
+} from "../services/admin/admin.coupon.service.js";
 
 export const checkoutPage = async (req, res) => {
   try {
     let userAddresses = await getUserAddresses(req.user._id);
 
     let [cartItems, calculations] = await getAvailableCartItems(req.user._id);
+
+    const coupons = await getAvailableCoupons(calculations.total);
 
     if (userAddresses && userAddresses.length) {
       userAddresses.sort((a, b) => b.isDefault - a.isDefault);
@@ -16,6 +22,8 @@ export const checkoutPage = async (req, res) => {
       addresses: userAddresses,
       cartItems,
       calculations,
+      coupons,
+      walletBalance: req.user.walletBalance || 0,
     });
   } catch (err) {
     console.log(err);
@@ -46,5 +54,23 @@ export const placeOrder = async (req, res) => {
       message,
       redirectUrl: `/order/failed?message=${encodeURIComponent(message)}`,
     });
+  }
+};
+
+export const applyCouponInCheckout = async (req, res) => {
+  try {
+    const couponId = req.params.couponId;
+
+    console.log("Reached apply coupon controller");
+
+    const appliedCalculations = await applyCouponService(
+      couponId,
+      req.user._id,
+    );
+
+    res.status(200).json({ newCalculations: appliedCalculations });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ message: err.message });
   }
 };

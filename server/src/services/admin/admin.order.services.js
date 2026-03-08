@@ -9,9 +9,11 @@ export const getAllOrders = async ({ page, limit, sort, search, filter }) => {
 
   // Search by order number
   const query = {
-    orderNumber: { $regex: search, $options: "i" },
+    $or: [
+      { orderNumber: { $regex: search, $options: "i" } },
+      { "address.name": { $regex: search, $options: "i" } },
+    ],
   };
-
   // Filter by status
   if (filter !== "all") {
     query.orderStatus = filter;
@@ -67,7 +69,7 @@ export const changeAdminOrderStatusService = async (orderId, newStatus) => {
     throw new Error("Can't change the status bcz its invalid");
 
   order.items.forEach((item) => {
-    item.status = newStatus;
+    if (item.status !== "cancelled") item.status = newStatus;
   });
 
   order.orderStatus = newStatus;
@@ -122,6 +124,57 @@ export const acceptItemReturn = async (orderId, itemId) => {
   if (allReturnedOrCancelled) {
     order.returnStatus = "returned";
     order.orderStatus = "returned";
+  }
+
+  await order.save();
+  return order;
+};
+
+export const changeAdminOrderItemStatusService = async (
+  orderId,
+  itemId,
+  newStatus,
+) => {
+  const order = await Order.findById(orderId);
+  if (!order) throw new Error("Order not found");
+
+  const item = order.items.id(itemId);
+  if (!item) throw new Error("Item not found");
+
+  const availableTransitions = statusTransitions[item.status];
+
+  if (!availableTransitions || !availableTransitions.includes(newStatus)) {
+    throw new Error(
+      `Invalid status transition from ${item.status} to ${newStatus}`,
+    );
+  }
+
+  item.status = newStatus;
+
+  // Sync overall order status if necessary.
+  // If all non-cancelled items are successfully delivered, the order might be considered delivered.
+  // Or handle differently based on your store's logic. Simplest is to let item statuses be independent
+  // until we need to evaluate the whole order.
+
+  // Optionally update overall order status logic here:
+  const activeItems = order.items.filter(
+    (i) => i.status !== "cancelled" && i.status !== "returned",
+  );
+
+  if (activeItems.length > 0) {
+    // If all active items are delivered
+    const allDelivered = activeItems.every((i) => i.status === "delivered");
+    if (allDelivered) {
+      order.orderStatus = "delivered";
+    }
+    // If all active items are shipped or delivered
+    else if (
+      activeItems.every(
+        (i) => i.status === "shipped" || i.status === "delivered",
+      )
+    ) {
+      order.orderStatus = "shipped";
+    }
   }
 
   await order.save();

@@ -6,110 +6,170 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Wishlist - logiaFun</title>
   <link rel="stylesheet" href="/css/home.css" />
-  <link rel="stylesheet" href="/css/profile.css" />
+  <link rel="stylesheet" href="/css/cart.css" />
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <style>
-    .wishlist-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 20px;
-      margin-top: 20px;
-    }
-
-    .wishlist-item {
-      border: 1px solid #e2e8f0;
-      border-radius: 8px;
-      overflow: hidden;
-      background: #fff;
-      transition: transform 0.2s, box-shadow 0.2s;
-      position: relative;
-    }
-
-    .wishlist-item:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    }
-
-    .wishlist-img-container {
-      position: relative;
-      padding-top: 100%;
-      /* 1:1 Aspect Ratio */
-      overflow: hidden;
-    }
-
-    .wishlist-img-container img {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .wishlist-details {
-      padding: 15px;
-    }
-
-    .wishlist-title {
-      font-weight: 600;
-      margin-bottom: 5px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: block;
-      color: inherit;
-      text-decoration: none;
-    }
-
-    .wishlist-price {
-      color: #0f172a;
-      font-weight: 700;
-      margin-bottom: 10px;
-    }
-
-    .wishlist-actions {
+    .cart-header {
       display: flex;
-      gap: 10px;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
     }
 
-    .btn-sm {
-      padding: 0.4rem 0.8rem;
-      font-size: 0.875rem;
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
-    .remove-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: rgba(255, 255, 255, 0.9);
-      border: none;
-      width: 30px;
-      height: 30px;
+    /* Empty Cart Styles (reused for Empty Wishlist) */
+    .empty-cart-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 5rem 2rem;
+      text-align: center;
+      background: #fff;
+      border-radius: var(--radius-lg, 16px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      border: 1px solid #f1f5f9;
+      margin: 2rem 0;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    .empty-cart-icon {
+      width: 120px;
+      height: 120px;
+      background: #fef2f2;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
+      margin-bottom: 2rem;
       color: #ef4444;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      transition: transform 0.2s;
-    }
-
-    .remove-btn:hover {
-      transform: scale(1.1);
-    }
-
-    .empty-wishlist {
-      text-align: center;
-      padding: 50px 20px;
-      color: #64748b;
-    }
-
-    .empty-wishlist i {
       font-size: 3rem;
-      margin-bottom: 15px;
-      color: #cbd5e1;
+      position: relative;
+    }
+
+    .empty-cart-icon::after {
+      content: '';
+      position: absolute;
+      width: 140px;
+      height: 140px;
+      border: 2px dashed #fecaca;
+      border-radius: 50%;
+      animation: rotate 20s linear infinite;
+    }
+
+    @keyframes rotate {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .empty-cart-section h2 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 0.75rem;
+    }
+
+    .empty-cart-section p {
+      color: #64748b;
+      font-size: 1rem;
+      max-width: 300px;
+      margin-bottom: 2.5rem;
+      line-height: 1.5;
+    }
+
+    .start-shopping-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 2.5rem;
+      background-color: #0f172a;
+      color: #fff;
+      border-radius: 50px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2);
+    }
+
+    .start-shopping-btn:hover {
+      background-color: #1e293b;
+      transform: translateY(-2px);
+      box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.2);
+    }
+
+    .start-shopping-btn svg {
+      transition: transform 0.3s ease;
+    }
+
+    .start-shopping-btn:hover svg {
+      transform: translateX(4px);
+    }
+
+    /* Wishlist layout adjustments */
+    .cart-container {
+      display: flex;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .cart-items-column {
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .add-to-cart-action {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 1.5rem;
+      margin-left: auto;
+    }
+
+    @media (max-width: 768px) {
+      .add-to-cart-action {
+        padding: 1rem 0 0 0;
+        width: 100%;
+        margin-left: 0;
+      }
+
+      .add-to-cart-action button {
+        width: 100%;
+      }
+    }
+
+    .btn-sm-cart {
+      padding: 0.6rem 1.2rem;
+      font-weight: 500;
+      font-size: 0.9rem;
+      border-radius: 8px;
+      background-color: #0f172a;
+      color: white;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-sm-cart:hover {
+      background-color: #1e293b;
+      transform: translateY(-1px);
     }
   </style>
 </head>
@@ -119,133 +179,85 @@
   <%- include('../partials/header.ejs')%>
 
     <main>
-      <div class="profile-container">
-        <!-- Sidebar -->
-        <aside class="profile-sidebar">
-          <div class="profile-user-info">
-            <div class="profile-avatar-large"><img src="<%=user.profileImage%>"></div>
-            <div>
-              <!-- Keeping file input hidden but structure same as profile -->
-              <div class="profile-user-name" id="sidebarName">
-                <%=user.name%>
-              </div>
-              <div class="profilacce-user-email" id="sidebarEmail">
-                <%=user.email%>
+      <div class="cart-container">
+        <div class="cart-items-column">
+
+          <% if (wishlistItems.length> 0) { %>
+            <div class="cart-header">
+              <div>
+                <h1 style="font-size: 2rem; font-weight: 800; color: #0f172a; margin-bottom: 0.25rem;">My Wishlist</h1>
+                <p style="color: #64748b;">You have <%=wishlistItems.length%> items in your wishlist</p>
               </div>
             </div>
-          </div>
-          <nav class="sidebar-menu">
-            <a href="/user/profile" class="sidebar-link">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
-              Profile
-            </a>
-            <a href="/user/addresses" class="sidebar-link">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                <circle cx="12" cy="10" r="3"></circle>
-              </svg>
-              Addresses
-            </a>
-            <a href="/user/orders" class="sidebar-link">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="1" y="3" width="15" height="13" />
-                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
-                <circle cx="5.5" cy="18.5" r="2.5" />
-                <circle cx="18.5" cy="18.5" r="2.5" />
-              </svg>
-              My Orders
-            </a>
-            <a href="/user/wishlist" class="sidebar-link active">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path
-                  d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
-                </path>
-              </svg>
-              Wishlist
-            </a>
-            <a href="#" class="sidebar-link">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="2" y="5" width="20" height="14" rx="2" />
-                <line x1="2" y1="10" x2="22" y2="10" />
-              </svg>
-              Wallet
-            </a>
-            <form action="/user/logout" method="POST" style="display: inline">
-              <button type="submit" class="sidebar-link logout-link">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                  <polyline points="16 17 21 12 16 7"></polyline>
-                  <line x1="21" y1="12" x2="9" y2="12"></line>
-                </svg>
-                Log Out
-              </button>
-            </form>
-          </nav>
-        </aside>
 
-        <!-- Main Content -->
-        <section class="profile-content">
-          <div class="profile-header">
-            <h2>My Wishlist</h2>
-          </div>
-
-          <% if (wishlistItems.length===0) { %>
-            <div class="empty-wishlist">
-              <i class="fa-regular fa-heart"></i>
-              <h3>Your wishlist is empty</h3>
-              <p>Explore more products and shortlist some items.</p>
-              <a href="/products" class="btn btn-primary" style="margin-top: 15px;">Explore Products</a>
-            </div>
-            <% } else { %>
-              <div class="wishlist-grid">
-                <% wishlistItems.forEach(item=> { %>
-                  <div class="wishlist-item" id="wishlist-item" data-item-id="<%=item._id%>">
-                    <button class="remove-btn" title="Remove from wishlist"
-                      onclick="removeFromWishlist(event, '<%=item._id%>')">
-                      <i class="fa-solid fa-times"></i>
-                    </button>
-                    <a href="/products/<%=item.productId%>"
-                      style="text-decoration: none; color: inherit; display: block;">
-                      <div class="wishlist-img-container">
-                        <img src="<%=item.image%>" alt="<%=item.name%>">
-                      </div>
-                      <div class="wishlist-details">
-                        <span class="wishlist-title">
-                          <%=item.name%>
-                        </span>
-                        <div class="wishlist-price">₹<%=item.price.toFixed(2)%>
-                        </div>
-                      </div>
+            <div class="cart-items">
+              <% wishlistItems.forEach(item=> { %>
+                <div class="cart-item" id="wishlist-item" data-item-id="<%=item._id%>">
+                  <div class="cart-item-image">
+                    <a href="/products/<%=item.productId%>">
+                      <img src="<%=item.image%>" alt="<%=item.name%>" />
                     </a>
-                    <div class="wishlist-details" style="padding-top: 0;">
-                      <div class="wishlist-actions">
-                        <button onclick="addToCartFromWishList(event)" class="btn btn-primary btn-sm" style="flex: 1;"
-                          data-product-id="<%=item.productId%>" data-variant-id="<%=item.variantId%>">
-                          <i class="fa-solid fa-cart-plus"></i> Add to Cart
-                        </button>
-                        <button class="btn btn-outline btn-sm remove-wishlist-item-btn" title="Remove"
-                          onclick="removeFromWishlist(event, '<%=item._id%>')">
-                          X
-                        </button>
-                      </div>
+                  </div>
+
+                  <div class="cart-item-details">
+                    <a href="/products/<%=item.productId%>" class="cart-item-title">
+                      <%=item.name%>
+                    </a>
+                    <div class="cart-item-price">₹<%=item.price.toFixed(2)%>
                     </div>
                   </div>
-                  <% }) %>
+
+                  <div class="add-to-cart-action">
+                    <button onclick="addToCartFromWishList(event)" class="btn-sm-cart"
+                      data-product-id="<%=item.productId%>" data-variant-id="<%=item.variantId%>">
+                      <i class="fa-solid fa-cart-plus"></i> Add to Cart
+                    </button>
+                  </div>
+
+                  <button class="remove-btn" title="Remove from wishlist" aria-label="Remove item"
+                    onclick="removeFromWishlist(event, '<%=item._id%>')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                  </button>
+                </div>
+                <% }) %>
+            </div>
+
+            <% } else { %>
+              <!-- Empty Wishlist Section -->
+              <div class="empty-cart-section">
+                <div class="empty-cart-icon">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path
+                      d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                    </path>
+                  </svg>
+                </div>
+                <h2>Your wishlist is empty</h2>
+                <p>Explore more products and shortlist some items.</p>
+                <a href="/products" class="start-shopping-btn">
+                  Explore Products
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </a>
               </div>
               <% } %>
 
-        </section>
+        </div>
       </div>
     </main>
 
     <!-- Footer -->
     <%- include('../partials/footer') %>
+
       <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
       <script src="/js/user.wishlist.js"></script>
 </body>
-
 
 </html>

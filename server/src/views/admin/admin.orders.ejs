@@ -14,8 +14,8 @@
     .status-badge {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      padding: 0.4rem 0.8rem;
+      justify-content: space-between;
+      padding: 0.4rem 2rem 0.4rem 1rem;
       border-radius: 20px;
       font-size: 0.75rem;
       font-weight: 600;
@@ -27,13 +27,23 @@
       outline: none;
       appearance: none;
       -webkit-appearance: none;
-      text-align: center;
-      text-align-last: center;
+      text-align: left;
       transition: all 0.2s ease;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.8rem center;
+      background-size: 14px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
 
     .status-badge:focus {
-      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1);
+      border-color: #cbd5e1;
+    }
+
+    .status-badge:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
     }
 
     .see-details-btn {
@@ -170,6 +180,12 @@
             </a>
           </li>
           <li class="nav-item">
+            <a href="/admin/coupons" class="nav-link">
+              <i class="fa-solid fa-ticket"></i>
+              <span>Coupons</span>
+            </a>
+          </li>
+          <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="fa-solid fa-image"></i>
               <span>Banners</span>
@@ -265,61 +281,63 @@
             <tbody>
               <% orders.forEach(order=> { %>
 
-              <% const statusClass=order.orderStatus.toLowerCase(); %>
+                <% const statusClass=order.orderStatus.toLowerCase(); %>
 
-              <tr>
-                <!-- ORDER NUMBER -->
-                <td>
-                  <span class="order-id" data-order-id="<%= order._id %>">#<%= order.orderNumber %></span>
-                </td>
+                  <tr>
+                    <!-- ORDER NUMBER -->
+                    <td>
+                      <span class="order-id" data-order-id="<%= order._id %>">#<%= order.orderNumber %></span>
+                    </td>
 
-                <!-- DATE -->
-                <td>
-                  <%= new Date(order.createdAt).toLocaleDateString(undefined, { year: 'numeric' , month: 'short' ,
+                    <!-- DATE -->
+                    <td>
+                      <%= new Date(order.createdAt).toLocaleDateString(undefined, { year: 'numeric' , month: 'short' ,
                         day: 'numeric' }) %>
-                </td>
+                    </td>
 
-                <!-- CUSTOMER INFO -->
-                <td>
-                  <div class="customer-info" style="display:flex; flex-direction:column;">
-                    <span class="name">
-                      <%= order.address.name %>
-                    </span>
+                    <!-- CUSTOMER INFO -->
+                    <td>
+                      <div class="customer-info" style="display:flex; flex-direction:column;">
+                        <span class="name">
+                          <%= order.address.name %>
+                        </span>
 
-                    <span class="email">
-                      +91 - <%= order.address.phone %>
-                    </span>
-                  </div>
-                </td>
+                        <span class="email">
+                          +91 - <%= order.address.phone %>
+                        </span>
+                      </div>
+                    </td>
 
-                <!-- TOTAL -->
-                <td>
-                  <span style="font-weight:500; color:#0f172a;">
-                    ₹<%= order.totalAmount %>
-                  </span>
-                </td>
+                    <!-- TOTAL -->
+                    <td>
+                      <span style="font-weight:500; color:#0f172a;">
+                        ₹<%= order.totalAmount %>
+                      </span>
+                    </td>
 
-                <!-- STATUS -->
-                <td>
-                  <select class="status-badge status-<%= statusClass %>" data-order-id="<%= order._id %>" data-previous-status="<%= order.orderStatus %>" onchange="updateOrderStatus(this, '<%= order._id %>')">
-                    <% order.statusOptions.forEach(function(status) { %>
-                    <option value="<%= status %>" <%= status === order.orderStatus ? 'selected' : '' %>>
-                      <%= status %>
-                    </option>
-                    <% }) %>
-                  </select>
-                </td>
+                    <!-- STATUS -->
+                    <td>
+                      <select class="status-badge status-<%= statusClass %>" data-order-id="<%= order._id %>"
+                        data-previous-status="<%= order.orderStatus %>"
+                        onchange="updateOrderStatus(this, '<%= order._id %>')">
+                        <% order.statusOptions.forEach(function(status) { %>
+                          <option value="<%= status %>" <%=status===order.orderStatus ? 'selected' : '' %>>
+                            <%= status %>
+                          </option>
+                          <% }) %>
+                      </select>
+                    </td>
 
-                <!-- ACTIONS -->
-                <td>
-                  <a href="/admin/orders/<%= order._id %>" class="see-details-btn" title="See Order Details">
-                    <span>See Order Details</span>
-                    <i class="fa-solid fa-arrow-right"></i>
-                  </a>
-                </td>
-              </tr>
+                    <!-- ACTIONS -->
+                    <td>
+                      <a href="/admin/orders/<%= order._id %>" class="see-details-btn" title="See Order Details">
+                        <span>See Order Details</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                      </a>
+                    </td>
+                  </tr>
 
-              <% }) %>
+                  <% }) %>
             </tbody>
           </table>
         </div>
@@ -329,15 +347,15 @@
           <div class="pagination-info">
             Showing
             <%= total===0 ? 0 : ((page - 1) * limit + 1) %>
-            -
-            <%= Math.min(page * limit, total) %>
-            of
-            <%= total %>
+              -
+              <%= Math.min(page * limit, total) %>
+                of
+                <%= total %>
           </div>
           <div class="pagination-controls">
             <button class="page-btn" <%=page===1 || totalPages===0 ? "disabled" : "" %> onclick="goToPage(<%= page - 1
                 %>)">
-              <i class="fa-solid fa-chevron-left"></i>
+                <i class="fa-solid fa-chevron-left"></i>
             </button>
 
             <div class="page-numbers">
@@ -347,7 +365,7 @@
             </div>
             <button class="page-btn" <%=page===totalPages || totalPages===0 ? "disabled" : "" %> onclick="goToPage(<%=
                 page + 1 %>)">
-              <i class="fa-solid fa-chevron-right"></i>
+                <i class="fa-solid fa-chevron-right"></i>
             </button>
           </div>
         </div>

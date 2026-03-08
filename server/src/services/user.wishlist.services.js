@@ -4,7 +4,7 @@ import { checkProductAvailability } from "./user.product.services.js";
 export const addProductToWishListService = async (productData, userId) => {
   const validProduct = await checkProductAvailability(productData.productId);
 
-  if (!validProduct) throw new Error("Product not found or blocked");
+  if (!validProduct) throw new Error("product out of stock or got blocked");
 
   let wishlist = await Wishlist.findOne({ userId });
 

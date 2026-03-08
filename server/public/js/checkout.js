@@ -76,7 +76,7 @@ addAddressForm.onsubmit = async (e) => {
     if (res.ok) {
       location.reload(); // Simplest way to reflect new address in checkout
     } else {
-      alert(result.message || "Failed to add address");
+      showToast(result.message || "Failed to add address", "error");
     }
   } catch (err) {
     console.error(err);
@@ -107,7 +107,7 @@ editAddressForm.onsubmit = async (e) => {
     if (result.success || result.address) {
       location.reload();
     } else {
-      alert(result.message || "Failed to update address");
+      showToast(result.message || "Failed to update address", "error");
     }
   } catch (err) {
     console.error(err);
@@ -124,9 +124,23 @@ async function placeOrder() {
     .querySelector('input[name="selectedAddress"]:checked')
     ?.closest(".address-select-card")?.dataset.id;
 
-  const paymentMethod = document.querySelector(
+  const paymentRadio = document.querySelector(
     'input[name="payment"]:checked',
-  )?.value;
+  );
+
+  const paymentMethod = paymentRadio?.value;
+
+  if (paymentMethod === 'wallet' && paymentRadio?.disabled) {
+    Swal.fire({
+      icon: "error",
+      title: "Insufficient Wallet Balance",
+      text: "You do not have enough funds in your wallet to cover this order.",
+    });
+    return;
+  }
+
+  const appliedCouponCard = document.querySelector(".coupon-card.applied-coupon");
+  const couponId = appliedCouponCard ? appliedCouponCard.querySelector(".coupon-apply-btn").getAttribute("onclick").match(/'([^']+)'/)[1] : null;
 
   console.log(paymentMethod);
 
@@ -138,6 +152,7 @@ async function placeOrder() {
     body: JSON.stringify({
       selectedAddress,
       paymentMethod,
+      couponId
     }),
   });
 
@@ -148,4 +163,64 @@ async function placeOrder() {
   } else {
     console.error(result.message);
   }
+}
+
+async function applyCoupon(couponId, element) {
+  try {
+    const res = await fetch(`/user/cart/checkout/${couponId}/toggle`, {
+      method: "POST",
+    });
+
+    result = await res.json();
+
+    if (res.ok) {
+      updateCheckoutAmount(result.newCalculations);
+
+      // Remove applied state from all other coupons
+      document.querySelectorAll('.coupon-card').forEach(card => {
+        card.classList.remove('applied-coupon');
+        const btn = card.querySelector('.coupon-apply-btn');
+        if (btn) btn.textContent = 'Apply Coupon';
+      });
+
+      element.closest('.coupon-card').classList.add("applied-coupon");
+      element.textContent = "Applied";
+    } else {
+      alert(result.message);
+    }
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+function updateCheckoutAmount(updatedAmount) {
+  const priceCard = document.getElementById("order-summary-card");
+
+  const discountPrice = priceCard
+    .querySelectorAll(".summary-item")[1]
+    .querySelectorAll("span")[1];
+
+  const totalPrice = priceCard
+    .querySelector(".summary-total")
+    .querySelectorAll("span")[1];
+
+  discountPrice.textContent = `₹ ${updatedAmount.discount}`;
+  totalPrice.textContent = `₹ ${updatedAmount.total}`;
+}
+
+function removeCoupon() {
+  document.querySelectorAll('.coupon-card').forEach(card => {
+    card.classList.remove('applied-coupon');
+    const btn = card.querySelector('.coupon-apply-btn');
+    if (btn) btn.textContent = 'Apply Coupon';
+  });
+
+  const priceCard = document.getElementById("order-summary-card");
+  const originalDiscount = priceCard.getAttribute("data-original-discount");
+  const originalTotal = priceCard.getAttribute("data-original-total");
+
+  updateCheckoutAmount({
+    discount: originalDiscount,
+    total: originalTotal
+  });
 }

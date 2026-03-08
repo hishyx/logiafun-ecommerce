@@ -36,6 +36,11 @@ router
   .get(userCheckoutControllers.checkoutPage)
   .post(userCheckoutControllers.placeOrder);
 
+router.post(
+  "/user/cart/checkout/:couponId/toggle",
+  userCheckoutControllers.applyCouponInCheckout,
+);
+
 router
   .route("/user/orders")
   .get(userOrderControllers.orderPage)
@@ -58,6 +63,11 @@ router
 router
   .route("/user/change-email/resend")
   .post(userControllers.resendEmailChangeOTP);
+
+// Wallet
+router
+  .route("/user/wallet")
+  .get(userControllers.walletPage);
 
 //Address related works
 

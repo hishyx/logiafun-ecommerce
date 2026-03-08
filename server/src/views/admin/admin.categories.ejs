@@ -429,6 +429,12 @@
             </a>
           </li>
           <li class="nav-item">
+            <a href="/admin/coupons" class="nav-link">
+              <i class="fa-solid fa-ticket"></i>
+              <span>Coupons</span>
+            </a>
+          </li>
+          <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="fa-solid fa-image"></i>
               <span>Banners</span>
@@ -517,7 +523,7 @@
               <tr>
                 <th>Category Name</th>
                 <th>Description</th>
-                <th>Inventory & Stats</th>
+
                 <th>Status</th>
                 <th style="text-align: right;">Actions</th>
               </tr>
@@ -546,25 +552,7 @@
                     </div>
                   </td>
 
-                  <!-- Inventory & Stats -->
-                  <td>
-                    <div style="display: flex; flex-direction: column; gap: 4px;">
-                      <% if (category.stock> 10) { %>
-                        <span class="badge-stock stock-in" style="width: fit-content;">
-                          <%= category.stock %> In Stock
-                        </span>
-                        <% } else if (category.stock> 0) { %>
-                          <span class="badge-stock stock-low" style="width: fit-content;">
-                            <%= category.stock %> Left
-                          </span>
-                          <% } else { %>
-                            <span class="badge-stock stock-out" style="width: fit-content;">Out of Stock</span>
-                            <% } %>
-                              <small style="color: #64748b; font-weight: 500;">
-                                <%= category.sold %> Sold
-                              </small>
-                    </div>
-                  </td>
+
 
                   <!-- Status -->
                   <td>

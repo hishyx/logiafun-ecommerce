@@ -46,14 +46,14 @@ fileInput.addEventListener("change", function (e) {
 
   // Validation
   if (!file.type.startsWith("image/")) {
-    Swal.fire("Error", "Please select an image file", "error");
+    showToast("Please select an image file", "error");
     this.value = "";
     return;
   }
 
   if (file.size > 5 * 1024 * 1024) {
     // 5MB
-    Swal.fire("Error", "Image size should be less than 5MB", "error");
+    showToast("Image size should be less than 5MB", "error");
     this.value = "";
     return;
   }
@@ -185,7 +185,7 @@ if (editModal) {
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      Swal.fire("Error", "Please select an image file", "error");
+      showToast("Please select an image file", "error");
       this.value = "";
       return;
     }
@@ -262,15 +262,14 @@ document.querySelector("tbody").addEventListener("click", async function (e) {
           title: newStatus ? "Category listed" : "Category unlisted",
         });
       } else {
-        Swal.fire(
-          "Error",
+        showToast(
           data.message || "Failed to update category",
           "error",
         );
       }
     } catch (error) {
       console.error(error);
-      Swal.fire("Error", "Something went wrong", "error");
+      showToast("Something went wrong", "error");
     }
   }
 
@@ -337,11 +336,11 @@ async function submitCategory(event) {
         timer: 3000,
       });
     } else {
-      Swal.fire("Error", data.message || "Failed to add category", "error");
+      showToast(data.message || "Failed to add category", "error");
     }
   } catch (error) {
     console.error("Error:", error);
-    Swal.fire("Error", "An error occurred while adding the category", "error");
+    showToast("An error occurred while adding the category", "error");
   } finally {
     submitBtn.disabled = false;
     submitBtn.innerHTML = originalBtnText;
@@ -416,7 +415,7 @@ async function submitEditCategory(event) {
 
       closeEditModal();
     } else {
-      Swal.fire("Error", data.message || "Failed to update category", "error");
+      showToast(data.message || "Failed to update category", "error");
     }
   } catch (error) {
     console.error("Error:", error);

@@ -192,7 +192,7 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.reload();
       } catch (err) {
         console.error(err);
-        alert("Failed to set default address");
+        showToast("Failed to set default address", "error");
         confirmDefaultBtn.disabled = false;
       }
     });
@@ -269,7 +269,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (data.address) {
         updateAddressCard(data.address);
-        alert("Address updated successfully");
+        showToast("Address updated successfully", "success");
         closeEditModal();
       }
     });

@@ -415,7 +415,7 @@ document.addEventListener("DOMContentLoaded", () => {
           if (typeof FormValidator !== "undefined") {
             FormValidator.showError(input, "Please select an image file");
           } else {
-            alert("Please select an image file");
+            showToast("Please select an image file", "error");
           }
           input.value = "";
           return;
@@ -647,11 +647,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (err) {
         console.error(err);
         // DISPLAY ERROR TO USER
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: err.message || "An unexpected error occurred",
-        });
+        showToast(err.message || "An unexpected error occurred", "error");
       } finally {
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
@@ -705,9 +701,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const imgParam =
       product.variants &&
-      product.variants.length > 0 &&
-      product.variants[0].images &&
-      product.variants[0].images.length > 0
+        product.variants.length > 0 &&
+        product.variants[0].images &&
+        product.variants[0].images.length > 0
         ? product.variants[0].images[0]
         : "https://placehold.co/40x40";
 
@@ -764,18 +760,17 @@ document.addEventListener("DOMContentLoaded", () => {
       toggleBtn.style.color = product.isActive ? "#ef4444" : "#10b981";
 
       const icon = toggleBtn.querySelector("i");
-      icon.className = `fa-solid ${
-        product.isActive ? "fa-eye-slash" : "fa-eye"
-      }`;
+      icon.className = `fa-solid ${product.isActive ? "fa-eye-slash" : "fa-eye"
+        }`;
     }
   }
 
   function generateProductRowHTML(product) {
     const imgParam =
       product.variants &&
-      product.variants.length > 0 &&
-      product.variants[0].images &&
-      product.variants[0].images.length > 0
+        product.variants.length > 0 &&
+        product.variants[0].images &&
+        product.variants[0].images.length > 0
         ? product.variants[0].images[0]
         : "https://placehold.co/40x40";
 
@@ -829,10 +824,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     <!-- Status Column -->
     <td>
-      ${
-        product.isActive
-          ? `<span class="status-badge status-active"><span class="status-indicator"></span> Active</span>`
-          : `<span class="status-badge status-blocked"><span class="status-indicator"></span> Inactive</span>`
+      ${product.isActive
+        ? `<span class="status-badge status-active"><span class="status-indicator"></span> Active</span>`
+        : `<span class="status-badge status-blocked"><span class="status-indicator"></span> Inactive</span>`
       }
     </td>
 
@@ -855,9 +849,8 @@ document.addEventListener("DOMContentLoaded", () => {
           data-active="${product.isActive}"
           style="color: ${product.isActive ? "#ef4444" : "#10b981"}"
         >
-          <i class="fa-solid ${
-            product.isActive ? "fa-eye-slash" : "fa-eye"
-          }"></i>
+          <i class="fa-solid ${product.isActive ? "fa-eye-slash" : "fa-eye"
+      }"></i>
         </button>
       </div>
     </td>
@@ -986,15 +979,14 @@ document.addEventListener("DOMContentLoaded", () => {
               title: newStatus ? "Product listed" : "Product unlisted",
             });
           } else {
-            Swal.fire(
-              "Error",
+            showToast(
               data.message || "Failed to update product",
               "error",
             );
           }
         } catch (error) {
           console.error(error);
-          Swal.fire("Error", "Something went wrong", "error");
+          showToast("Something went wrong", "error");
         }
       }
     });

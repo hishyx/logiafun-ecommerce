@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Wallet - logiaFun</title>
+    <link rel="stylesheet" href="/css/home.css" />
+    <link rel="stylesheet" href="/css/profile.css" />
+    <style>
+        /* Wallet Specific Styles adhering to Profile Design System */
+        .wallet-header-card {
+            background: linear-gradient(135deg, var(--bg-light) 0%, var(--white) 100%);
+            border: 1px solid var(--primary);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 25px -5px rgba(30, 58, 95, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wallet-header-card::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(30, 58, 95, 0.05) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .wallet-header-card::after {
+            content: '';
+            position: absolute;
+            bottom: -30px;
+            left: -30px;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.05) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .wallet-balance-label {
+            color: var(--text-light);
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .wallet-balance-amount {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary);
+            font-family: 'Fredoka', sans-serif;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .wallet-primary-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .wallet-primary-actions .btn {
+            padding: 0.875rem 2rem;
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .quick-actions-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .quick-action-btn {
+            background: var(--white);
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius-lg);
+            padding: 1.25rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-dark);
+            font-weight: 500;
+            font-size: 0.95rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .quick-action-btn:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(30, 58, 95, 0.08);
+            transform: translateY(-2px);
+            color: var(--primary);
+        }
+
+        .quick-action-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(30, 58, 95, 0.05);
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .quick-action-btn:hover .quick-action-icon {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .transaction-history-section h3 {
+            font-size: 1.25rem;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .transaction-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .transaction-card {
+            background: var(--white);
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: var(--transition);
+        }
+
+        .transaction-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .tx-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .tx-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .tx-icon.credit {
+            background: #ecfdf5;
+            color: #10b981;
+        }
+
+        .tx-icon.debit {
+            background: #fef2f2;
+            color: #ef4444;
+        }
+
+        .tx-details h4 {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.25rem;
+            font-size: 1rem;
+        }
+
+        .tx-date {
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+
+        .tx-right {
+            text-align: right;
+        }
+
+        .tx-amount {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .tx-amount.credit {
+            color: #10b981;
+        }
+
+        .tx-amount.debit {
+            color: var(--text-dark);
+        }
+
+        .tx-status {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .tx-status.success {
+            background: #f0fdf4;
+            color: #15803d;
+        }
+
+        .tx-status.pending {
+            background: #fffbeb;
+            color: #b45309;
+        }
+
+        .tx-status.failed {
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+
+        @media (max-width: 768px) {
+            .quick-actions-row {
+                grid-template-columns: 1fr;
+            }
+
+            .wallet-primary-actions {
+                flex-direction: column;
+            }
+
+            .wallet-primary-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .wallet-balance-amount {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <%- include('../partials/header.ejs')%>
+
+        <main>
+            <div class="profile-container">
+                <!-- Sidebar -->
+                <aside class="profile-sidebar">
+                    <div class="profile-user-info">
+                        <div class="profile-avatar-large"><img src="<%=user.profileImage%>" alt="Profile"></div>
+                        <div>
+                            <div class="profile-user-name" id="sidebarName">
+                                <%=user.name%>
+                            </div>
+                            <div class="profile-user-email" id="sidebarEmail">
+                                <%=user.email%>
+                            </div>
+                        </div>
+                    </div>
+                    <nav class="sidebar-menu">
+                        <a href="/user/profile" class="sidebar-link">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            Profile
+                        </a>
+                        <a href="/user/addresses" class="sidebar-link">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            Addresses
+                        </a>
+                        <a href="/user/orders" class="sidebar-link">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="1" y="3" width="15" height="13" />
+                                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+                                <circle cx="5.5" cy="18.5" r="2.5" />
+                                <circle cx="18.5" cy="18.5" r="2.5" />
+                            </svg>
+                            My Orders
+                        </a>
+
+                        <a href="/user/wallet" class="sidebar-link active">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="5" width="20" height="14" rx="2" />
+                                <line x1="2" y1="10" x2="22" y2="10" />
+                            </svg>
+                            Wallet
+                        </a>
+                        <form action="/user/logout" method="POST" style="display: inline">
+                            <button type="submit" class="sidebar-link logout-link">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                    <polyline points="16 17 21 12 16 7"></polyline>
+                                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                                </svg>
+                                Log Out
+                            </button>
+                        </form>
+                    </nav>
+                </aside>
+
+                <!-- Main Content -->
+                <section class="profile-content">
+                    <div class="profile-header">
+                        <h2>My Wallet</h2>
+                    </div>
+
+                    <!-- Top Wallet Card -->
+                    <div class="wallet-header-card">
+                        <div class="wallet-balance-label">Available Balance</div>
+                        <div class="wallet-balance-amount">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <rect x="2" y="5" width="20" height="14" rx="2" />
+                                <line x1="2" y1="10" x2="22" y2="10" />
+                            </svg>
+                            ₹1,250.00
+                        </div>
+                        <div class="wallet-primary-actions">
+                            <button class="btn btn-primary">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                Add Money
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions Row -->
+                    <div class="quick-actions-row">
+                        <div class="quick-action-btn">
+                            <div class="quick-action-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <polyline points="1 4 1 10 7 10"></polyline>
+                                    <polyline points="23 20 23 14 17 14"></polyline>
+                                    <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15">
+                                    </path>
+                                </svg>
+                            </div>
+                            Transfer to Bank
+                        </div>
+                        <div class="quick-action-btn">
+                            <div class="quick-action-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                                </svg>
+                            </div>
+                            Request Payment
+                        </div>
+                        <div class="quick-action-btn">
+                            <div class="quick-action-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                            </div>
+                            Transaction History
+                        </div>
+                    </div>
+
+                    <!-- Transaction History -->
+                    <div class="transaction-history-section">
+                        <h3>
+                            Recent Transactions
+                            <a href="#" class="btn-link" style="font-size: 0.9rem; color: var(--primary);">View All</a>
+                        </h3>
+
+                        <div class="transaction-list">
+                            <!-- Sample Transaction 1: Credit -->
+                            <div class="transaction-card">
+                                <div class="tx-left">
+                                    <div class="tx-icon credit">
+                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2.5">
+                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                        </svg>
+                                    </div>
+                                    <div class="tx-details">
+                                        <h4>Order Refund (#ORD-4921)</h4>
+                                        <div class="tx-date">Oct 24, 2023 • 2:30 PM</div>
+                                    </div>
+                                </div>
+                                <div class="tx-right">
+                                    <div class="tx-amount credit">+ ₹450.00</div>
+                                    <div class="tx-status success">Success</div>
+                                </div>
+                            </div>
+
+                            <!-- Sample Transaction 2: Debit -->
+                            <div class="transaction-card">
+                                <div class="tx-left">
+                                    <div class="tx-icon debit">
+                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2.5">
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </div>
+                                    <div class="tx-details">
+                                        <h4>Payment for Order #ORD-8832</h4>
+                                        <div class="tx-date">Oct 21, 2023 • 10:15 AM</div>
+                                    </div>
+                                </div>
+                                <div class="tx-right">
+                                    <div class="tx-amount debit">- ₹1,200.00</div>
+                                    <div class="tx-status success">Success</div>
+                                </div>
+                            </div>
+
+                            <!-- Sample Transaction 3: Add Money -->
+                            <div class="transaction-card">
+                                <div class="tx-left">
+                                    <div class="tx-icon credit">
+                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2.5">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </div>
+                                    <div class="tx-details">
+                                        <h4>Added to Wallet via Card</h4>
+                                        <div class="tx-date">Oct 15, 2023 • 4:00 PM</div>
+                                    </div>
+                                </div>
+                                <div class="tx-right">
+                                    <div class="tx-amount credit">+ ₹2,000.00</div>
+                                    <div class="tx-status success">Success</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </section>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <%- include('../partials/footer') %>
+
+</body>
+
+</html>

@@ -44,7 +44,21 @@ export const profilePage = async (req, res) => {
     res.status(500).send("Something went wrong");
   }
 };
+export const walletPage = async (req, res) => {
+  try {
+    const authInfo = await User.findById(req.user._id).select("googleId");
 
+    const isGoogle = !!authInfo.googleId;
+
+    res.render("user/wallet", {
+      user: req.user,
+      isGoogle,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Something went wrong");
+  }
+};
 export const editProfile = async (req, res) => {
   try {
     const { name, phone, newPassword, currentPassword } = req.body;

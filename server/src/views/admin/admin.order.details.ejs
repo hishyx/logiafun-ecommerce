@@ -100,6 +100,39 @@
       border-color: #fee2e2 !important;
     }
 
+    .status-select {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.35rem 2rem 0.35rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #0f172a;
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      cursor: pointer;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      transition: all 0.2s ease;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23475569'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.6rem center;
+      background-size: 14px;
+    }
+
+    .status-select:hover {
+      background-color: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    .status-select:focus {
+      box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.1);
+      border-color: #94a3b8;
+    }
+
+
     .back-btn {
       display: inline-flex;
       align-items: center;
@@ -350,6 +383,12 @@
             </a>
           </li>
           <li class="nav-item">
+            <a href="/admin/coupons" class="nav-link">
+              <i class="fa-solid fa-ticket"></i>
+              <span>Coupons</span>
+            </a>
+          </li>
+          <li class="nav-item">
             <a href="#" class="nav-link">
               <i class="fa-solid fa-image"></i>
               <span>Banners</span>
@@ -478,8 +517,8 @@
                                       <% } %>
                                 </div>
                                 <div class="product-variant">
-                                  <% if (item.variant) { %>
-                                    <%= item.variant.name %>
+                                  <% if (item.product.variantName) { %>
+                                    <%= item.product.variantName %>
                                       <% } else { %>
                                         No specific variant
                                         <% } %>
@@ -498,10 +537,25 @@
                                   <% } %>
                                     <span class="price">₹<%= item.product.price %></span>
                                     <span class="qty">x <%= item.quantity %></span>
-                                    <div class="status-capsule status-<%= item.status.toLowerCase() %>"
-                                      style="margin-top: 8px; font-size: 0.75rem; padding: 2px 10px;">
-                                      <%= item.status.charAt(0).toUpperCase() + item.status.slice(1) %>
-                                    </div>
+
+                                    <% if (item.statusOptions && item.statusOptions.length> 1) { %>
+                                      <div style="margin-top: 8px;">
+                                        <select class="status-select"
+                                          onchange="handleItemStatusChange('<%= order._id %>', '<%= item._id %>', this.value, '<%= item.status %>')">
+                                          <% item.statusOptions.forEach(statusOption=> { %>
+                                            <option value="<%= statusOption %>" <%=statusOption===item.status
+                                              ? 'selected' : '' %>>
+                                              <%= statusOption.charAt(0).toUpperCase() + statusOption.slice(1) %>
+                                            </option>
+                                            <% }) %>
+                                        </select>
+                                      </div>
+                                      <% } else { %>
+                                        <div class="status-capsule status-<%= item.status.toLowerCase() %>"
+                                          style="margin-top: 8px; font-size: 0.75rem; padding: 2px 10px;">
+                                          <%= item.status.charAt(0).toUpperCase() + item.status.slice(1) %>
+                                        </div>
+                                        <% } %>
                               </div>
                               <% if (item.returnStatus==='requested' ) { %>
                                 <div style="margin-left: 1rem; border-left: 1px solid #f1f5f9; padding-left: 1rem;">
@@ -639,15 +693,69 @@
             });
             window.location.reload();
           } else {
-            Swal.fire('Error', data.message || 'Failed to accept return', 'error');
+            showToast(data.message || 'Failed to accept return', 'error');
           }
         } catch (error) {
           console.error('Error:', error);
-          Swal.fire('Error', 'Something went wrong', 'error');
+          showToast('Something went wrong', 'error');
         }
       }
     }
 
+
+    async function handleItemStatusChange(orderId, itemId, newStatus, currentStatus) {
+      if (newStatus === currentStatus) return;
+
+      const result = await Swal.fire({
+        title: 'Change Item Status?',
+        text: `Are you sure you want to change this item's status to ${newStatus}?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3b82f6',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Yes, change it!'
+      });
+
+      if (result.isConfirmed) {
+        try {
+          const response = await fetch(`/admin/orders/${orderId}/items/${itemId}/status`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              newStatus
+            })
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            await Swal.fire({
+              title: 'Success!',
+              text: 'Item status updated successfully.',
+              icon: 'success',
+              timer: 1500,
+              showConfirmButton: false
+            });
+            window.location.reload();
+          } else {
+            showToast(data.message || 'Failed to update item status', 'error');
+            // Reset dropdown
+            window.location.reload();
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          showToast('Something went wrong while updating item status', 'error');
+          // Reset dropdown
+          window.location.reload();
+        }
+      } else {
+        // Reset dropdown if cancelled
+        const select = document.querySelector(`select[onchange*="${itemId}"]`);
+        if (select) select.value = currentStatus;
+      }
+    }
 
     function downloadInvoice(orderId) {
 

@@ -952,7 +952,7 @@
           const reason = document.getElementById("cancelReasonText").value;
 
           if (reason.trim() === "") {
-            alert("Please provide a reason!");
+            showToast("Please provide a reason!", "error");
             return;
           }
 
@@ -985,15 +985,15 @@
             });
 
             if (response.ok) {
-              alert(`${targetType === 'order' ? 'Order' : 'Item'} ${actionType === 'cancel' ? 'cancelled' : 'returned'} successfully!`);
-              location.reload();
+              showToast(`${targetType === 'order' ? 'Order' : 'Item'} ${actionType === 'cancel' ? 'cancelled' : 'returned'} successfully!`, "success");
+              setTimeout(() => location.reload(), 1500); // Give toast time to show before reload
             } else {
               const data = await response.json();
-              alert("Error: " + (data.message || `Failed to ${actionType} ${targetType}`));
+              showToast("Error: " + (data.message || `Failed to ${actionType} ${targetType}`), "error");
             }
           } catch (error) {
             console.error("Error:", error);
-            alert(`Something went wrong while ${actionType === 'cancel' ? 'cancelling' : 'returning'} the ${targetType}.`);
+            showToast(`Something went wrong while ${actionType === 'cancel' ? 'cancelling' : 'returning'} the ${targetType}.`, "error");
           }
         }
 

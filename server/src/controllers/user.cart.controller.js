@@ -1,4 +1,5 @@
 import * as userCartServices from "../services/user.cart.services.js";
+import { getProductVariantDetails } from "../services/user.product.services.js";
 
 export const addToCart = async (req, res) => {
   try {
@@ -20,7 +21,16 @@ export const cartPage = async (req, res) => {
       req.user._id,
     );
 
-    console.log("cartItems is : ", cartItems);
+    console.log("the cart items is:\n", JSON.stringify(cartItems, null, 2));
+
+    for (const item of cartItems) {
+      const attrs = item.product.variants?.attributes || {};
+
+      item.product.variantName = Object.entries(attrs)
+        .map(([key, value]) => `${key} - ${value}`)
+        .join("/ ");
+    }
+
     res.render("user/cart", { cartItems, calculations });
   } catch (err) {
     console.log(err);

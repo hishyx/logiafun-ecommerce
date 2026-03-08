@@ -9,12 +9,37 @@ import statusTransitions from "../components/order.status.transitions.js";
 
 import { getAddressDetails } from "./user.services.js";
 
-import { reduceProductStock } from "./user.product.services.js";
+import {
+  reduceProductStock,
+  getProductVariantDetails,
+} from "./user.product.services.js";
+
+import Coupon from "../models/coupon.model.js";
 
 export const createOrder = async (userId, orderData) => {
   const [orderProducts, amounts] = await getAvailableCartItems(userId, true);
 
   if (orderProducts.length == 0) throw new Error("The cart is empty");
+
+  if (orderData.couponId) {
+    const coupon = await Coupon.findOne({
+      _id: orderData.couponId,
+      minPurchaseAmount: { $lte: amounts.subtotal },
+      isActive: true,
+      startDate: { $lte: new Date() },
+      expiryDate: { $gte: new Date() },
+      $expr: { $lt: ["$usedCount", "$usageLimit"] },
+    });
+
+    if (coupon) {
+      if (coupon.discountType == "fixed") {
+        amounts.total -= coupon.discountValue;
+      }
+
+      // Increment coupon used count
+      await Coupon.findByIdAndUpdate(coupon._id, { $inc: { usedCount: 1 } });
+    }
+  }
 
   console.log("orderData.selectedAddress is : ", orderData.selectedAddress);
 
@@ -104,7 +129,19 @@ export const getOrderDetails = async (orderId, orderNumber) => {
     order = await Order.findById(orderId).populate("userId");
   }
 
-  console.log("Order result:", order);
+  order = order.toObject();
+
+  for (const item of order.items) {
+    const { variantName } = await getProductVariantDetails(
+      item.product.productId,
+      item.product.variantId,
+    );
+
+    console.log("variantName is:", variantName);
+
+    item.product.variantName = variantName;
+  }
+  console.log("Order is:\n", JSON.stringify(order, null, 2));
 
   return order;
 };

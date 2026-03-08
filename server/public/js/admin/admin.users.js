@@ -34,14 +34,14 @@ async function toggleUser(userId, isBlocked) {
     });
 
     if (!res.ok) {
-      alert("Request failed");
+      showToast("Request failed", "error");
       return;
     }
 
     const data = await res.json();
 
     if (!data.success) {
-      alert("Failed to update user");
+      showToast("Failed to update user", "error");
       return;
     }
 
@@ -74,6 +74,6 @@ async function toggleUser(userId, isBlocked) {
     }
   } catch (err) {
     console.error(err);
-    alert("Something went wrong");
+    showToast("Something went wrong", "error");
   }
 }

@@ -112,7 +112,7 @@ export const returnSpecificItem = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Item returned successfully",
+      message: "Item return request send",
     });
   } catch (error) {
     console.error(error);
