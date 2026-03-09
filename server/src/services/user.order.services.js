@@ -7,6 +7,8 @@ import {
 
 import statusTransitions from "../components/order.status.transitions.js";
 
+import * as userWalletServices from "./user.wallet.services.js";
+
 import { getAddressDetails } from "./user.services.js";
 
 import {
@@ -18,6 +20,8 @@ import Coupon from "../models/coupon.model.js";
 
 export const createOrder = async (userId, orderData) => {
   const [orderProducts, amounts] = await getAvailableCartItems(userId, true);
+
+  let paymentSuccess;
 
   if (orderProducts.length == 0) throw new Error("The cart is empty");
 
@@ -89,8 +93,24 @@ export const createOrder = async (userId, orderData) => {
     await reduceProductStock(productId, variantId, quantity);
   }
 
+  //Payment operation
+
+  const orderNumber = generateOrderNumber();
+
+  if (paymentMethod == "cod") paymentSuccess = true;
+
+  if (paymentMethod == "wallet") {
+    paymentSuccess = await userWalletServices.payWithWallet(
+      userId,
+      amounts?.total,
+      orderNumber,
+    );
+  }
+
+  if (!paymentSuccess) throw new Error("Something went wrong");
+
   const newOrder = await Order.create({
-    orderNumber: generateOrderNumber(),
+    orderNumber,
     checkoutId,
     userId,
     items,
@@ -171,6 +191,17 @@ export const cancelEntireOrder = async (orderId, reason) => {
   order.statusChangeReason = reason;
 
   await order.save();
+
+  const transactionData = {
+    userId: order.userId,
+    amount: order.totalAmount,
+    orderNumber: order.orderNumber,
+    status: "cancelled",
+  };
+
+  console.log("The transction data for cencellation is : ", transactionData);
+
+  await userWalletServices.addRefundToWallet(transactionData);
 };
 
 export const cancelSpecificOrderItem = async (orderId, itemId, reason) => {
@@ -226,6 +257,15 @@ export const returnEntireOrder = async (orderId, reason) => {
   order.statusChangeReason = reason;
 
   await order.save();
+
+  const transactionData = {
+    userId: order.userId,
+    amount: order.totalAmount,
+    orderNumber: order.orderNumber,
+    status: "returned",
+  };
+
+  await userWalletServices.addRefundToWallet(transactionData);
 };
 
 export const returnSpecificOrderItem = async (orderId, itemId, reason) => {

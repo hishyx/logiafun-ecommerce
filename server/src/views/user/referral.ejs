@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Refer & Earn - logiaFun</title>
+    <link rel="stylesheet" href="/css/home.css" />
+    <link rel="stylesheet" href="/css/profile.css" />
+    <style>
+        .referral-card {
+            background: var(--white);
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .referral-hero-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(30, 58, 95, 0.05);
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+        }
+
+        .referral-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+        }
+
+        .referral-desc {
+            color: var(--text-light);
+            max-width: 500px;
+            margin: 0 auto 2rem;
+            line-height: 1.6;
+        }
+
+        .referral-code-box {
+            background: #f8fafc;
+            border: 2px dashed #cbd5e1;
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .referral-code-text {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: 4px;
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        .referral-link-box {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            gap: 1rem;
+        }
+
+        .referral-link-input {
+            border: none;
+            background: transparent;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            width: 100%;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .copy-btn {
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .copy-btn:hover {
+            background: #1e3a5fcc;
+            transform: translateY(-2px);
+        }
+
+        .steps-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 3rem;
+            text-align: center;
+        }
+
+        .step-item {
+            position: relative;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin: 0 auto 1rem;
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .step-text {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .steps-container {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .referral-code-box {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .referral-code-text {
+                font-size: 1.5rem;
+            }
+
+            .referral-link-box {
+                flex-direction: column;
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('../partials/header.ejs')%>
+
+        <main>
+            <div class="profile-container">
+                <aside class="profile-sidebar">
+                    <div class="profile-user-info">
+                        <div class="profile-avatar-large"><img src="<%=user.profileImage%>" alt="Profile"></div>
+                        <div>
+                            <div class="profile-user-name">
+                                <%=user.name%>
+                            </div>
+                            <div class="profile-user-email">
+                                <%=user.email%>
+                            </div>
+                        </div>
+                    </div>
+                    <nav class="sidebar-menu">
+                        <a href="/user/profile" class="sidebar-link">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            Profile
+                        </a>
+                        <a href="/user/addresses" class="sidebar-link">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            Addresses
+                        </a>
+                        <a href="/user/orders" class="sidebar-link">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="1" y="3" width="15" height="13" />
+                                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+                                <circle cx="5.5" cy="18.5" r="2.5" />
+                                <circle cx="18.5" cy="18.5" r="2.5" />
+                            </svg>
+                            My Orders
+                        </a>
+                        <a href="/user/wallet" class="sidebar-link">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="5" width="20" height="14" rx="2" />
+                                <line x1="2" y1="10" x2="22" y2="10" />
+                            </svg>
+                            Wallet
+                        </a>
+                        <a href="/user/referral" class="sidebar-link active">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                            Refer & Earn
+                        </a>
+                        <form action="/user/logout" method="POST" style="display: inline">
+                            <button type="submit" class="sidebar-link logout-link">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                    <polyline points="16 17 21 12 16 7"></polyline>
+                                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                                </svg>
+                                Log Out
+                            </button>
+                        </form>
+                    </nav>
+                </aside>
+
+                <section class="profile-content">
+                    <div class="profile-header">
+                        <h2>Refer & Earn</h2>
+                    </div>
+
+                    <div class="referral-card">
+                        <div class="referral-hero-icon">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <polyline points="16 11 18 13 22 9"></polyline>
+                            </svg>
+                        </div>
+                        <h1 class="referral-title">Invite your friends!</h1>
+                        <p class="referral-desc">Share your referral code with friends. When they join and make their
+                            first purchase, you both get amazing rewards in your wallet!</p>
+
+                        <div class="referral-code-box" style="margin-bottom: 1.5rem;">
+                            <span class="referral-code-text" id="refCodeText">
+                                <%=referralCode%>
+                            </span>
+                            <button class="copy-btn" onclick="copyReferralCode()">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                                Copy Code
+                            </button>
+                        </div>
+
+                        <div class="referral-link-box">
+                            <input type="text" class="referral-link-input" id="refLinkInput"
+                                value="http://localhost:2007/auth/signup/<%=referralCode%>" readonly>
+                            <button class="copy-btn" onclick="copyReferralLink()"
+                                style="padding: 0.6rem 1.2rem; font-size: 0.85rem; flex-shrink: 0;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                                </svg>
+                                Copy Link
+                            </button>
+                        </div>
+
+                        <div class="steps-container">
+                            <div class="step-item">
+                                <div class="step-number">1</div>
+                                <h3 class="step-title">Share Code</h3>
+                                <p class="step-text">Send your code to your friends and family.</p>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">2</div>
+                                <h3 class="step-title">Friend Joins</h3>
+                                <p class="step-text">They sign up using your unique referral code.</p>
+                            </div>
+                            <div class="step-item">
+                                <div class="step-number">3</div>
+                                <h3 class="step-title">Earn Rewards</h3>
+                                <p class="step-text">Get rewards credited directly to your wallet!</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <%- include('../partials/footer') %>
+
+            <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+            <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+            <script>
+                function copyReferralCode() {
+                    const code = document.getElementById('refCodeText').innerText;
+                    navigator.clipboard.writeText(code).then(() => {
+                        showToast("Referral code copied!");
+                    });
+                }
+
+                function copyReferralLink() {
+                    const link = document.getElementById('refLinkInput').value;
+                    navigator.clipboard.writeText(link).then(() => {
+                        showToast("Referral link copied!");
+                    });
+                }
+
+                function showToast(message) {
+                    Toastify({
+                        text: message,
+                        duration: 3000,
+                        gravity: "bottom",
+                        position: "center",
+                        style: {
+                            background: "var(--primary)",
+                            borderRadius: "8px"
+                        }
+                    }).showToast();
+                }
+            </script>
+</body>
+
+</html>

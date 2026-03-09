@@ -212,7 +212,7 @@
         }
 
         .tx-amount.debit {
-            color: var(--text-dark);
+            color: #ef4444;
         }
 
         .tx-status {
@@ -310,6 +310,15 @@
                             </svg>
                             Wallet
                         </a>
+                        <a href="/user/referral" class="sidebar-link">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                            Refer & Earn
+                        </a>
                         <form action="/user/logout" method="POST" style="display: inline">
                             <button type="submit" class="sidebar-link logout-link">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -338,7 +347,7 @@
                                 <rect x="2" y="5" width="20" height="14" rx="2" />
                                 <line x1="2" y1="10" x2="22" y2="10" />
                             </svg>
-                            ₹1,250.00
+                            ₹<%= wallet ? wallet.balance.toFixed(2) : '0.00' %>
                         </div>
                         <div class="wallet-primary-actions">
                             <button class="btn btn-primary">
@@ -395,66 +404,51 @@
                         </h3>
 
                         <div class="transaction-list">
-                            <!-- Sample Transaction 1: Credit -->
-                            <div class="transaction-card">
-                                <div class="tx-left">
-                                    <div class="tx-icon credit">
-                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="2.5">
-                                            <polyline points="20 6 9 17 4 12"></polyline>
-                                        </svg>
+                            <% if (wallet && wallet.transactions && wallet.transactions.length> 0) { %>
+                                <% wallet.transactions.sort((a,b)=> b.createdAt - a.createdAt).forEach(tx => {
+                                    const isCredit = tx.type === 'credit';
+                                    const absAmount = Math.abs(tx.amount).toFixed(2);
+                                    %>
+                                    <div class="transaction-card">
+                                        <div class="tx-left">
+                                            <div class="tx-icon <%= isCredit ? 'credit' : 'debit' %>">
+                                                <% if (isCredit) { %>
+                                                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                                                        stroke="currentColor" stroke-width="2.5">
+                                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                                    </svg>
+                                                    <% } else { %>
+                                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+                                                            stroke="currentColor" stroke-width="2.5">
+                                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                                        </svg>
+                                                        <% } %>
+                                            </div>
+                                            <div class="tx-details">
+                                                <h4>
+                                                    <%= tx.description %>
+                                                </h4>
+                                                <div class="tx-date">
+                                                    <%= new Date(tx.createdAt).toLocaleDateString('en-US', {
+                                                        month: 'short' , day: 'numeric' , year: 'numeric' ,
+                                                        hour: 'numeric' , minute: '2-digit' }) %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tx-right">
+                                            <div class="tx-amount <%= isCredit ? 'credit' : 'debit' %>">
+                                                <%= isCredit ? '+' : '-' %> ₹<%= absAmount %>
+                                            </div>
+                                            <div class="tx-status <%= tx.status %>">
+                                                <%= tx.status.charAt(0).toUpperCase() + tx.status.slice(1) %>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="tx-details">
-                                        <h4>Order Refund (#ORD-4921)</h4>
-                                        <div class="tx-date">Oct 24, 2023 • 2:30 PM</div>
-                                    </div>
-                                </div>
-                                <div class="tx-right">
-                                    <div class="tx-amount credit">+ ₹450.00</div>
-                                    <div class="tx-status success">Success</div>
-                                </div>
-                            </div>
-
-                            <!-- Sample Transaction 2: Debit -->
-                            <div class="transaction-card">
-                                <div class="tx-left">
-                                    <div class="tx-icon debit">
-                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="2.5">
-                                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                                        </svg>
-                                    </div>
-                                    <div class="tx-details">
-                                        <h4>Payment for Order #ORD-8832</h4>
-                                        <div class="tx-date">Oct 21, 2023 • 10:15 AM</div>
-                                    </div>
-                                </div>
-                                <div class="tx-right">
-                                    <div class="tx-amount debit">- ₹1,200.00</div>
-                                    <div class="tx-status success">Success</div>
-                                </div>
-                            </div>
-
-                            <!-- Sample Transaction 3: Add Money -->
-                            <div class="transaction-card">
-                                <div class="tx-left">
-                                    <div class="tx-icon credit">
-                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="2.5">
-                                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                                        </svg>
-                                    </div>
-                                    <div class="tx-details">
-                                        <h4>Added to Wallet via Card</h4>
-                                        <div class="tx-date">Oct 15, 2023 • 4:00 PM</div>
-                                    </div>
-                                </div>
-                                <div class="tx-right">
-                                    <div class="tx-amount credit">+ ₹2,000.00</div>
-                                    <div class="tx-status success">Success</div>
-                                </div>
-                            </div>
+                                    <% }) %>
+                                        <% } else { %>
+                                            <p style="text-align: center; color: var(--text-muted); padding: 2rem;">No
+                                                recent transactions.</p>
+                                            <% } %>
                         </div>
                     </div>
 

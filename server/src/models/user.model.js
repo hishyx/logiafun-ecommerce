@@ -41,6 +41,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+    referalCode: {
+      type: String,
+      required: true,
+      unique: true,
+    },
   },
   { timestamps: true },
 );

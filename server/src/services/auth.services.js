@@ -2,9 +2,10 @@ import bcrypt from "bcrypt";
 import User from "../models/user.model.js";
 import uploadImageToCloudinary from "../utils/cloudinary.upload.js";
 import cloudinaryFolders from "../components/cloudinary.folders.js";
+import generateReferralCode from "../utils/referal.code.js";
 
 export const createTempUserForSignup = async (body) => {
-  const { name, email, phone, password, confirm_password } = body;
+  const { name, email, phone, password, confirm_password, referralCode } = body;
 
   if (password !== confirm_password) {
     throw new Error("Passwords do not match");
@@ -29,6 +30,7 @@ export const createTempUserForSignup = async (body) => {
     email: normalizedEmail,
     phone,
     password: hash,
+    referralCode,
   };
 };
 
@@ -90,6 +92,7 @@ export const googleUserExist = async (googleUser) => {
       provider: "google",
     }),
     isVerified: true,
+    referalCode: generateReferralCode(googleUser.displayName),
   });
 
   return newUser;

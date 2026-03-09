@@ -6,6 +6,8 @@ import * as userCartControllers from "../controllers/user.cart.controller.js";
 import * as userWishlistControllers from "../controllers/user.wishlist.controller.js";
 import * as userCheckoutControllers from "../controllers/user.checkout.controller.js";
 import * as userOrderControllers from "../controllers/user.orders.controller.js";
+import * as userWalletControllers from "../controllers/user.wallet.controller.js";
+import * as userReferralControllers from "../controllers/user.referral.controller.js";
 import * as orderFailedController from "../controllers/user/order.controller.js";
 
 import { setLocalVariables } from "../middlewares/user.middlewares.js";
@@ -67,7 +69,8 @@ router
 // Wallet
 router
   .route("/user/wallet")
-  .get(userControllers.walletPage);
+  .get(userWalletControllers.walletPage);
+router.get("/user/referral", userReferralControllers.referralPage);
 
 //Address related works
 

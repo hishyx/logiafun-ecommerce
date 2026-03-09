@@ -23,6 +23,7 @@ export const isUserGuest = (req, res, next) => {
   if (req.isAuthenticated()) {
     return res.redirect("/home");
   } else {
+    console.log("Is uest middleware");
     next();
   }
 };

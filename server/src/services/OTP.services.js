@@ -3,6 +3,8 @@ import User from "../models/user.model.js";
 import * as mailUtil from "../utils/mailer.js";
 import crypto from "crypto";
 import bcrypt from "bcrypt";
+import generateReferalCode from "../utils/referal.code.js";
+import { addReferralBonus } from "./user.wallet.services.js";
 
 const OTP_EXPIRY_MS = 2 * 60 * 1000; // 5 minutes
 const RESEND_COOLDOWN_MS = 60 * 1000; // 1 minute
@@ -90,7 +92,19 @@ export const verifySignupOTP = async (otpId, inputOtp, pendingUser) => {
     password: pendingUser.password,
     profileImage: "https://www.computerhope.com/jargon/g/guest-user.png",
     isVerified: true,
+    referalCode: generateReferalCode(pendingUser.name),
   });
+
+  // Referral Bonus logic
+  if (pendingUser.referralCode) {
+    const referrer = await User.findOne({ referalCode: pendingUser.referralCode });
+    if (referrer) {
+      // Give ₹5 to referrer
+      await addReferralBonus(referrer._id, 5, `Referral reward for inviting ${user.name}`);
+      // Give ₹2 to new user
+      await addReferralBonus(user._id, 2, `Welcome bonus for joining with referral code`);
+    }
+  }
 
   // cleanup
   await OTP.deleteOne({ _id: otpDoc._id });

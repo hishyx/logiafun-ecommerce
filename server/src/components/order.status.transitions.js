@@ -3,9 +3,9 @@ const transitions = {
 
   processing: ["shipped", "cancelled"],
 
-  shipped: ["in_transit", "returned"],
+  shipped: ["in_transit"],
 
-  in_transit: ["delivered", "returned"],
+  in_transit: ["delivered"],
 
   delivered: ["returned"],
 

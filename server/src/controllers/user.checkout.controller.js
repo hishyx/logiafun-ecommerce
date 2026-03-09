@@ -5,6 +5,7 @@ import {
   getAvailableCoupons,
   applyCouponService,
 } from "../services/admin/admin.coupon.service.js";
+import { getWalletByUserId } from "../services/user.wallet.services.js";
 
 export const checkoutPage = async (req, res) => {
   try {
@@ -13,6 +14,9 @@ export const checkoutPage = async (req, res) => {
     let [cartItems, calculations] = await getAvailableCartItems(req.user._id);
 
     const coupons = await getAvailableCoupons(calculations.total);
+
+    const wallet = await getWalletByUserId(req.user._id);
+    const walletBalance = wallet ? wallet.balance : 0;
 
     if (userAddresses && userAddresses.length) {
       userAddresses.sort((a, b) => b.isDefault - a.isDefault);
@@ -23,7 +27,7 @@ export const checkoutPage = async (req, res) => {
       cartItems,
       calculations,
       coupons,
-      walletBalance: req.user.walletBalance || 0,
+      walletBalance,
     });
   } catch (err) {
     console.log(err);

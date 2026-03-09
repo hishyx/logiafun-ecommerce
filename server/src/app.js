@@ -40,8 +40,8 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 app.use("/", authRoute);
-app.use("/", adminRoute);
 app.use("/", userRoute);
+app.use("/", adminRoute);
 app.use("/", invoiceRoute);
 
 app.use((req, res) => {

@@ -21,11 +21,16 @@ export const loginPage = (req, res) => {
 };
 
 export const signupPage = (req, res) => {
-  res.render("auth/signup", { error: req.flash("error") });
+  const { referralCode } = req.params;
+  res.render("auth/signup", {
+    error: req.flash("error"),
+    referralCode: referralCode || "",
+  });
 };
 
 export const verifyOTPPage = async (req, res) => {
   try {
+    console.log("verify otp page reached");
     const otpId = req.session.OTPId;
 
     if (!otpId) {
@@ -34,12 +39,13 @@ export const verifyOTPPage = async (req, res) => {
 
     const resendCooldown = await getRemainingCooldown(otpId, "signup");
 
-    return res.render("auth/verify-otp", {
+    return res.render("auth/verify-otp.ejs", {
       error: req.flash("error"),
       resendCooldown,
     });
   } catch (err) {
     console.error(err);
+    console.log("Error occured");
     req.flash("error", err.message);
     return res.redirect("/auth/signup");
   }
@@ -58,6 +64,7 @@ export const signupUser = async (req, res) => {
       req.session.tempUser.email,
       false,
     );
+    console.log("Created adnd sended");
 
     req.session.OTPId = otpDoc._id;
 
