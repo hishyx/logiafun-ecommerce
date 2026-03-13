@@ -28,6 +28,10 @@ export const adminProductListPage = async (req, res) => {
 
     const totalPages = Math.ceil(productsList.total / limit);
 
+    console.log("start");
+    console.log(productsList);
+    console.log("end");
+
     res.render("admin/admin.products.ejs", {
       ...productsList,
       categories,

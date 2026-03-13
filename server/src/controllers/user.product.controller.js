@@ -16,7 +16,7 @@ export const productListPage = async (req, res) => {
   minPrice = minPrice !== undefined ? Number(minPrice) : null;
   maxPrice = maxPrice !== undefined ? Number(maxPrice) : null;
 
-  const limit = 4;
+  const limit = 6;
 
   //Filtering works
 

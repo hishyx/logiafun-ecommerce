@@ -3,7 +3,11 @@ import { getProductVariantDetails } from "../services/user.product.services.js";
 
 export const addToCart = async (req, res) => {
   try {
+    if (!req.user || !req.user._id)
+      throw new Error("Please login to add items to cart");
+
     req.body.quantity = Number(req.body.quantity);
+
     await userCartServices.addProductToCartService(req.body, req.user._id);
 
     const cartCount = await userCartServices.getCartCount(req.user._id);
@@ -17,19 +21,24 @@ export const addToCart = async (req, res) => {
 
 export const cartPage = async (req, res) => {
   try {
-    const [cartItems, calculations] = await userCartServices.getCartItems(
-      req.user._id,
-    );
+    let cartItems;
+    let calculations;
 
-    console.log("the cart items is:\n", JSON.stringify(cartItems, null, 2));
+    if (req.user && req.user._id) {
+      [cartItems, calculations] = await userCartServices.getCartItems(
+        req.user._id,
+      );
 
-    for (const item of cartItems) {
-      const attrs = item.product.variants?.attributes || {};
+      for (const item of cartItems) {
+        const { variantName } = await getProductVariantDetails(
+          item.product._id,
+          item.product.variants._id,
+        );
+        item.product.variantName = variantName;
+      }
+    } else cartItems = [];
 
-      item.product.variantName = Object.entries(attrs)
-        .map(([key, value]) => `${key} - ${value}`)
-        .join("/ ");
-    }
+    console.log("Cart items is : { ", cartItems);
 
     res.render("user/cart", { cartItems, calculations });
   } catch (err) {

@@ -20,8 +20,8 @@ export const getAllOrders = async ({ page, limit, sort, search, filter }) => {
   }
 
   // Sorting options
-  let sortQuery = { createdAt: -1 };
-  if (sort === "oldest") sortQuery = { createdAt: 1 };
+  let sortQuery = { createdAt: -1, _id: -1 };
+  if (sort === "oldest") sortQuery = { createdAt: 1, _id: -1 };
 
   const result = await Order.aggregate([
     { $match: query },

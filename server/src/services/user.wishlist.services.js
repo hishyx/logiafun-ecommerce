@@ -111,3 +111,8 @@ export const removeProductFromWishlistService = async (userId, itemId) => {
   );
   return result;
 };
+
+export const getWishlistCount = async (userId) => {
+  const wishlist = await Wishlist.findOne({ userId });
+  if (wishlist) return wishlist.items.length;
+};

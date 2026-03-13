@@ -13,19 +13,27 @@ export const addRefundToWallet = async ({
   amount,
   orderNumber,
   status,
+  itemName,
 }) => {
   let description;
 
-  if (status == "cancelled")
+  if (itemName && status == "cancelled") {
+    description = `Order cancellation of ${itemName}`;
+  } else if (itemName && status == "returned") {
+    description = `Order returning of ${itemName}`;
+  } else if (status == "cancelled")
     description = `Order cancellation of ${orderNumber}`;
-  if (status == "returned") description = `Order returning of ${orderNumber}`;
+  else if (status == "returned")
+    description = `Order returning of ${orderNumber}`;
 
   const transaction = {
-    type: "debit",
+    type: "credit",
     amount,
     description,
     orderNumber,
   };
+
+  if (itemName) transaction.itemName = itemName;
 
   const wallet = await Wallet.findOne({ userId });
 

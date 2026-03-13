@@ -12,15 +12,20 @@ import * as userWalletServices from "./user.wallet.services.js";
 import { getAddressDetails } from "./user.services.js";
 
 import {
-  reduceProductStock,
+  changeProductStock,
   getProductVariantDetails,
 } from "./user.product.services.js";
 
 import Coupon from "../models/coupon.model.js";
+import razorpay from "../config/razorpay.js";
 
 export const createOrder = async (userId, orderData) => {
   const [orderProducts, amounts] = await getAvailableCartItems(userId, true);
 
+  if (!amounts.subtotal) throw new Error("Subtotal invalid");
+
+  console.log("Got items btw ");
+  let couponDiscountAmount = 0;
   let paymentSuccess;
 
   if (orderProducts.length == 0) throw new Error("The cart is empty");
@@ -38,6 +43,7 @@ export const createOrder = async (userId, orderData) => {
     if (coupon) {
       if (coupon.discountType == "fixed") {
         amounts.total -= coupon.discountValue;
+        couponDiscountAmount = coupon.discountValue;
       }
 
       // Increment coupon used count
@@ -58,17 +64,27 @@ export const createOrder = async (userId, orderData) => {
 
   const items = [];
 
+  console.log("ORDER PRODUCTS LENGTH:", orderProducts.length);
+
   for (const orderProduct of orderProducts) {
-    const originalPrice = orderProduct?.product?.variants?.price;
-    const discountPercent = orderProduct.discount || 0;
-
-    const currentPrice = Math.round(
-      originalPrice * (1 - discountPercent / 100),
-    );
-
-    const productId = orderProduct?.items?.productId;
-    const variantId = orderProduct?.items?.variantId;
+    if (!orderProduct.product || !orderProduct.product.variants) {
+      console.log("BROKEN ITEM:", orderProduct);
+      continue;
+    }
+    const productId = orderProduct.product._id;
+    const variantId = orderProduct.product.variants._id;
     const quantity = Number(orderProduct?.items?.quantity);
+    const unitPrice = Number(orderProduct.discountedPrice);
+
+    const itemTotal = unitPrice * quantity;
+
+    const itemShare = itemTotal / amounts.subtotal;
+
+    const itemCouponDiscount = itemShare * couponDiscountAmount;
+
+    const finalItemTotal = Math.round(itemTotal - itemCouponDiscount);
+
+    const finalUnitPrice = Math.round(finalItemTotal / quantity);
 
     items.push({
       product: {
@@ -76,9 +92,8 @@ export const createOrder = async (userId, orderData) => {
         variantId,
         name: orderProduct?.product?.name,
         image: orderProduct?.product?.variants?.images[0],
-        originalPrice,
-        discountPercent,
-        price: currentPrice,
+        originalPrice: unitPrice,
+        discountedPrice: finalUnitPrice,
       },
       quantity,
       status: "pending",
@@ -90,24 +105,16 @@ export const createOrder = async (userId, orderData) => {
       },
     });
 
-    await reduceProductStock(productId, variantId, quantity);
+    await changeProductStock(productId, variantId, quantity, "decrease");
   }
+
+  console.log("Order pushing done");
 
   //Payment operation
 
   const orderNumber = generateOrderNumber();
 
-  if (paymentMethod == "cod") paymentSuccess = true;
-
-  if (paymentMethod == "wallet") {
-    paymentSuccess = await userWalletServices.payWithWallet(
-      userId,
-      amounts?.total,
-      orderNumber,
-    );
-  }
-
-  if (!paymentSuccess) throw new Error("Something went wrong");
+  //Create temp order
 
   const newOrder = await Order.create({
     orderNumber,
@@ -123,7 +130,44 @@ export const createOrder = async (userId, orderData) => {
     address: orderAddress,
   });
 
-  console.log("order done");
+  console.log("Order creating done");
+
+  if (paymentMethod == "cod") paymentSuccess = true;
+
+  if (paymentMethod == "wallet") {
+    paymentSuccess = await userWalletServices.payWithWallet(
+      userId,
+      amounts?.total,
+      orderNumber,
+    );
+  }
+
+  if (paymentMethod == "razorpay") {
+    const razorpayOrder = await razorpay.orders.create({
+      amount: amounts?.total * 100,
+      currency: "INR",
+      receipt: orderNumber,
+    });
+
+    return {
+      razorpay: true,
+      orderId: newOrder._id,
+      orderNumber: newOrder.orderNumber,
+      userId: newOrder.userId,
+      razorpayOrderId: razorpayOrder.id,
+      amount: razorpayOrder.amount,
+      key: process.env.RAZORPAY_KEY_ID,
+    };
+  }
+
+  if (!paymentSuccess) throw new Error("Something went wrong");
+
+  // console.log("order done");
+
+  //Update payment status
+
+  newOrder.payment.status = "paid";
+  newOrder.save();
 
   await deleteAllItems(userId);
 
@@ -177,14 +221,9 @@ export const cancelEntireOrder = async (orderId, reason) => {
     throw new Error("Can't change the status because it's invalid");
   }
 
-  order.items.forEach((item) => {
-    const itemTransitions = statusTransitions[item.status];
-
-    if (itemTransitions?.includes("cancelled")) {
-      item.status = "cancelled";
-      item.statusChangeReason = reason;
-    }
-  });
+  for (let item of order.items) {
+    await cancelSpecificOrderItem(orderId, item._id, reason, true);
+  }
 
   // update order status
   order.orderStatus = "cancelled";
@@ -204,7 +243,12 @@ export const cancelEntireOrder = async (orderId, reason) => {
   await userWalletServices.addRefundToWallet(transactionData);
 };
 
-export const cancelSpecificOrderItem = async (orderId, itemId, reason) => {
+export const cancelSpecificOrderItem = async (
+  orderId,
+  itemId,
+  reason,
+  isEntireCancel,
+) => {
   console.log("Order id is : ", orderId);
 
   const order = await Order.findById(orderId);
@@ -227,6 +271,24 @@ export const cancelSpecificOrderItem = async (orderId, itemId, reason) => {
     }
   } else {
     throw new Error("Invalid status");
+  }
+
+  await changeProductStock(
+    item.product.productId,
+    item.product.variantId,
+    item.quantity,
+    "increase",
+  );
+
+  if (!isEntireCancel) {
+    const transactionData = {
+      userId: order.userId,
+      amount: item.product.discountedPrice * item.quantity,
+      orderNumber: order.orderNumber,
+      status: "cancelled",
+      itemName: item.product.name,
+    };
+    await userWalletServices.addRefundToWallet(transactionData);
   }
 
   await order.save();
@@ -257,15 +319,6 @@ export const returnEntireOrder = async (orderId, reason) => {
   order.statusChangeReason = reason;
 
   await order.save();
-
-  const transactionData = {
-    userId: order.userId,
-    amount: order.totalAmount,
-    orderNumber: order.orderNumber,
-    status: "returned",
-  };
-
-  await userWalletServices.addRefundToWallet(transactionData);
 };
 
 export const returnSpecificOrderItem = async (orderId, itemId, reason) => {
@@ -297,4 +350,12 @@ export const returnSpecificOrderItem = async (orderId, itemId, reason) => {
   }
 
   await order.save();
+};
+
+export const updatePaymentStatus = async (orderId, status, transactionId) => {
+  console.log("Reached ststaus updater");
+  await Order.findByIdAndUpdate(orderId, {
+    "payment.status": status,
+    "payment.transactionId": transactionId,
+  });
 };

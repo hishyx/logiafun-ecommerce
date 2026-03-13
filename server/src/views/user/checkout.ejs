@@ -718,369 +718,361 @@
   <!-- Header -->
   <%- include('../partials/header.ejs')%>
 
-    <main>
-      <div class="container">
-        <h1 style="margin: 2rem 0; font-family: 'Fredoka', sans-serif; color: var(--primary);">Checkout</h1>
+  <main>
+    <div class="container">
+      <h1 style="margin: 2rem 0; font-family: 'Fredoka', sans-serif; color: var(--primary);">Checkout</h1>
 
-        <div class="checkout-container">
+      <div class="checkout-container">
 
-          <!-- TOP ROW: Order Items + Summary -->
-          <div class="checkout-row checkout-row-top">
-            <!-- Order Items Section -->
-            <div class="checkout-section">
-              <h2 class="checkout-title">
-                <div class="checkout-title-text">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
-                    <path d="M3 6h18"></path>
-                    <path d="M16 10a4 4 0 0 1-8 0"></path>
-                  </svg>
-                  Order Items
+        <!-- TOP ROW: Order Items + Summary -->
+        <div class="checkout-row checkout-row-top">
+          <!-- Order Items Section -->
+          <div class="checkout-section">
+            <h2 class="checkout-title">
+              <div class="checkout-title-text">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+                  <path d="M3 6h18"></path>
+                  <path d="M16 10a4 4 0 0 1-8 0"></path>
+                </svg>
+                Order Items
+              </div>
+            </h2>
+            <div class="order-items-list">
+
+              <%cartItems.forEach(item=>{%>
+              <div class="order-item">
+                <div class="order-item-img-container">
+                  <img src="<%=item.product.variants.images[0]%>" alt="<%=item.product.name%>" class="order-item-img">
+                  <div class="premium-quantity-badge">
+                    <%=item.items.quantity%>
+                  </div>
                 </div>
-              </h2>
-              <div class="order-items-list">
-
-                <%cartItems.forEach(item=>{%>
-                  <div class="order-item">
-                    <div class="order-item-img-container">
-                      <img src="<%=item.product.variants.images[0]%>" alt="<%=item.product.name%>"
-                        class="order-item-img">
-                      <div class="premium-quantity-badge">
+                <div class="order-item-details">
+                  <span class="order-item-name" style="font-weight: 700; color: #0f172a; display: block; margin-bottom: 0.25rem;">
+                    <%=item.product.name%>
+                  </span>
+                  <div class="order-item-variant" style="margin-bottom: 0.5rem;">
+                    <span style="font-size: 0.8rem; color: #64748b; font-weight: 500;">Variant:</span>
+                    <span style="font-size: 0.8rem; color: #0f172a; font-weight: 600;">
+                      <%=item.product.variantName%>
+                    </span>
+                  </div>
+                  <div class="order-item-meta">
+                    <div class="order-item-quantity-text">
+                      <span class="order-item-quantity-label">quantity</span>
+                      <span>
                         <%=item.items.quantity%>
-                      </div>
-                    </div>
-                    <div class="order-item-details">
-                      <span class="order-item-name">
-                        <%=item.product.name%>
                       </span>
-                      <div class="order-item-meta">
-                        <div class="order-item-quantity-text">
-                          <span class="order-item-quantity-label">quantity</span>
-                          <span>
-                            <%=item.items.quantity%>
-                          </span>
-                        </div>
-                        <!-- <span style="display: flex; align-items: center; gap: 0.5rem;">
+                    </div>
+                    <!-- <span style="display: flex; align-items: center; gap: 0.5rem;">
                       <span class="order-item-quantity-label">Color</span>
                       <span>Silver</span>
                     </span> -->
-                      </div>
-                      <% if (item.items.quantityChange) { %>
-                        <div class="stock-reduction-badge">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2.5">
-                            <path
-                              d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
-                            </path>
-                            <line x1="12" y1="9" x2="12" y2="13"></line>
-                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                          </svg>
-                          Quantity reduced due to limited stock
-                        </div>
-                        <% } %>
-                    </div>
-                    <div class="order-item-price">₹<%=item.product.variants.price%>
-                    </div>
                   </div>
-                  <%})%>
-
-              </div>
-            </div>
-
-            <div class="checkout-sidebar">
-              <div class="order-summary-card" id="order-summary-card"
-                data-original-discount="<%=calculations.discount%>" data-original-total="<%=calculations.total%>">
-                <h2 class="checkout-title">Order Summary</h2>
-
-                <div class="summary-item">
-                  <span>Subtotal</span>
-                  <span>₹<%=calculations.subtotal%></span>
-                </div>
-                <div class="summary-item">
-                  <span>Discount</span>
-                  <span>₹<%=calculations.discount%></span>
-                </div>
-                <div class="summary-item">
-                  <span>Shipping</span>
-                  <span>Free</span>
-                </div>
-
-                <div class="summary-total">
-                  <span>Total</span>
-                  <span>₹<%=calculations.total%></span>
-                </div>
-
-                <button class="btn btn-primary place-order-btn" onclick="placeOrder()">
-                  Place Order
-                </button>
-              </div>
-            </div>
-          </div> <!-- End Top Row -->
-
-          <!-- MIDDLE ROW: Shipping Address + Payment Method -->
-          <div class="checkout-row checkout-row-middle">
-            <!-- Shipping Address -->
-            <div class="checkout-section">
-              <div class="checkout-title">
-                <div class="checkout-title-text">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                    <circle cx="12" cy="10" r="3"></circle>
-                  </svg>
-                  Shipping Address
-                </div>
-                <a href="/user/addresses" class="btn-link" style="font-size: 0.9rem; color: var(--accent);">Manage
-                  Addresses</a>
-              </div>
-
-              <div class="address-selection-grid">
-                <% if (addresses && addresses.length> 0) { %>
-                  <% addresses.forEach((address, index)=> { %>
-                    <label class="address-select-card <%= address.isDefault ? 'selected' : '' %>"
-                      data-id="<%= address._id %>">
-                      <input type="radio" name="selectedAddress" value="<%= address._id %>" <%=address.isDefault
-                        ? "checked" : "" %>>
-                      <div class="address-info">
-                        <span class="address-badge">
-                          <%= address.addressName %>
-                        </span>
-                        <strong>
-                          <%= address.name %>
-                        </strong>
-                        <p class="address-street">
-                          <%= address.street %>
-                        </p>
-                        <p>
-                          <span class="address-city">
-                            <%= address.city %>
-                          </span>, <span class="address-pincode">
-                            <%= address.pincode %>
-                          </span>
-                        </p>
-                        <p>Phone: <span class="address-phone">
-                            <%= address.phone %>
-                          </span>
-                        </p>
-                      </div>
-                      <button type="button" class="address-card-edit"
-                        onclick="event.preventDefault(); openEditModalFromCard('<%= address._id %>')">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                          stroke-width="2">
-                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                        </svg>
-                      </button>
-                    </label>
-                    <% }) %>
-                      <% } else { %>
-                        <p style="text-align: center; color: var(--text-muted); padding: 2rem;">
-                          No addresses found. Please add a shipping address.</p>
-                        <% } %>
-
-                          <button type="button" class="add-new-address-inline" onclick="openAddModal()">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                              stroke-width="2">
-                              <line x1="12" y1="5" x2="12" y2="19"></line>
-                              <line x1="5" y1="12" x2="19" y2="12"></line>
-                            </svg>
-                            Add New Address
-                          </button>
-              </div>
-            </div>
-
-            <!-- Payment Method -->
-            <div class="checkout-section">
-              <h2 class="checkout-title">
-                <div class="checkout-title-text">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-                    <line x1="1" y1="10" x2="23" y2="10"></line>
-                  </svg>
-                  Payment Method
-                </div>
-              </h2>
-
-              <div class="payment-options">
-                <label class="payment-option">
-                  <input type="radio" name="payment" value="cod" checked>
-                  <span>Cash on Delivery (COD)</span>
-                </label>
-                <label class="payment-option">
-                  <input type="radio" name="payment" value="online">
-                  <span>Online Payment (Razorpay)</span>
-                </label>
-                <label class="payment-option <%= walletBalance < calculations.total ? 'disabled-option' : '' %>">
-                  <input type="radio" name="payment" value="wallet" <%=walletBalance < calculations.total ? 'disabled'
-                    : '' %>>
-                  <span>Wallet <small>(Balance: ₹<%= walletBalance %>)</small></span>
-                  <% if (walletBalance < calculations.total) { %>
-                    <span
-                      style="display:block; font-size: 0.8rem; color: #ef4444; margin-top: 4px; margin-left: 24px;">Insufficient
-                      wallet balance</span>
-                    <% } %>
-                </label>
-              </div>
-            </div>
-          </div> <!-- End Middle Row -->
-
-          <!-- Available Coupons -->
-          <div class="checkout-row checkout-row-bottom">
-            <div class="checkout-section coupon-section-wrapper">
-              <h2 class="checkout-title">
-                <div class="checkout-title-text">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
-                    <line x1="7" y1="7" x2="7.01" y2="7"></line>
-                  </svg>
-                  Available Coupons
-                </div>
-              </h2>
-
-              <% if (coupons && coupons.length> 0) { %>
-                <div class="coupon-list">
-                  <% coupons.forEach(coupon=> { %>
-                    <div class="coupon-card">
-                      <div class="coupon-left-cutout"></div>
-                      <div class="coupon-right-cutout"></div>
-
-                      <div class="coupon-code-badge">
-                        <%= coupon.code %>
-                      </div>
-
-                      <div class="coupon-discount">
-                        <%= coupon.discountType==='percentage' ? coupon.discountValue + '%' : '₹' + coupon.discountValue
-                          %> OFF
-                      </div>
-
-                      <div class="coupon-description">
-                        <%= coupon.description || "Get a discount on your purchase." %>
-                          <% if (coupon.minPurchaseAmount> 0) { %>
-                            <br><small>Valid on orders above ₹<%= coupon.minPurchaseAmount %></small>
-                            <% } %>
-                      </div>
-
-                      <div class="coupon-action-buttons">
-                        <button type="button" class="coupon-apply-btn" onclick="applyCoupon('<%= coupon._id %>', this)">
-                          Apply Coupon
-                        </button>
-                        <button type="button" class="coupon-remove-btn" onclick="removeCoupon()">
-                          Remove
-                        </button>
-                      </div>
-                    </div>
-                    <% }) %>
-                </div>
-                <% } else { %>
-                  <div
-                    style="text-align: center; color: var(--text-light); padding: 1.5rem; background: #f8fafc; border-radius: 12px; border: 1px dashed #cbd5e1;">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-                      style="margin-bottom: 0.5rem; opacity: 0.5;">
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <line x1="12" y1="8" x2="12" y2="12"></line>
-                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  <% if (item.items.quantityChange) { %>
+                  <div class="stock-reduction-badge">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                      </path>
+                      <line x1="12" y1="9" x2="12" y2="13"></line>
+                      <line x1="12" y1="17" x2="12.01" y2="17"></line>
                     </svg>
-                    <p style="margin: 0; font-weight: 500;">No coupons available for this order.</p>
+                    Quantity reduced due to limited stock
                   </div>
                   <% } %>
-            </div>
-          </div> <!-- End Bottom Row -->
+                </div>
+                <div class="order-item-price">₹<%=item.product.variants.price%>
+                </div>
+              </div>
+              <%})%>
 
-        </div>
+            </div>
+          </div>
+
+          <div class="checkout-sidebar">
+            <div class="order-summary-card" id="order-summary-card" data-original-discount="<%=calculations.discount%>" data-original-total="<%=calculations.total%>">
+              <h2 class="checkout-title">Order Summary</h2>
+
+              <div class="summary-item">
+                <span>Subtotal</span>
+                <span>₹<%=calculations.subtotal%></span>
+              </div>
+              <div class="summary-item">
+                <span>Discount</span>
+                <span>₹<%=calculations.discount%></span>
+              </div>
+              <div class="summary-item">
+                <span>Shipping</span>
+                <span>Free</span>
+              </div>
+
+              <div class="summary-total">
+                <span>Total</span>
+                <span>₹<%=calculations.total%></span>
+              </div>
+
+              <button class="btn btn-primary place-order-btn" onclick="placeOrder()">
+                Place Order
+              </button>
+            </div>
+          </div>
+        </div> <!-- End Top Row -->
+
+        <!-- MIDDLE ROW: Shipping Address + Payment Method -->
+        <div class="checkout-row checkout-row-middle">
+          <!-- Shipping Address -->
+          <div class="checkout-section">
+            <div class="checkout-title">
+              <div class="checkout-title-text">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                Shipping Address
+              </div>
+              <a href="/user/addresses" class="btn-link" style="font-size: 0.9rem; color: var(--accent);">Manage
+                Addresses</a>
+            </div>
+
+            <div class="address-selection-grid">
+              <% if (addresses && addresses.length> 0) { %>
+              <% addresses.forEach((address, index)=> { %>
+              <label class="address-select-card <%= address.isDefault ? 'selected' : '' %>" data-id="<%= address._id %>">
+                <input type="radio" name="selectedAddress" value="<%= address._id %>" <%=address.isDefault
+                        ? "checked" : "" %>>
+                <div class="address-info">
+                  <span class="address-badge">
+                    <%= address.addressName %>
+                  </span>
+                  <strong>
+                    <%= address.name %>
+                  </strong>
+                  <p class="address-street">
+                    <%= address.street %>
+                  </p>
+                  <p>
+                    <span class="address-city">
+                      <%= address.city %>
+                    </span>, <span class="address-pincode">
+                      <%= address.pincode %>
+                    </span>
+                  </p>
+                  <p>Phone: <span class="address-phone">
+                      <%= address.phone %>
+                    </span>
+                  </p>
+                </div>
+                <button type="button" class="address-card-edit" onclick="event.preventDefault(); openEditModalFromCard('<%= address._id %>')">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                  </svg>
+                </button>
+              </label>
+              <% }) %>
+              <% } else { %>
+              <p style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                No addresses found. Please add a shipping address.</p>
+              <% } %>
+
+              <button type="button" class="add-new-address-inline" onclick="openAddModal()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Add New Address
+              </button>
+            </div>
+          </div>
+
+          <!-- Payment Method -->
+          <div class="checkout-section">
+            <h2 class="checkout-title">
+              <div class="checkout-title-text">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                  <line x1="1" y1="10" x2="23" y2="10"></line>
+                </svg>
+                Payment Method
+              </div>
+            </h2>
+
+            <div class="payment-options">
+              <label class="payment-option">
+                <input type="radio" name="payment" value="cod" checked>
+                <span>Cash on Delivery (COD)</span>
+              </label>
+              <label class="payment-option">
+                <input type="radio" name="payment" value="razorpay">
+                <span>Online Payment (Razorpay)</span>
+              </label>
+              <label class="payment-option <%= walletBalance < calculations.total ? 'disabled-option' : '' %>">
+                <input type="radio" name="payment" value="wallet" <%=walletBalance < calculations.total ? 'disabled'
+                    : '' %>>
+                <span>Wallet <small>(Balance: ₹<%= walletBalance %>)</small></span>
+                <% if (walletBalance < calculations.total) { %>
+                <span style="display:block; font-size: 0.8rem; color: #ef4444; margin-top: 4px; margin-left: 24px;">Insufficient
+                  wallet balance</span>
+                <% } %>
+              </label>
+            </div>
+          </div>
+        </div> <!-- End Middle Row -->
+
+        <!-- Available Coupons -->
+        <div class="checkout-row checkout-row-bottom">
+          <div class="checkout-section coupon-section-wrapper">
+            <h2 class="checkout-title">
+              <div class="checkout-title-text">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                  <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                </svg>
+                Available Coupons
+              </div>
+            </h2>
+
+            <% if (coupons && coupons.length> 0) { %>
+            <div class="coupon-list">
+              <% coupons.forEach(coupon=> { %>
+              <div class="coupon-card">
+                <div class="coupon-left-cutout"></div>
+                <div class="coupon-right-cutout"></div>
+
+                <div class="coupon-code-badge">
+                  <%= coupon.code %>
+                </div>
+
+                <div class="coupon-discount">
+                  <%= coupon.discountType==='percentage' ? coupon.discountValue + '%' : '₹' + coupon.discountValue
+                          %> OFF
+                </div>
+
+                <div class="coupon-description">
+                  <%= coupon.description || "Get a discount on your purchase." %>
+                  <% if (coupon.minPurchaseAmount> 0) { %>
+                  <br><small>Valid on orders above ₹<%= coupon.minPurchaseAmount %></small>
+                  <% } %>
+                </div>
+
+                <div class="coupon-action-buttons">
+                  <button type="button" class="coupon-apply-btn" onclick="applyCoupon('<%= coupon._id %>', this)">
+                    Apply Coupon
+                  </button>
+                  <button type="button" class="coupon-remove-btn" onclick="removeCoupon()">
+                    Remove
+                  </button>
+                </div>
+              </div>
+              <% }) %>
+            </div>
+            <% } else { %>
+            <div style="text-align: center; color: var(--text-light); padding: 1.5rem; background: #f8fafc; border-radius: 12px; border: 1px dashed #cbd5e1;">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 0.5rem; opacity: 0.5;">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <p style="margin: 0; font-weight: 500;">No coupons available for this order.</p>
+            </div>
+            <% } %>
+          </div>
+        </div> <!-- End Bottom Row -->
+
       </div>
-    </main>
+    </div>
+  </main>
 
-    <!-- Footer -->
-    <%- include('../partials/footer') %>
+  <!-- Footer -->
+  <%- include('../partials/footer') %>
 
 
-      <!--Modales-->
+  <!--Modales-->
 
-      <!-- Add Address Modal -->
-      <div class="modal-overlay" id="addAddressModal">
-        <div class="modal-content">
-          <button class="modal-close" id="closeAddModal">&times;</button>
-          <h3>Add New Address</h3>
-          <form class="profile-form" id="addAddressForm" novalidate>
-            <div class="form-group">
-              <label>Address Name (e.g., Home, Office)</label>
-              <input type="text" placeholder="Home" name="addressName" required minlength="3" />
-            </div>
-            <div class="form-group">
-              <label>Full Name</label>
-              <input type="text" placeholder="John Doe" name="name" required minlength="3" />
-            </div>
-            <div class="form-group">
-              <label>Street Address</label>
-              <input type="text" placeholder="123 Street Name" name="street" required />
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label>City</label>
-                <input type="text" placeholder="City" name="city" required />
-              </div>
-              <div class="form-group">
-                <label>State/Zip</label>
-                <input type="text" placeholder="Pincode" name="pincode" required pattern="^[0-9]{6}$"
-                  data-msg-pattern="Please enter a valid 6-digit pincode" />
-              </div>
-            </div>
-            <div class="form-group">
-              <label>Phone Number</label>
-              <input type="tel" placeholder="10-digit number" name="phone" required pattern="^[0-9]{10}$"
-                data-msg-pattern="Please enter a valid 10-digit phone number" />
-            </div>
-            <button type="submit" class="btn btn-primary btn-save" style="width: 100%">
-              Save Address
-            </button>
-          </form>
+  <!-- Add Address Modal -->
+  <div class="modal-overlay" id="addAddressModal">
+    <div class="modal-content">
+      <button class="modal-close" id="closeAddModal">&times;</button>
+      <h3>Add New Address</h3>
+      <form class="profile-form" id="addAddressForm" novalidate>
+        <div class="form-group">
+          <label>Address Name (e.g., Home, Office)</label>
+          <input type="text" placeholder="Home" name="addressName" required minlength="3" />
         </div>
-      </div>
-
-
-      <!-- Edit Address Modal -->
-      <div class="modal-overlay" id="editAddressModal">
-        <div class="modal-content">
-          <button class="modal-close" id="closeEditModal">&times;</button>
-          <h3>Edit Address</h3>
-          <form class="profile-form" id="editAddressForm" novalidate>
-            <div class="form-group">
-              <label>Address Name (e.g., Home, Office)</label>
-              <input type="text" name="addressName" required minlength="3" />
-            </div>
-            <div class="form-group">
-              <label>Full Name</label>
-              <input type="text" name="name" required minlength="3" />
-            </div>
-            <div class="form-group">
-              <label>Street Address</label>
-              <input type="text" name="street" required />
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label>City</label>
-                <input type="text" name="city" required />
-              </div>
-              <div class="form-group">
-                <label>State/Zip</label>
-                <input type="text" name="pincode" required pattern="^[0-9]{6}$"
-                  data-msg-pattern="Please enter a valid 6-digit pincode" />
-              </div>
-            </div>
-            <div class="form-group">
-              <label>Phone Number</label>
-              <input type="tel" name="phone" required pattern="^[0-9]{10}$"
-                data-msg-pattern="Please enter a valid 10-digit phone number" />
-            </div>
-            <button type="submit" class="btn btn-primary btn-save" style="width: 100%">
-              Update Address
-            </button>
-          </form>
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" placeholder="John Doe" name="name" required minlength="3" />
         </div>
-      </div>
+        <div class="form-group">
+          <label>Street Address</label>
+          <input type="text" placeholder="123 Street Name" name="street" required />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>City</label>
+            <input type="text" placeholder="City" name="city" required />
+          </div>
+          <div class="form-group">
+            <label>State/Zip</label>
+            <input type="text" placeholder="Pincode" name="pincode" required pattern="^[0-9]{6}$" data-msg-pattern="Please enter a valid 6-digit pincode" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" placeholder="10-digit number" name="phone" required pattern="^[0-9]{10}$" data-msg-pattern="Please enter a valid 10-digit phone number" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-save" style="width: 100%">
+          Save Address
+        </button>
+      </form>
+    </div>
+  </div>
 
 
-      <script src="/js/helpers/formValidator.js"></script>
-      <script src="/js/checkout.js"></script>
+  <!-- Edit Address Modal -->
+  <div class="modal-overlay" id="editAddressModal">
+    <div class="modal-content">
+      <button class="modal-close" id="closeEditModal">&times;</button>
+      <h3>Edit Address</h3>
+      <form class="profile-form" id="editAddressForm" novalidate>
+        <div class="form-group">
+          <label>Address Name (e.g., Home, Office)</label>
+          <input type="text" name="addressName" required minlength="3" />
+        </div>
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" name="name" required minlength="3" />
+        </div>
+        <div class="form-group">
+          <label>Street Address</label>
+          <input type="text" name="street" required />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>City</label>
+            <input type="text" name="city" required />
+          </div>
+          <div class="form-group">
+            <label>State/Zip</label>
+            <input type="text" name="pincode" required pattern="^[0-9]{6}$" data-msg-pattern="Please enter a valid 6-digit pincode" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" name="phone" required pattern="^[0-9]{10}$" data-msg-pattern="Please enter a valid 10-digit phone number" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-save" style="width: 100%">
+          Update Address
+        </button>
+      </form>
+    </div>
+  </div>
+
+
+  <script src="/js/helpers/formValidator.js"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="/js/checkout.js"></script>
 </body>
 
 </html>

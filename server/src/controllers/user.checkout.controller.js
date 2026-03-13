@@ -6,12 +6,21 @@ import {
   applyCouponService,
 } from "../services/admin/admin.coupon.service.js";
 import { getWalletByUserId } from "../services/user.wallet.services.js";
+import { getProductVariantDetails } from "../services/user.product.services.js";
 
 export const checkoutPage = async (req, res) => {
   try {
     let userAddresses = await getUserAddresses(req.user._id);
 
     let [cartItems, calculations] = await getAvailableCartItems(req.user._id);
+
+    for (const item of cartItems) {
+      const { variantName } = await getProductVariantDetails(
+        item.product._id,
+        item.product.variants._id,
+      );
+      item.product.variantName = variantName;
+    }
 
     const coupons = await getAvailableCoupons(calculations.total);
 
@@ -40,7 +49,10 @@ export const placeOrder = async (req, res) => {
 
     const order = await createOrder(req.user._id, req.body);
 
-    console.log(order.orderNumber);
+    console.log("order is : ", order);
+    if (order.razorpay) {
+      return res.status(200).json(order);
+    }
 
     return res.status(200).json({
       success: true,

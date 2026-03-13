@@ -727,24 +727,40 @@
                             <img src="<%= item.product.image %>" alt="<%= item.product.name %>">
                           </div>
                           <div class="item-info">
-                            <h3 class="item-name">
+                            <h3 class="item-name" style="margin-bottom: 0.25rem;">
                               <%= item.product.name %>
                             </h3>
+                            <div class="item-variant" style="margin-bottom: 0.5rem;">
+                              <span
+                                style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">Variant:</span>
+                              <span style="font-size: 0.85rem; color: var(--primary); font-weight: 600;">
+                                <%= item.product.variantName %>
+                              </span>
+                            </div>
                             <div class="item-meta">
                               <span>Quantity: <%= item.quantity %></span>
                               <div style="text-align: right;">
-                                <% if (item.product.discountPercent> 0) { %>
+                                <% if (item.product.originalPrice> item.product.discountedPrice) {
+                                  const discountAmount = item.product.originalPrice - item.product.discountedPrice;
+                                  const discountPercent = (discountAmount / item.product.originalPrice) * 100;
+                                  %>
                                   <div
                                     style="font-size: 0.75rem; color: var(--text-secondary); text-decoration: line-through; margin-bottom: 2px;">
                                     ₹<%= item.product.originalPrice %>
                                   </div>
-                                  <div
-                                    style="font-size: 0.75rem; color: var(--success); font-weight: 600; margin-bottom: 2px;">
-                                    <%= item.product.discountPercent %>% OFF
-                                  </div>
-                                  <% } %>
-                                    <span style="font-weight: 600; color: var(--primary);">₹<%= item.product.price %>
-                                    </span>
+                                  <% if (discountPercent>= 1) { %>
+                                    <div
+                                      style="font-size: 0.75rem; color: var(--success); font-weight: 600; margin-bottom: 2px;">
+                                      <%= Math.round(discountPercent) %>% OFF
+                                    </div>
+                                    <% } %>
+                                      <% } %>
+                                        <div style="font-weight: 600; color: var(--primary);">₹<%=
+                                            item.product.discountedPrice %>
+                                        </div>
+                                        <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">
+                                          Total: ₹<%= item.product.discountedPrice * item.quantity %>
+                                        </div>
                               </div>
                             </div>
                             <div class="order-status-badge status-<%= item.status %>"
@@ -817,16 +833,33 @@
               Payment Summary
             </div>
             <div class="payment-summary">
+              <% let subtotal=0; order.items.forEach(item=> {
+                subtotal += item.product.originalPrice * item.quantity;
+                });
+                const discount = subtotal - order.totalAmount;
+                %>
 
-              <div class="summary-row">
-                <span>Shipping</span>
-                <span style="color: var(--success); font-weight: 500;">Free</span>
-              </div>
+                <div class="summary-row">
+                  <span>Subtotal</span>
+                  <span>₹<%= subtotal %></span>
+                </div>
 
-              <div class="summary-row total">
-                <span>Order Total</span>
-                <span>₹<%= order.totalAmount %></span>
-              </div>
+                <% if (discount> 0) { %>
+                  <div class="summary-row" style="color: #16a34a;">
+                    <span>Discount</span>
+                    <span>-₹<%= discount %></span>
+                  </div>
+                  <% } %>
+
+                    <div class="summary-row">
+                      <span>Shipping</span>
+                      <span style="color: var(--success); font-weight: 500;">Free</span>
+                    </div>
+
+                    <div class="summary-row total">
+                      <span>Order Total</span>
+                      <span>₹<%= order.totalAmount %></span>
+                    </div>
 
             </div>
             <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border);">

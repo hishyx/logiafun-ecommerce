@@ -192,7 +192,7 @@
 
             <div class="cart-items">
               <% wishlistItems.forEach(item=> { %>
-                <div class="cart-item" id="wishlist-item" data-item-id="<%=item._id%>">
+                <div class="cart-item wishlist-item" data-item-id="<%=item._id%>">
                   <div class="cart-item-image">
                     <a href="/products/<%=item.productId%>">
                       <img src="<%=item.image%>" alt="<%=item.name%>" />
@@ -200,9 +200,16 @@
                   </div>
 
                   <div class="cart-item-details">
-                    <a href="/products/<%=item.productId%>" class="cart-item-title">
+                    <a href="/products/<%=item.productId%>" class="cart-item-title"
+                      style="font-weight: 700; color: #0f172a; text-decoration: none; font-size: 1.1rem; display: block; margin-bottom: 0.25rem;">
                       <%=item.name%>
                     </a>
+                    <div class="cart-item-variant" style="margin-bottom: 0.5rem;">
+                      <span style="font-size: 0.85rem; color: #64748b; font-weight: 500;">Variant:</span>
+                      <span style="font-size: 0.85rem; color: #0f172a; font-weight: 600;">
+                        <%=item.variantName%>
+                      </span>
+                    </div>
                     <div class="cart-item-price">₹<%=item.price.toFixed(2)%>
                     </div>
                   </div>
@@ -256,7 +263,6 @@
     <!-- Footer -->
     <%- include('../partials/footer') %>
 
-      <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
       <script src="/js/user.wishlist.js"></script>
 </body>
 

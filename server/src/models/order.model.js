@@ -20,15 +20,11 @@ const productSnapshotSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    price: {
+    discountedPrice: {
       type: Number,
       required: true,
     },
     originalPrice: {
-      type: Number,
-      required: true,
-    },
-    discountPercent: {
       type: Number,
       required: true,
     },

@@ -25,11 +25,11 @@ export const getAllProducts = async ({ page, limit, sort, search, filter }) => {
   if (filter === "blocked") query.isActive = false;
 
   // Sorting options
-  let sortQuery = { createdAt: -1 };
+  let sortQuery = { createdAt: -1, _id: -1 };
 
-  if (sort === "oldest") sortQuery = { createdAt: 1 };
-  if (sort === "name_asc") sortQuery = { name: 1 };
-  if (sort === "name_desc") sortQuery = { name: -1 };
+  if (sort === "oldest") sortQuery = { createdAt: 1, _id: -1 };
+  if (sort === "name_asc") sortQuery = { name: 1, _id: -1 };
+  if (sort === "name_desc") sortQuery = { name: -1, _id: -1 };
   // if (sort === "price_asc") sortQuery = { price: 1 };
   // if (sort === "price_desc") sortQuery = { price: -1 };
 
@@ -239,3 +239,5 @@ export const toggleListUnlistProduct = async (productId) => {
 
   return product;
 };
+
+export const getSelectedProductForHomePage = async () => {};

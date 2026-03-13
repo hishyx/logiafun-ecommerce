@@ -15,8 +15,13 @@ const transactionSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    orderId: {
-      type: mongoose.Schema.Types.ObjectId,
+    orderNumber: {
+      type: String,
+      ref: "Order",
+      required: false,
+    },
+    itemName: {
+      type: String,
       ref: "Order",
       required: false,
     },

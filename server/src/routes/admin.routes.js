@@ -1,8 +1,13 @@
 import express from "express";
 
-import { checkAdminStatus, isAdmin } from "../middlewares/auth.middleware.js";
+import {
+  checkAdminStatus,
+  isAdmin,
+  isAdminGuest,
+} from "../middlewares/auth.middleware.js";
 import upload from "../config/multer.js";
 
+import * as authControllers from "../controllers/auth.controller.js";
 import * as adminUserControllers from "../controllers/admin/admin.user.controller.js";
 import * as adminProductControllers from "../controllers/admin/admin.product.controller.js";
 import * as adminCategoryControllers from "../controllers/admin/admin.categories.controller.js";
@@ -10,6 +15,13 @@ import * as adminOrderControllers from "../controllers/admin/admin.order.control
 import * as adminCouponControllers from "../controllers/admin/admin.coupon.controller.js";
 
 const router = express.Router();
+
+router.use("/admin/auth", isAdminGuest);
+
+router
+  .route("/admin/auth/login")
+  .get(authControllers.adminLoginPage)
+  .post(authControllers.loginAdmin);
 
 router.use("/admin", isAdmin);
 router.use("/admin", checkAdminStatus);
@@ -29,7 +41,7 @@ router.patch(
 
 router.patch(
   "/admin/orders/:orderId/items/:itemId/status",
-  adminOrderControllers.updateAdminOrderItemStatus
+  adminOrderControllers.updateAdminOrderItemStatus,
 );
 
 router
@@ -72,7 +84,10 @@ router
   .post(adminCouponControllers.addCoupon);
 
 router.patch("/admin/coupons/:couponId", adminCouponControllers.editCoupon);
-router.patch("/admin/coupons/:couponId/toggle", adminCouponControllers.toggleCoupon);
+router.patch(
+  "/admin/coupons/:couponId/toggle",
+  adminCouponControllers.toggleCoupon,
+);
 
 router.patch(
   "/admin/products/:productId/toggle",

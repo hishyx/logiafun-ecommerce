@@ -15,22 +15,23 @@ const orderTemplate = (order) => {
         <td>
           <div class="product-cell">
             <img src="${item.product.image}" class="product-image"/>
-            <div class="product-details">
+            <div class="product-info">
               <div class="product-name">${item.product.name}</div>
-              ${item.product.discountPercent > 0 ? `<div class="product-discount">${item.product.discountPercent}% OFF</div>` : ""}
+              <div class="product-variant">${item.product.variantName || "-"}</div>
             </div>
           </div>
         </td>
         <td class="text-center">${item.quantity}</td>
         <td>
           <div class="price-stack">
-            ${item.product.discountPercent > 0 ? `<span class="original-price">₹${item.product.originalPrice}</span>` : ""}
-            <span class="final-price">₹${item.product.price}</span>
+            ${item.product.originalPrice > item.product.discountedPrice ? `<span class="original-price">₹${item.product.originalPrice}</span>` : ""}
+            <span class="final-price">₹${item.product.discountedPrice}</span>
           </div>
         </td>
-        <td><span class="status-badge status-${item.status.toLowerCase()}">${item.status}</span></td>
-        <td class="text-center">${item.returnStatus || "-"}</td>
-        <td class="text-right font-bold">₹${item.product.price * item.quantity}</td>
+        <td class="text-center">
+          <span class="status-text status-${item.status.toLowerCase()}">${item.status}</span>
+        </td>
+        <td class="text-right font-bold">₹${item.product.discountedPrice * item.quantity}</td>
       </tr>
     `,
     )
@@ -41,446 +42,356 @@ const orderTemplate = (order) => {
   <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-      :root {
-        --primary: #1e3a5f;
-        --secondary: #f8b500;
-        --accent: #4361ee;
-        --white: #ffffff;
-        --gray-light: #f8fafc;
-        --gray-medium: #e2e8f0;
-        --gray-dark: #64748b;
-        --text-main: #1e293b;
-        --radius: 12px;
-        --shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+      @page {
+        size: A4;
+        margin: 0;
       }
-
       * {
         box-sizing: border-box;
         -webkit-print-color-adjust: exact;
       }
-
       body {
-        font-family: 'Poppins', sans-serif;
-        color: var(--text-main);
-        background-color: #fefefe;
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        color: #334155;
+        background-color: #fff;
         margin: 0;
         padding: 40px;
-        line-height: 1.5;
-        font-size: 14px;
+        line-height: 1.4;
+        font-size: 13px;
       }
-
-      h1, h2, h3, h4 {
-        font-family: 'Fredoka', sans-serif;
-        margin: 0;
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
       }
-
       /* Header Styling */
       .header {
         display: flex;
         justify-content: space-between;
-        align-items: center;
-        padding: 30px;
-        background: var(--primary);
-        border-radius: var(--radius);
-        margin-bottom: 30px;
-        color: var(--white);
-        position: relative;
-        overflow: hidden;
+        align-items: flex-start;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e2e8f0;
+        margin-bottom: 25px;
       }
-
-      .header::after {
-        content: "";
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 150px;
-        height: 100%;
-        background: var(--secondary);
-        clip-path: polygon(25% 0%, 100% 0%, 100% 100%, 0% 100%);
-        opacity: 0.1;
-      }
-
       .brand {
         display: flex;
         align-items: center;
-        gap: 15px;
+        gap: 12px;
       }
-
       .logo-icon {
-        width: 45px;
-        height: 45px;
-        background: var(--secondary);
-        border-radius: 10px;
+        width: 40px;
+        height: 40px;
+        background: #1e293b;
+        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-family: 'Fredoka', sans-serif;
-        font-weight: 600;
+        font-weight: 700;
+        font-size: 20px;
+        color: white;
+      }
+      .brand-name {
         font-size: 24px;
-        color: var(--primary);
+        font-weight: 700;
+        color: #1e293b;
+        margin: 0;
       }
-
-      .brand h1 {
-        font-size: 28px;
-        letter-spacing: 1px;
-      }
-
-      .invoice-label {
+      .invoice-meta {
         text-align: right;
       }
-
-      .invoice-label h2 {
-        font-size: 36px;
-        color: var(--secondary);
-        margin-bottom: 5px;
-      }
-
-      .invoice-label p {
+      .invoice-title {
+        font-size: 28px;
+        font-weight: 800;
+        color: #1e293b;
         margin: 0;
-        font-weight: 500;
-        opacity: 0.8;
+        letter-spacing: -0.5px;
+      }
+      .invoice-num {
+        font-weight: 600;
+        color: #64748b;
+        margin-top: 5px;
       }
 
-      /* Grid Layout */
+      /* Info Grid */
       .info-grid {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-        margin-bottom: 30px;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 40px;
+        margin-bottom: 25px;
       }
-
-      .card {
-        background: var(--white);
-        padding: 24px;
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        border: 1px solid var(--gray-medium);
+      .section-title {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: #94a3b8;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #f1f5f9;
+        padding-bottom: 5px;
       }
-
-      .card-title {
-        font-weight: 600;
-        color: var(--primary);
-        font-size: 16px;
+      .info-block {
         margin-bottom: 15px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        border-bottom: 2px solid var(--gray-light);
-        padding-bottom: 10px;
       }
-
-      .card-title i {
-        color: var(--accent);
-      }
-
       .info-row {
         display: flex;
-        justify-content: space-between;
-        margin-bottom: 8px;
+        margin-bottom: 4px;
       }
-
-      .info-label-text {
+      .info-label {
+        width: 120px;
+        color: #64748b;
         font-weight: 500;
-        color: var(--gray-dark);
       }
-
-      .info-value-text {
+      .info-value {
         font-weight: 600;
-        color: var(--primary);
+        color: #1e293b;
       }
 
-      .address-block p {
-        margin: 4px 0;
-        line-height: 1.4;
+      /* Address */
+      .shipping-section {
+        margin-bottom: 25px;
+        padding: 15px;
+        background: #f8fafc;
+        border-radius: 8px;
+        border: 1px solid #f1f5f9;
+      }
+      .address-details {
+        font-style: normal;
+        line-height: 1.6;
+      }
+      .address-name {
+        font-weight: 700;
+        font-size: 14px;
+        color: #1e293b;
+        margin-bottom: 2px;
       }
 
       /* Table Styling */
-      .table-container {
-        background: var(--white);
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        overflow: hidden;
-        border: 1px solid var(--gray-medium);
-        margin-bottom: 30px;
+      .table-wrapper {
+        margin-bottom: 25px;
       }
-
       table {
         width: 100%;
         border-collapse: collapse;
       }
-
       th {
-        background: var(--primary);
-        color: var(--white);
-        font-family: 'Fredoka', sans-serif;
-        font-weight: 500;
+        background: #f8fafc;
+        color: #475569;
+        font-weight: 700;
         text-align: left;
-        padding: 15px 20px;
-        font-size: 14px;
+        padding: 10px 12px;
+        border-bottom: 2px solid #e2e8f0;
+        font-size: 11px;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
       }
-
       td {
-        padding: 15px 20px;
-        border-bottom: 1px solid var(--gray-light);
+        padding: 10px 12px;
+        border-bottom: 1px solid #f1f5f9;
         vertical-align: middle;
       }
-
       .product-cell {
         display: flex;
         align-items: center;
-        gap: 15px;
+        gap: 12px;
       }
-
       .product-image {
-        width: 50px;
-        height: 50px;
+        width: 40px;
+        height: 40px;
         object-fit: cover;
-        border-radius: 8px;
-        border: 1px solid var(--gray-medium);
-        background: var(--gray-light);
+        border-radius: 4px;
+        border: 1px solid #e2e8f0;
       }
-
       .product-name {
         font-weight: 600;
-        color: var(--primary);
+        color: #1e293b;
       }
-
-      .product-discount {
+      .product-variant {
         font-size: 11px;
-        color: #16a34a;
-        font-weight: 600;
-        background: #f0fdf4;
-        padding: 2px 6px;
-        border-radius: 4px;
-        width: fit-content;
-        margin-top: 4px;
+        color: #64748b;
       }
-
       .price-stack span {
         display: block;
       }
-
       .original-price {
-        font-size: 12px;
-        color: var(--gray-dark);
+        font-size: 11px;
+        color: #94a3b8;
         text-decoration: line-through;
       }
-
       .final-price {
-        font-weight: 700;
-        color: var(--primary);
-      }
-
-      .status-badge {
-        padding: 4px 10px;
-        border-radius: 30px;
-        font-size: 11px;
         font-weight: 600;
-        text-transform: uppercase;
       }
-
+      .status-text {
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        padding: 2px 8px;
+        border-radius: 4px;
+      }
       .status-delivered { background: #f0fdf4; color: #16a34a; }
       .status-pending { background: #fffbeb; color: #d97706; }
       .status-cancelled { background: #fef2f2; color: #dc2626; }
 
-      /* Summary Section */
-      .summary-section {
+      /* Totals */
+      .totals-container {
         display: flex;
         justify-content: flex-end;
       }
-
-      .summary-card {
-        width: 300px;
-        background: var(--white);
-        padding: 24px;
-        border-radius: var(--radius);
-        box-shadow: var(--shadow);
-        border: 1px solid var(--gray-medium);
+      .totals-table {
+        width: 250px;
       }
-
-      .summary-row {
+      .total-row {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 12px;
-        color: var(--gray-dark);
+        margin-bottom: 8px;
+        font-size: 13px;
+      }
+      .total-row.discount {
+        color: #16a34a;
         font-weight: 500;
       }
-
-      .summary-row.discount {
-        color: #16a34a;
-      }
-
-      .grand-total {
-        margin-top: 20px;
-        padding-top: 20px;
-        border-top: 2px dashed var(--gray-medium);
+      .grand-total-row {
         display: flex;
         justify-content: space-between;
-        align-items: center;
-      }
-
-      .grand-total span:first-child {
-        font-family: 'Fredoka', sans-serif;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 2px solid #1e293b;
         font-size: 18px;
-        color: var(--primary);
-        font-weight: 600;
+        font-weight: 800;
+        color: #1e293b;
       }
 
-      .grand-total .total-amount {
-        font-size: 24px;
-        color: var(--secondary);
-        font-weight: 700;
-        background: var(--primary);
-        padding: 8px 15px;
-        border-radius: 8px;
-      }
-
-      .footer-note {
-        margin-top: 40px;
+      /* Footer */
+      .footer {
+        margin-top: 50px;
         text-align: center;
-        color: var(--gray-dark);
-        font-size: 12px;
         padding-top: 20px;
-        border-top: 1px solid var(--gray-light);
+        border-top: 1px solid #f1f5f9;
+        color: #94a3b8;
+        font-size: 11px;
       }
-
+      .thank-you {
+        font-weight: 600;
+        color: #64748b;
+        margin-bottom: 5px;
+        font-size: 13px;
+      }
       .text-center { text-align: center; }
       .text-right { text-align: right; }
       .font-bold { font-weight: 700; }
     </style>
   </head>
   <body>
-
-    <!-- HEADER -->
-    <div class="header">
-      <div class="brand">
-        <div class="logo-icon">L</div>
-        <h1>LogiaFun</h1>
-      </div>
-      <div class="invoice-label">
-        <h2>INVOICE</h2>
-        <p>Order #${order.orderNumber}</p>
-      </div>
-    </div>
-
-    <!-- MAIN INFO GRID -->
-    <div class="info-grid">
-      <!-- Order Card -->
-      <div class="card">
-        <div class="card-title">Order Information</div>
-        <div class="info-row">
-          <span class="info-label-text">Date:</span>
-          <span class="info-value-text">${new Date(order.createdAt).toLocaleDateString()}</span>
+    <div class="container">
+      <!-- HEADER -->
+      <div class="header">
+        <div class="brand">
+          <div class="logo-icon">L</div>
+          <h1 class="brand-name">LogiaFun</h1>
         </div>
-        <div class="info-row">
-          <span class="info-label-text">Status:</span>
-          <span class="info-value-text">${order.orderStatus}</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label-text">Payment Method:</span>
-          <span class="info-value-text">${order.payment.method.toUpperCase()}</span>
+        <div class="invoice-meta">
+          <h2 class="invoice-title">INVOICE</h2>
+          <div class="invoice-num">#${order.orderNumber}</div>
         </div>
       </div>
 
-      <!-- Customer Card -->
-      <div class="card">
-        <div class="card-title">Customer Information</div>
-        <div class="info-row">
-          <span class="info-label-text">Name:</span>
-          <span class="info-value-text">${order.userId.name}</span>
+      <!-- INFO GRID -->
+      <div class="info-grid">
+        <div class="info-block">
+          <div class="section-title">Order Information</div>
+          <div class="info-row">
+            <span class="info-label">Order Date</span>
+            <span class="info-value">${new Date(order.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Order Status</span>
+            <span class="info-value">${order.orderStatus}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Payment Type</span>
+            <span class="info-value">${order.payment.method.toUpperCase()}</span>
+          </div>
         </div>
-        <div class="info-row">
-          <span class="info-label-text">Email:</span>
-          <span class="info-value-text" style="font-size: 12px;">${order.userId.email}</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label-text">Phone:</span>
-          <span class="info-value-text">${order.userId.phone}</span>
+
+        <div class="info-block">
+          <div class="section-title">Customer Details</div>
+          <div class="info-row">
+            <span class="info-label">Name</span>
+            <span class="info-value">${order.userId.name}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Email</span>
+            <span class="info-value" style="font-size: 12px;">${order.userId.email}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Phone</span>
+            <span class="info-value">${order.userId.phone}</span>
+          </div>
         </div>
       </div>
 
-      <!-- Shipping Card -->
-      <div class="card">
-        <div class="card-title">Shipping Address</div>
-        <div class="address-block">
-          <div class="info-value-text">${order.address.addressName}</div>
-          <p>${order.address.street}</p>
-          <p>${order.address.city}, ${order.address.pincode}</p>
-          <p>Phone: ${order.address.phone}</p>
+      <!-- SHIPPING -->
+      <div class="shipping-section">
+        <div class="section-title">Shipping Address</div>
+        <div class="address-details">
+          <div class="address-name">${order.address.name}</div>
+          <div>${order.address.street}</div>
+          <div>${order.address.city}, ${order.address.pincode}</div>
+          <div>Phone: ${order.address.phone}</div>
         </div>
       </div>
 
-      <!-- Payment Status Card -->
-      <div class="card">
-        <div class="card-title">Payment Status</div>
-        <div class="info-row">
-          <span class="info-label-text">Status:</span>
-          <span class="info-value-text">${order.payment.status}</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label-text">Transaction ID:</span>
-          <span class="info-value-text" style="font-size: 11px;">${order.payment.transactionId || "N/A"}</span>
-        </div>
-        <div class="info-row">
-          <span class="info-label-text">Checkout ID:</span>
-          <span class="info-value-text" style="font-size: 11px;">${order.checkoutId}</span>
+      <!-- PRODUCT TABLE -->
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th width="45%">Product</th>
+              <th class="text-center" width="10%">Qty</th>
+              <th width="15%">Price</th>
+              <th class="text-center" width="15%">Status</th>
+              <th class="text-right" width="15%">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${itemsHtml}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- TOTALS -->
+      <div class="totals-container">
+        <div class="totals-table">
+          <div class="total-row">
+            <span>Subtotal</span>
+            <span>₹${subtotal}</span>
+          </div>
+          ${discount > 0 ? `
+          <div class="total-row discount">
+            <span>Discount Applied</span>
+            <span>-₹${discount}</span>
+          </div>
+          ` : ""}
+          <div class="total-row">
+            <span>Shipping</span>
+            <span style="color: #16a34a; font-weight: 600;">FREE</span>
+          </div>
+          <div class="grand-total-row">
+            <span>Grand Total</span>
+            <span>₹${order.totalAmount}</span>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- PRODUCT TABLE -->
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th width="40%">Product</th>
-            <th class="text-center" width="10%">Qty</th>
-            <th width="15%">Price</th>
-            <th width="10%">Status</th>
-            <th class="text-center" width="10%">Return</th>
-            <th class="text-right" width="15%">Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${itemsHtml}
-        </tbody>
-      </table>
-    </div>
-
-    <!-- SUMMARY SECTION -->
-    <div class="summary-section">
-      <div class="summary-card">
-        <div class="summary-row">
-          <span>Subtotal</span>
-          <span>₹${subtotal}</span>
-        </div>
-        <div class="summary-row discount">
-          <span>Discount Applied</span>
-          <span>-₹${discount}</span>
-        </div>
-        <div class="summary-row" style="color:var(--accent)">
-          <span>Shipping</span>
-          <span>FREE</span>
-        </div>
-        <div class="grand-total">
-          <span>Grand Total</span>
-          <span class="total-amount">₹${order.totalAmount}</span>
-        </div>
+      <!-- FOOTER -->
+      <div class="footer">
+        <div class="thank-you">Thank you for shopping with LogiaFun!</div>
+        <div>We appreciate your business. If you have any questions about this invoice, please contact us.</div>
+        <div style="margin-top: 15px;">&copy; ${new Date().getFullYear()} LogiaFun E-commerce Store. All rights reserved.</div>
       </div>
     </div>
-
-    <div class="footer-note">
-      <p>Thank you for shopping with LogiaFun! We hope you love your purchase.</p>
-      <p>&copy; ${new Date().getFullYear()} LogiaFun E-commerce Store. All rights reserved.</p>
-    </div>
-
   </body>
   </html>
   `;
 };
 
 export default orderTemplate;
+

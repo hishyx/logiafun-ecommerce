@@ -80,8 +80,15 @@ export const getCartItems = async (userId, isOrder) => {
           $round: [
             {
               $multiply: [
-                "$product.variants.price",
-                { $subtract: [1, { $divide: ["$product.discount", 100] }] },
+                { $ifNull: ["$product.variants.price", 0] },
+                {
+                  $subtract: [
+                    1,
+                    {
+                      $divide: [{ $ifNull: ["$product.discount", 0] }, 100],
+                    },
+                  ],
+                },
               ],
             },
             0,
@@ -90,6 +97,8 @@ export const getCartItems = async (userId, isOrder) => {
       },
     },
   ]);
+
+  //Prevnt if discount is null
 
   if (!cart) return [];
 
@@ -134,21 +143,23 @@ export const getCartItems = async (userId, isOrder) => {
       );
     }
 
+    console.log("One cart item is : { ", item);
+
     const quantity = item.items.quantity;
     const originalPrice = item.product.variants.price;
     const finalPrice = item.discountedPrice || originalPrice;
 
     //Calculations
 
-    calculations.subtotal += Math.round(originalPrice * quantity);
+    calculations.subtotal += Math.round(finalPrice * quantity);
     calculations.total += Math.round(finalPrice * quantity);
 
-    calculations.discount += Math.round(
-      (originalPrice - finalPrice) * quantity,
-    );
+    calculations.discount = 0;
   }
 
   const cartItems = cart;
+
+  console.log("Cart items is : { ", cartItems);
 
   return [cartItems, calculations];
 };

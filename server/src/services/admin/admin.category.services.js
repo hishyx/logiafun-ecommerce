@@ -19,11 +19,11 @@ export const getProductCategories = async ({
   if (filter == "active") query.isActive = true;
   if (filter == "blocked") query.isActive = false;
 
-  let sortQuery = { createdAt: -1 };
+  let sortQuery = { createdAt: -1, _id: -1 };
 
-  if (sort === "oldest") sortQuery = { createdAt: 1 };
-  if (sort === "name_asc") sortQuery = { name: 1 };
-  if (sort === "name_desc") sortQuery = { name: -1 };
+  if (sort === "oldest") sortQuery = { createdAt: 1, _id: -1 };
+  if (sort === "name_asc") sortQuery = { name: 1, _id: -1 };
+  if (sort === "name_desc") sortQuery = { name: -1, _id: -1 };
 
   const result = await Category.aggregate([
     { $match: query },

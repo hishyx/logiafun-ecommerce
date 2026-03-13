@@ -1,12 +1,22 @@
 import * as userWishListServices from "../services/user.wishlist.services.js";
+import { getProductVariantDetails } from "../services/user.product.services.js";
 
 export const wishlistPage = async (req, res) => {
+  let wishlistItems;
   try {
-    const wishlistItems = await userWishListServices.getWishlistItems(
-      req.user._id,
-    );
+    if (req.user && req.user._id) {
+      wishlistItems = await userWishListServices.getWishlistItems(req.user._id);
 
-    console.log(wishlistItems);
+      for (const item of wishlistItems) {
+        const { variantName } = await getProductVariantDetails(
+          item.productId,
+          item.variantId,
+        );
+        item.variantName = variantName;
+      }
+    } else {
+      wishlistItems = [];
+    }
 
     res.render("user/wishlist", {
       wishlistItems,
@@ -20,6 +30,9 @@ export const wishlistPage = async (req, res) => {
 
 export const addToWishList = async (req, res) => {
   try {
+    if (!req.user || !req.user._id)
+      throw new Error("Please login to add items to wishlist");
+
     await userWishListServices.addProductToWishListService(
       req.body,
       req.user._id,

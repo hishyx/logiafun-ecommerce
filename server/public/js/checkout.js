@@ -124,13 +124,11 @@ async function placeOrder() {
     .querySelector('input[name="selectedAddress"]:checked')
     ?.closest(".address-select-card")?.dataset.id;
 
-  const paymentRadio = document.querySelector(
-    'input[name="payment"]:checked',
-  );
+  const paymentRadio = document.querySelector('input[name="payment"]:checked');
 
   const paymentMethod = paymentRadio?.value;
 
-  if (paymentMethod === 'wallet' && paymentRadio?.disabled) {
+  if (paymentMethod === "wallet" && paymentRadio?.disabled) {
     Swal.fire({
       icon: "error",
       title: "Insufficient Wallet Balance",
@@ -139,8 +137,15 @@ async function placeOrder() {
     return;
   }
 
-  const appliedCouponCard = document.querySelector(".coupon-card.applied-coupon");
-  const couponId = appliedCouponCard ? appliedCouponCard.querySelector(".coupon-apply-btn").getAttribute("onclick").match(/'([^']+)'/)[1] : null;
+  const appliedCouponCard = document.querySelector(
+    ".coupon-card.applied-coupon",
+  );
+  const couponId = appliedCouponCard
+    ? appliedCouponCard
+        .querySelector(".coupon-apply-btn")
+        .getAttribute("onclick")
+        .match(/'([^']+)'/)[1]
+    : null;
 
   console.log(paymentMethod);
 
@@ -152,11 +157,36 @@ async function placeOrder() {
     body: JSON.stringify({
       selectedAddress,
       paymentMethod,
-      couponId
+      couponId,
     }),
   });
 
   const result = await res.json();
+
+  if (result.razorpay) {
+    const options = {
+      key: result.key,
+      amount: result.amount,
+      currency: "INR",
+      order_id: result.razorpayOrderId,
+
+      handler: async function (response) {
+        await fetch("/verify-razorpay", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...response,
+            orderId: result.orderId,
+            userId: result.userId,
+          }),
+        });
+
+        window.location.href = `/order/success/${result.orderNumber}`;
+      },
+    };
+
+    new Razorpay(options).open();
+  }
 
   if (result.redirectUrl) {
     window.location.href = result.redirectUrl;
@@ -177,13 +207,13 @@ async function applyCoupon(couponId, element) {
       updateCheckoutAmount(result.newCalculations);
 
       // Remove applied state from all other coupons
-      document.querySelectorAll('.coupon-card').forEach(card => {
-        card.classList.remove('applied-coupon');
-        const btn = card.querySelector('.coupon-apply-btn');
-        if (btn) btn.textContent = 'Apply Coupon';
+      document.querySelectorAll(".coupon-card").forEach((card) => {
+        card.classList.remove("applied-coupon");
+        const btn = card.querySelector(".coupon-apply-btn");
+        if (btn) btn.textContent = "Apply Coupon";
       });
 
-      element.closest('.coupon-card').classList.add("applied-coupon");
+      element.closest(".coupon-card").classList.add("applied-coupon");
       element.textContent = "Applied";
     } else {
       alert(result.message);
@@ -209,10 +239,10 @@ function updateCheckoutAmount(updatedAmount) {
 }
 
 function removeCoupon() {
-  document.querySelectorAll('.coupon-card').forEach(card => {
-    card.classList.remove('applied-coupon');
-    const btn = card.querySelector('.coupon-apply-btn');
-    if (btn) btn.textContent = 'Apply Coupon';
+  document.querySelectorAll(".coupon-card").forEach((card) => {
+    card.classList.remove("applied-coupon");
+    const btn = card.querySelector(".coupon-apply-btn");
+    if (btn) btn.textContent = "Apply Coupon";
   });
 
   const priceCard = document.getElementById("order-summary-card");
@@ -221,6 +251,6 @@ function removeCoupon() {
 
   updateCheckoutAmount({
     discount: originalDiscount,
-    total: originalTotal
+    total: originalTotal,
   });
 }

@@ -284,6 +284,90 @@
         height: 200px;
       }
     }
+
+    /* Empty Orders Styles */
+    .empty-orders-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 5rem 2rem;
+      text-align: center;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      border: 1px solid #f1f5f9;
+      margin: 1rem 0;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .empty-orders-icon {
+      width: 120px;
+      height: 120px;
+      background: #f8fafc;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 2rem;
+      color: #94a3b8;
+      position: relative;
+    }
+
+    .empty-orders-icon::after {
+      content: '';
+      position: absolute;
+      width: 140px;
+      height: 140px;
+      border: 2px dashed #e2e8f0;
+      border-radius: 50%;
+      animation: rotate 20s linear infinite;
+    }
+
+    @keyframes rotate {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .empty-orders-section h2 {
+      font-family: "Fredoka", sans-serif;
+      font-size: 1.75rem;
+      color: var(--primary);
+      margin-bottom: 0.75rem;
+    }
+
+    .empty-orders-section p {
+      color: var(--text-light);
+      font-size: 1rem;
+      max-width: 350px;
+      margin-bottom: 2.5rem;
+      line-height: 1.5;
+    }
+
+    .explore-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 2.5rem;
+      text-decoration: none;
+    }
   </style>
 </head>
 
@@ -372,74 +456,91 @@
             </div>
           </div>
 
-          <div class="order-list">
-
-            <!-- Order 2 -->
-
-            <%orders.forEach(order=>{%>
-              <div class="order-card">
-                <div class="order-card-header">
-                  <div class="order-meta">
-                    <div class="meta-item">
-                      <span class="meta-label">Order Placed</span>
-                      <span class="meta-value">
-                        <%=new Date(order.createdAt).toLocaleDateString("en-US", {month: "short" ,day: "numeric"
-                          ,year: "numeric" })%>
-                      </span>
-                    </div>
-                    <div class="meta-item">
-                      <span class="meta-label">Total Amount</span>
-                      <span class="meta-value">₹<%=order.totalAmount%></span>
-                    </div>
-                    <div class="meta-item">
-                      <span class="meta-label">Order #</span>
-                      <span class="meta-value">
-                        <%=order.orderNumber%>
-                      </span>
-                    </div>
-                    <div class="meta-item">
-                      <span class="meta-label">Items</span>
-                      <span class="meta-value">
-                        <%=order.items.length%>
-                      </span>
-                    </div>
-                  </div>
-                  <div class="status-badge status-<%= order.orderStatus %>">
-                    <span class="status-dot"></span>
-                    <%= order.orderStatus.charAt(0).toUpperCase() + order.orderStatus.slice(1) %>
-                  </div>
-                </div>
-                <div class="order-content">
-                  <div style="display: flex; align-items: center; gap: 0.75rem;">
-                    <% order.items.slice(0, 3).forEach(item=> { %>
-                      <div
-                        style="width: 50px; height: 50px; border-radius: 8px; overflow: hidden; border: 1px solid #f1f5f9; background: #f8fafc; flex-shrink: 0;">
-                        <img src="<%=item.product.image%>" alt="<%=item.product.name%>"
-                          style="width: 100%; height: 100%; object-fit: cover;">
+          <% if (orders && orders.length> 0) { %>
+            <div class="order-list">
+              <% orders.forEach(order=> { %>
+                <div class="order-card">
+                  <div class="order-card-header">
+                    <div class="order-meta">
+                      <div class="meta-item">
+                        <span class="meta-label">Order Placed</span>
+                        <span class="meta-value">
+                          <%= new Date(order.createdAt).toLocaleDateString("en-US", {month: "short" , day: "numeric" ,
+                            year: "numeric" }) %>
+                        </span>
                       </div>
-                      <% }) %>
-
-                        <% if (order.items.length> 3) { %>
-                          <div
-                            style="height: 50px; padding: 0 0.75rem; border-radius: 8px; border: 1px solid #f1f5f9; background: #f8fafc; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; color: var(--text-light); flex-shrink: 0;">
-                            +<%= order.items.length - 3 %> more
-                          </div>
-                          <% } %>
+                      <div class="meta-item">
+                        <span class="meta-label">Total Amount</span>
+                        <span class="meta-value">₹<%= order.totalAmount %></span>
+                      </div>
+                      <div class="meta-item">
+                        <span class="meta-label">Order #</span>
+                        <span class="meta-value">
+                          <%= order.orderNumber %>
+                        </span>
+                      </div>
+                      <div class="meta-item">
+                        <span class="meta-label">Items</span>
+                        <span class="meta-value">
+                          <%= order.items.length %>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="status-badge status-<%= order.orderStatus %>">
+                      <span class="status-dot"></span>
+                      <%= order.orderStatus.charAt(0).toUpperCase() + order.orderStatus.slice(1) %>
+                    </div>
                   </div>
+                  <div class="order-content">
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                      <% order.items.slice(0, 3).forEach(item=> { %>
+                        <div
+                          style="width: 50px; height: 50px; border-radius: 8px; overflow: hidden; border: 1px solid #f1f5f9; background: #f8fafc; flex-shrink: 0;">
+                          <img src="<%= item.product.image %>" alt="<%= item.product.name %>"
+                            style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <% }) %>
 
-                  <div class="order-card-footer"
-                    style="padding: 1rem 0 0 0; margin-top: 1rem; border-top: 1px solid #f1f5f9;">
-                    <button class="order-btn btn-outline">Track Package</button>
-                    <a href="/user/orders/<%= order._id %>" class="order-btn btn-fill"
-                      style="text-decoration: none;">View Details</a>
+                          <% if (order.items.length> 3) { %>
+                            <div
+                              style="height: 50px; padding: 0 0.75rem; border-radius: 8px; border: 1px solid #f1f5f9; background: #f8fafc; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; color: var(--text-light); flex-shrink: 0;">
+                              +<%= order.items.length - 3 %> more
+                            </div>
+                            <% } %>
+                    </div>
+
+                    <div class="order-card-footer"
+                      style="padding: 1rem 0 0 0; margin-top: 1rem; border-top: 1px solid #f1f5f9;">
+                      <button class="order-btn btn-outline">Track Package</button>
+                      <a href="/user/orders/<%= order._id %>" class="order-btn btn-fill"
+                        style="text-decoration: none;">View Details</a>
+                    </div>
                   </div>
                 </div>
-                <%})%>
-
-
-
-                  <!-- Order 3 -->
+                <% }) %>
+            </div>
+            <% } else { %>
+              <div class="empty-orders-section">
+                <div class="empty-orders-icon">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                  </svg>
+                </div>
+                <h2>No orders yet!</h2>
+                <p>Looks like you haven't placed any orders yet. Start shopping to see your orders here.</p>
+                <a href="/products" class="order-btn btn-fill explore-btn">
+                  Explore Products
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </a>
               </div>
+              <% } %>
         </section>
       </div>
     </main>

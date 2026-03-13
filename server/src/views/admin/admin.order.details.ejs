@@ -525,37 +525,45 @@
                                 </div>
                               </div>
                               <div class="product-price-qty">
-                                <% if (item.product.discountPercent> 0) { %>
+                                <% if (item.product.originalPrice> item.product.discountedPrice) {
+                                  const discountAmount = item.product.originalPrice - item.product.discountedPrice;
+                                  const discountPercent = (discountAmount / item.product.originalPrice) * 100;
+                                  %>
                                   <span
                                     style="font-size: 0.75rem; color: #94a3b8; text-decoration: line-through; display: block; margin-bottom: 2px;">
                                     ₹<%= item.product.originalPrice %>
                                   </span>
-                                  <span
-                                    style="font-size: 0.75rem; color: #16a34a; font-weight: 600; display: block; margin-bottom: 2px;">
-                                    <%= item.product.discountPercent %>% OFF
-                                  </span>
-                                  <% } %>
-                                    <span class="price">₹<%= item.product.price %></span>
-                                    <span class="qty">x <%= item.quantity %></span>
-
-                                    <% if (item.statusOptions && item.statusOptions.length> 1) { %>
-                                      <div style="margin-top: 8px;">
-                                        <select class="status-select"
-                                          onchange="handleItemStatusChange('<%= order._id %>', '<%= item._id %>', this.value, '<%= item.status %>')">
-                                          <% item.statusOptions.forEach(statusOption=> { %>
-                                            <option value="<%= statusOption %>" <%=statusOption===item.status
-                                              ? 'selected' : '' %>>
-                                              <%= statusOption.charAt(0).toUpperCase() + statusOption.slice(1) %>
-                                            </option>
-                                            <% }) %>
-                                        </select>
-                                      </div>
-                                      <% } else { %>
-                                        <div class="status-capsule status-<%= item.status.toLowerCase() %>"
-                                          style="margin-top: 8px; font-size: 0.75rem; padding: 2px 10px;">
-                                          <%= item.status.charAt(0).toUpperCase() + item.status.slice(1) %>
+                                  <% if (discountPercent>= 1) { %>
+                                    <span
+                                      style="font-size: 0.75rem; color: #16a34a; font-weight: 600; display: block; margin-bottom: 2px;">
+                                      <%= Math.round(discountPercent) %>% OFF
+                                    </span>
+                                    <% } %>
+                                      <% } %>
+                                        <span class="price">₹<%= item.product.discountedPrice %></span>
+                                        <span class="qty">x <%= item.quantity %></span>
+                                        <div style="font-size: 0.8rem; color: #64748b; margin-top: 4px;">
+                                          Total: ₹<%= item.product.discountedPrice * item.quantity %>
                                         </div>
-                                        <% } %>
+
+                                        <% if (item.statusOptions && item.statusOptions.length> 1) { %>
+                                          <div style="margin-top: 8px;">
+                                            <select class="status-select"
+                                              onchange="handleItemStatusChange('<%= order._id %>', '<%= item._id %>', this.value, '<%= item.status %>')">
+                                              <% item.statusOptions.forEach(statusOption=> { %>
+                                                <option value="<%= statusOption %>" <%=statusOption===item.status
+                                                  ? 'selected' : '' %>>
+                                                  <%= statusOption.charAt(0).toUpperCase() + statusOption.slice(1) %>
+                                                </option>
+                                                <% }) %>
+                                            </select>
+                                          </div>
+                                          <% } else { %>
+                                            <div class="status-capsule status-<%= item.status.toLowerCase() %>"
+                                              style="margin-top: 8px; font-size: 0.75rem; padding: 2px 10px;">
+                                              <%= item.status.charAt(0).toUpperCase() + item.status.slice(1) %>
+                                            </div>
+                                            <% } %>
                               </div>
                               <% if (item.returnStatus==='requested' ) { %>
                                 <div style="margin-left: 1rem; border-left: 1px solid #f1f5f9; padding-left: 1rem;">
@@ -590,7 +598,7 @@
               <div class="info-group">
                 <span class="info-label">Name</span>
                 <span class="info-value">
-                  <%= order.address.name %>
+                  <%= order.userId.name %>
                 </span>
               </div>
               <div class="info-group">
@@ -601,7 +609,7 @@
               </div>
               <div class="info-group">
                 <span class="info-label">Phone</span>
-                <span class="info-value">+91-<%= order.address.phone %></span>
+                <span class="info-value">+91-<%= order.userId.phone %></span>
               </div>
             </div>
 
@@ -612,11 +620,12 @@
               </div>
               <p class="info-value">
                 <strong>
-                  <%= order.address.addressName %>
+                  <%= order.address.name %>
                 </strong><br>
                 <%= order.address.street %>,<br>
                   <%= order.address.city %>,<br>
-                    <%= order.address.pincode %>
+                    <%= order.address.pincode %><br>
+                      Phone: <%= order.address.phone %>
               </p>
             </div>
 
@@ -625,33 +634,44 @@
                 <i class="fa-solid fa-receipt"></i>
                 Order Summary
               </div>
-              <div class="summary-row">
-                <span>Subtotal</span>
-                <span>₹<%= order.totalAmount %></span>
-              </div>
-              <div class="summary-row">
-                <span>Shipping</span>
-                <span>
-                  <%= order.shippingFee> 0 ? '₹' + order.shippingFee : 'Free' %>
-                </span>
-              </div>
-              <div class="summary-row">
-                <span>Payment Method</span>
-                <span style="text-transform: uppercase;">
-                  <%= order.payment.method %>
-                </span>
-              </div>
-              <div class="summary-row total">
-                <span>Total Amount</span>
-                <span>₹<%= order.totalAmount %></span>
-              </div>
-
-              <% if (order.returnStatus==='returned' ) { %>
-                <div class="full-return-notice">
-                  <i class="fa-solid fa-circle-info"></i>
-                  <span>Entire order has been returned.</span>
+              <% let subtotal=0; order.items.forEach(item=> {
+                subtotal += item.product.originalPrice * item.quantity;
+                });
+                const discount = subtotal - order.totalAmount;
+                %>
+                <div class="summary-row">
+                  <span>Subtotal</span>
+                  <span>₹<%= subtotal %></span>
                 </div>
-                <% } %>
+                <% if (discount> 0) { %>
+                  <div class="summary-row" style="color: #16a34a;">
+                    <span>Discount</span>
+                    <span>-₹<%= discount %></span>
+                  </div>
+                  <% } %>
+                    <div class="summary-row">
+                      <span>Shipping</span>
+                      <span>
+                        <%= order.shippingFee> 0 ? '₹' + order.shippingFee : 'Free' %>
+                      </span>
+                    </div>
+                    <div class="summary-row">
+                      <span>Payment Method</span>
+                      <span style="text-transform: uppercase;">
+                        <%= order.payment.method %>
+                      </span>
+                    </div>
+                    <div class="summary-row total">
+                      <span>Total Amount</span>
+                      <span>₹<%= order.totalAmount %></span>
+                    </div>
+
+                    <% if (order.returnStatus==='returned' ) { %>
+                      <div class="full-return-notice">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span>Entire order has been returned.</span>
+                      </div>
+                      <% } %>
             </div>
           </div>
         </div>

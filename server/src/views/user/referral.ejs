@@ -7,6 +7,7 @@
     <title>Refer & Earn - logiaFun</title>
     <link rel="stylesheet" href="/css/home.css" />
     <link rel="stylesheet" href="/css/profile.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <style>
         .referral-card {
             background: var(--white);
@@ -305,8 +306,6 @@
 
         <%- include('../partials/footer') %>
 
-            <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-            <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
             <script>
                 function copyReferralCode() {
                     const code = document.getElementById('refCodeText').innerText;

@@ -14,10 +14,13 @@ import {
 
 import User from "../models/user.model.js";
 import { getAvailableCategories } from "../services/admin/admin.category.services.js";
+import { getSelectedProductForHomePage } from "../services/admin/admin.product.services.js";
 
 export const homePage = async (req, res) => {
   try {
     const categories = await getAvailableCategories();
+
+    const products = await getSelectedProductForHomePage();
 
     res.render("user/home.ejs", {
       user: req.user,
@@ -59,7 +62,7 @@ export const editProfile = async (req, res) => {
         phone: updatedUser.phone,
       },
     });
-  } catch (err) { }
+  } catch (err) {}
 };
 
 export const changeEmail = async (req, res) => {

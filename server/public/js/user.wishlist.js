@@ -85,9 +85,11 @@ async function addToCartFromWishList(e) {
     showToast(addToCartResult.message);
   }
 
-  const wishListItem = document.getElementById("wishlist-item");
+  const row = e.target.closest(".wishlist-item");
+  if (!row) return;
 
-  const itemId = wishListItem.dataset.itemId;
+  const itemId = row.dataset.itemId;
+  if (!itemId) return;
 
-  removeFromWishlist(wishListItem, itemId, true);
+  removeFromWishlist(row, itemId, true);
 }

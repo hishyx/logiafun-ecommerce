@@ -32,11 +32,11 @@ export const getAdminUsersService = async ({
   }
 
   //  sort
-  let sortQuery = { createdAt: -1 };
+  let sortQuery = { createdAt: -1, _id: -1 };
 
-  if (sort === "oldest") sortQuery = { createdAt: 1 };
-  if (sort === "name_asc") sortQuery = { name: 1 };
-  if (sort === "name_desc") sortQuery = { name: -1 };
+  if (sort === "oldest") sortQuery = { createdAt: 1, _id: -1 };
+  if (sort === "name_asc") sortQuery = { name: 1, _id: -1 };
+  if (sort === "name_desc") sortQuery = { name: -1, _id: -1 };
 
   const [users, total] = await Promise.all([
     User.find(query)

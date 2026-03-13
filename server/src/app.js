@@ -10,10 +10,8 @@ import errorHandler from "./middlewares/error.handling.middleware.js";
 
 //importing routers
 
-import authRoute from "./routes/auth.routes.js";
 import userRoute from "./routes/user.routes.js";
 import adminRoute from "./routes/admin.routes.js";
-import invoiceRoute from "./routes/invoice.routes.js";
 
 //Importing dirname
 
@@ -39,10 +37,8 @@ app.use(flash());
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-app.use("/", authRoute);
-app.use("/", userRoute);
 app.use("/", adminRoute);
-app.use("/", invoiceRoute);
+app.use("/", userRoute);
 
 app.use((req, res) => {
   res.status(404).render("404-not-found");

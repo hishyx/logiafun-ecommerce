@@ -74,22 +74,31 @@ export const editCoupon = async (req, res) => {
     console.error("Error in editCoupon:", error);
     return res
       .status(500)
-      .json({ success: false, message: error.message || "Failed to update coupon" });
+      .json({
+        success: false,
+        message: error.message || "Failed to update coupon",
+      });
   }
 };
 
 export const toggleCoupon = async (req, res) => {
   try {
     const { couponId } = req.params;
-    const { coupon, action } = await adminCouponServices.toggleCouponStatus(couponId);
+    const { coupon, action } =
+      await adminCouponServices.toggleCouponStatus(couponId);
 
     return res.status(200).json({
       success: true,
       message: `Coupon ${action}d successfully.`,
-      coupon
+      coupon,
     });
   } catch (error) {
     console.error("Error in toggleCoupon:", error);
-    return res.status(500).json({ success: false, message: error.message || "Failed to toggle coupon status." });
+    return res
+      .status(500)
+      .json({
+        success: false,
+        message: error.message || "Failed to toggle coupon status.",
+      });
   }
 };

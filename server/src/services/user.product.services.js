@@ -237,10 +237,11 @@ export const getRelatedProducts = async (categoryId, productId) => {
   return relatedProducts;
 };
 
-export const reduceProductStock = async (
+export const changeProductStock = async (
   productId,
   variantId,
-  soldQuantity,
+  quantity,
+  type,
 ) => {
   const product = await Product.findById(productId);
   if (!product) throw new Error("Product not found");
@@ -248,7 +249,8 @@ export const reduceProductStock = async (
   const variant = product.variants.id(variantId);
   if (!variant) throw new Error("Variant not found");
 
-  variant.stock -= soldQuantity;
+  if (type == "decrease") variant.stock -= quantity;
+  else if (type == "increase") variant.stock += quantity;
 
   await product.save();
 
