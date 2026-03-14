@@ -615,14 +615,18 @@
 
                 <div class="form-row">
                     <div class="form-group">
+                        <label class="form-label">Start Date</label>
+                        <input type="date" name="startDate" class="form-control" required>
+                    </div>
+                    <div class="form-group">
                         <label class="form-label">Expiry Date</label>
                         <input type="date" name="expiryDate" class="form-control" required>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Usage Limit</label>
-                        <input type="number" name="usageLimit" class="form-control"
-                            placeholder="Leave empty for unlimited">
-                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Usage Limit</label>
+                    <input type="number" name="usageLimit" class="form-control" placeholder="Leave empty for unlimited">
                 </div>
 
                 <div class="modal-footer">
@@ -688,14 +692,18 @@
 
                 <div class="form-row">
                     <div class="form-group">
+                        <label class="form-label">Start Date</label>
+                        <input type="date" name="startDate" class="form-control" required>
+                    </div>
+                    <div class="form-group">
                         <label class="form-label">Expiry Date</label>
                         <input type="date" name="expiryDate" class="form-control" required>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Usage Limit</label>
-                        <input type="number" name="usageLimit" class="form-control"
-                            placeholder="Leave empty for unlimited">
-                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Usage Limit</label>
+                    <input type="number" name="usageLimit" class="form-control" placeholder="Leave empty for unlimited">
                 </div>
 
                 <div class="modal-footer">
@@ -727,6 +735,13 @@
             document.querySelector('#editCouponForm input[name="discountValue"]').value = coupon.discountValue || '';
             document.querySelector('#editCouponForm input[name="minPurchaseAmount"]').value = coupon.minPurchaseAmount || '';
             document.querySelector('#editCouponForm input[name="maxDiscountAmount"]').value = coupon.maxDiscountAmount || '';
+
+            if (coupon.startDate) {
+                const date = new Date(coupon.startDate);
+                document.querySelector('#editCouponForm input[name="startDate"]').value = date.toISOString().split('T')[0];
+            } else {
+                document.querySelector('#editCouponForm input[name="startDate"]').value = '';
+            }
 
             if (coupon.expiryDate) {
                 const date = new Date(coupon.expiryDate);

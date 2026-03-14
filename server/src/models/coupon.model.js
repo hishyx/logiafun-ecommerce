@@ -62,3 +62,22 @@ const couponSchema = new mongoose.Schema(
 const Coupon = mongoose.model("Coupon", couponSchema);
 
 export default Coupon;
+
+const couponUsageSchema = new mongoose.Schema({
+  couponId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Coupon",
+    required: true,
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  usedAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+export const couponUsage = mongoose.model("couponUsage", couponUsageSchema);

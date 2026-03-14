@@ -1,5 +1,6 @@
 import Coupon from "../../models/coupon.model.js";
 import { getAvailableCartItems } from "../user.cart.services.js";
+import { couponUsage } from "../../models/coupon.model.js";
 
 export const getAllCoupons = async ({ page, limit, search, sort, filter }) => {
   const query = {};
@@ -35,12 +36,15 @@ export const getAllCoupons = async ({ page, limit, search, sort, filter }) => {
 
 export const createCoupon = async (couponData) => {
   const discountValue = Number(couponData.discountValue);
-  const maxDiscountAmount =
-    Number(couponData.maxDiscountAmount) == 0
-      ? Infinity
-      : Number(couponData.maxDiscountAmount);
+  const maxDiscountAmount = Number(couponData.maxDiscountAmount);
   const minPurchaseAmount = Number(couponData.minPurchaseAmount);
   const usageLimit = Number(couponData.usageLimit);
+  const discountType = couponData.discountType;
+
+  // ---- basic validations ----
+  if (!["fixed", "percentage"].includes(discountType)) {
+    throw new Error("Invalid discount type");
+  }
 
   if (Number.isNaN(discountValue) || discountValue <= 0) {
     throw new Error("Discount value must be greater than 0");
@@ -50,41 +54,68 @@ export const createCoupon = async (couponData) => {
     throw new Error("Minimum purchase amount must be greater than 0");
   }
 
-  if (Number.isNaN(usageLimit) || usageLimit <= 0) {
-    throw new Error("Usage limit must be greater than 0");
+  if (!Number.isInteger(usageLimit) || usageLimit <= 0) {
+    throw new Error("Usage limit must be a positive integer");
   }
 
-  if (couponData.discountType === "fixed") {
+  if (Number.isNaN(maxDiscountAmount) || maxDiscountAmount < 0) {
+    throw new Error("Max discount cannot be negative");
+  }
+
+  // ---- fixed coupon rules ----
+  if (discountType === "fixed") {
     if (discountValue > minPurchaseAmount) {
       throw new Error("Discount cannot exceed minimum purchase amount");
     }
 
-    if (
-      couponData.discountType === "fixed" &&
-      maxDiscountAmount > 0 &&
-      maxDiscountAmount < discountValue
-    ) {
+    if (maxDiscountAmount > 0 && maxDiscountAmount < discountValue) {
       throw new Error("Max discount cannot be less than discount value");
-    }
-
-    if (minPurchaseAmount > maxDiscountAmount) {
-      throw new Error("Min purchase cannot exceed max discount");
     }
   }
 
-  const coupon = await Coupon.create(couponData);
+  // ---- percentage coupon rules ----
+  if (discountType === "percentage") {
+    if (discountValue > 100) {
+      throw new Error("Percentage discount cannot exceed 100");
+    }
+
+    // cap required in most real systems (optional — keep if business rule)
+    if (maxDiscountAmount === 0) {
+      throw new Error("Max discount amount required for percentage coupon");
+    }
+
+    // logical sanity: % discount at min purchase should not exceed cap
+    const expectedDiscount = (minPurchaseAmount * discountValue) / 100;
+
+    if (maxDiscountAmount > 0 && expectedDiscount > maxDiscountAmount) {
+      throw new Error(
+        "Max discount too small for given percentage and minimum purchase",
+      );
+    }
+  }
+
+  const coupon = await Coupon.create({
+    ...couponData,
+    discountValue,
+    maxDiscountAmount,
+    minPurchaseAmount,
+    usageLimit,
+  });
 
   return coupon;
 };
 
 export const editCoupon = async (couponId, couponData) => {
   const discountValue = Number(couponData.discountValue);
-  const maxDiscountAmount =
-    Number(couponData.maxDiscountAmount) == 0
-      ? Infinity
-      : Number(couponData.maxDiscountAmount);
+  const maxDiscountAmount = Number(couponData.maxDiscountAmount);
   const minPurchaseAmount = Number(couponData.minPurchaseAmount);
   const usageLimit = Number(couponData.usageLimit);
+  const discountType = couponData.discountType;
+
+  // ---- basic validations ----
+  if (!["fixed", "percentage"].includes(discountType)) {
+    throw new Error("Invalid discount type");
+  }
 
   if (Number.isNaN(discountValue) || discountValue <= 0) {
     throw new Error("Discount value must be greater than 0");
@@ -94,33 +125,55 @@ export const editCoupon = async (couponId, couponData) => {
     throw new Error("Minimum purchase amount must be greater than 0");
   }
 
-  if (Number.isNaN(usageLimit) || usageLimit <= 0) {
-    throw new Error("Usage limit must be greater than 0");
+  if (!Number.isInteger(usageLimit) || usageLimit <= 0) {
+    throw new Error("Usage limit must be a positive integer");
   }
 
-  if (couponData.discountType === "fixed") {
+  if (Number.isNaN(maxDiscountAmount) || maxDiscountAmount < 0) {
+    throw new Error("Max discount cannot be negative");
+  }
+
+  // ---- fixed coupon rules ----
+  if (discountType === "fixed") {
     if (discountValue > minPurchaseAmount) {
       throw new Error("Discount cannot exceed minimum purchase amount");
     }
 
-    if (
-      couponData.discountType === "fixed" &&
-      maxDiscountAmount > 0 &&
-      maxDiscountAmount < discountValue
-    ) {
+    if (maxDiscountAmount > 0 && maxDiscountAmount < discountValue) {
       throw new Error("Max discount cannot be less than discount value");
-    }
-
-    if (minPurchaseAmount > maxDiscountAmount) {
-      console.log("[COUPON DEBUG]", {
-        minPurchaseAmount,
-        maxDiscountAmount,
-      });
-      throw new Error("Min purchase cannot exceed max discount");
     }
   }
 
-  const coupon = await Coupon.findByIdAndUpdate(couponId, couponData);
+  // ---- percentage coupon rules ----
+  if (discountType === "percentage") {
+    if (discountValue > 100) {
+      throw new Error("Percentage discount cannot exceed 100");
+    }
+
+    if (maxDiscountAmount === 0) {
+      throw new Error("Max discount amount required for percentage coupon");
+    }
+
+    const expectedDiscount = (minPurchaseAmount * discountValue) / 100;
+
+    if (maxDiscountAmount > 0 && expectedDiscount > maxDiscountAmount) {
+      throw new Error(
+        "Max discount too small for given percentage and minimum purchase",
+      );
+    }
+  }
+
+  const coupon = await Coupon.findByIdAndUpdate(
+    couponId,
+    {
+      ...couponData,
+      discountValue,
+      maxDiscountAmount,
+      minPurchaseAmount,
+      usageLimit,
+    },
+    { new: true, runValidators: true },
+  );
 
   return coupon;
 };
@@ -140,8 +193,8 @@ export const toggleCouponStatus = async (couponId) => {
   };
 };
 
-export const getAvailableCoupons = async (orderPrice) => {
-  console.log(orderPrice);
+export const getAvailableCoupons = async (orderPrice, userId) => {
+  // step 1 → get valid coupons
   const coupons = await Coupon.find({
     minPurchaseAmount: { $lte: orderPrice },
     isActive: true,
@@ -150,8 +203,18 @@ export const getAvailableCoupons = async (orderPrice) => {
     $expr: { $lt: ["$usedCount", "$usageLimit"] },
   });
 
-  console.log(coupons);
-  return coupons;
+  // get coupons already used by this user
+  const usedCoupons = await couponUsage.find({ userId });
+
+  // convert used coupon ids to string array
+  const usedCouponIds = usedCoupons.map((item) => item.couponId.toString());
+
+  // step 4 → filter
+  const availableCoupons = coupons.filter(
+    (coupon) => !usedCouponIds.includes(coupon._id.toString()),
+  );
+
+  return availableCoupons;
 };
 
 export const applyCouponService = async (couponId, userId) => {
@@ -168,16 +231,35 @@ export const applyCouponService = async (couponId, userId) => {
     $expr: { $lt: ["$usedCount", "$usageLimit"] },
   });
 
-  if (!coupon) throw new Error("Coupon not found");
+  const usedCoupon = await couponUsage.findOne({
+    userId,
+    couponId: coupon._id,
+  });
 
-  if (coupon.discountType == "fixed") {
-    cartCalaculations.discount += coupon.discountValue;
-    cartCalaculations.total -= coupon.discountValue;
+  if (usedCoupon) throw new Error("This coupon is already used");
+
+  if (!coupon) throw new Error("Coupon not valid or expired");
+
+  let discount = 0;
+
+  if (coupon.discountType === "fixed") {
+    discount = coupon.discountValue;
   }
 
-  console.log("Applying coupon is : ", coupon);
+  if (coupon.discountType === "percentage") {
+    discount = (orderPrice * coupon.discountValue) / 100;
 
-  console.log("Amounts before applying is : ", cartCalaculations);
+    if (coupon.maxDiscountAmount > 0) {
+      discount = Math.min(discount, coupon.maxDiscountAmount);
+    }
+  }
+
+  discount = Math.min(discount, cartCalaculations.total);
+
+  cartCalaculations.discount += discount;
+  cartCalaculations.total = Number(
+    (cartCalaculations.total - discount).toFixed(2),
+  );
 
   return cartCalaculations;
 };

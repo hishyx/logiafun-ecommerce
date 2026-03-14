@@ -163,30 +163,7 @@ async function placeOrder() {
 
   const result = await res.json();
 
-  if (result.razorpay) {
-    const options = {
-      key: result.key,
-      amount: result.amount,
-      currency: "INR",
-      order_id: result.razorpayOrderId,
-
-      handler: async function (response) {
-        await fetch("/verify-razorpay", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            ...response,
-            orderId: result.orderId,
-            userId: result.userId,
-          }),
-        });
-
-        window.location.href = `/order/success/${result.orderNumber}`;
-      },
-    };
-
-    new Razorpay(options).open();
-  }
+  await placePaymentWithPopup(result);
 
   if (result.redirectUrl) {
     window.location.href = result.redirectUrl;

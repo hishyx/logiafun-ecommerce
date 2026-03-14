@@ -6,9 +6,25 @@ import { hasDuplicateVariants } from "../../utils/variant.utils.js";
 export const getProductById = async (productId) => {
   const product = await Product.findById(productId).lean();
 
+  if (!product) return null;
+
+  //  derive product level attributes from variant attributes
+  const attrSet = new Set();
+
+  if (product.variants && product.variants.length) {
+    product.variants.forEach((variant) => {
+      if (variant.attributes) {
+        Object.keys(variant.attributes).forEach((key) => {
+          attrSet.add(key.trim());
+        });
+      }
+    });
+  }
+
+  product.attributes = [...attrSet];
+
   return product;
 };
-
 export const getAllProducts = async ({ page, limit, sort, search, filter }) => {
   page = parseInt(page);
   limit = parseInt(limit);

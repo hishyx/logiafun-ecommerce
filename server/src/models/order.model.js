@@ -53,6 +53,10 @@ const paymentSchema = new mongoose.Schema(
       enum: ["pending", "paid", "failed", "refunded"],
       default: "pending",
     },
+    failureReason: {
+      type: String,
+      required: false,
+    },
   },
   { _id: false },
 );

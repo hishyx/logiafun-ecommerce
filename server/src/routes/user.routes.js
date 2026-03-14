@@ -10,9 +10,8 @@ import * as userCheckoutControllers from "../controllers/user.checkout.controlle
 import * as userOrderControllers from "../controllers/user.orders.controller.js";
 import * as userWalletControllers from "../controllers/user.wallet.controller.js";
 import * as userReferralControllers from "../controllers/user.referral.controller.js";
-import * as orderFailedController from "../controllers/user/order.controller.js";
 import * as invoiceControllers from "../controllers/order.invoice.controller.js";
-import { verifyRazorPayPayment } from "../controllers/user/user.payment.controller.js";
+import * as userPaymentControllers from "../controllers/user/user.payment.controller.js";
 
 import { setLocalVariables } from "../middlewares/user.middlewares.js";
 import { checkAuthUniversaly } from "../middlewares/auth.middleware.js";
@@ -232,10 +231,12 @@ router.get(
 
 router.get("/user/orders/:orderId", userOrderControllers.orderDetailsPage);
 
-router.get("/order/failed", orderFailedController.orderFailedPage);
+router.get("/order/failed", userOrderControllers.orderFailedPage);
 
 //payment
 
-router.post("/verify-razorpay", verifyRazorPayPayment);
+router.post("/verify-razorpay", userPaymentControllers.verifyRazorPayPayment);
+router.post("/payment-failed", userPaymentControllers.paymentFailed);
+router.post("/retry-payment", userPaymentControllers.retryPayment);
 
 export default router;

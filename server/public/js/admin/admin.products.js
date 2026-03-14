@@ -1,3 +1,27 @@
+const PRODUCT_DATA = JSON.parse(
+  document.getElementById("productDataJson").textContent
+);
+
+window.PRODUCT_DATA = PRODUCT_DATA;
+
+
+// Add global showToast since it's used for error notifications
+function showToast(message, type = "success") {
+  if (typeof Swal !== "undefined") {
+    Swal.fire({
+      toast: true,
+      position: "top-end",
+      icon: type === "error" ? "error" : "success",
+      title: type === "error" ? "Error" : "Success",
+      text: message,
+      showConfirmButton: false,
+      timer: 3000,
+    });
+  } else {
+    alert(message);
+  }
+}
+
 /**
  * Admin Products Management Script
  * Refactored for readability and modularity.
@@ -113,6 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <i class="fa-solid fa-times remove-prod-attr-btn" 
                data-mode="${mode}" 
                data-index="${i}"></i>
+            <input type="hidden" name="attributes[${i}]" value="${attr}">
         `,
         );
         container.appendChild(span);
@@ -217,7 +242,7 @@ document.addEventListener("DOMContentLoaded", () => {
       wrapper.appendChild(variantEl);
 
       // Now sync attributes for this new row (and populate values if editing)
-      Variants.syncSingleRow(variantEl, mode, data ? data.attributes : null);
+      Variants.syncSingleRow(variantEl, mode, data ? (data.values || data.attributes) : null);
     },
 
     remove: (btn) => {

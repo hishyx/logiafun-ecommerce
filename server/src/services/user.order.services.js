@@ -17,6 +17,8 @@ import {
 } from "./user.product.services.js";
 
 import Coupon from "../models/coupon.model.js";
+
+import { couponUsage } from "../models/coupon.model.js";
 import razorpay from "../config/razorpay.js";
 
 export const createOrder = async (userId, orderData) => {
@@ -41,16 +43,43 @@ export const createOrder = async (userId, orderData) => {
     });
 
     if (coupon) {
-      if (coupon.discountType == "fixed") {
-        amounts.total -= coupon.discountValue;
-        couponDiscountAmount = coupon.discountValue;
+      let discount = 0;
+
+      // FIXED COUPON
+      if (coupon.discountType === "fixed") {
+        discount = coupon.discountValue;
       }
 
-      // Increment coupon used count
-      await Coupon.findByIdAndUpdate(coupon._id, { $inc: { usedCount: 1 } });
+      // PERCENTAGE COUPON
+      if (coupon.discountType === "percentage") {
+        discount = (amounts.total * coupon.discountValue) / 100;
+      }
+
+      // prevent discount more than total
+      if (discount > amounts.total) {
+        discount = amounts.total;
+      }
+
+      // apply discount
+      amounts.total = amounts.total - discount;
+      couponDiscountAmount = discount;
+
+      const usedCoupon = await couponUsage.findOne({
+        userId,
+        couponId: coupon._id,
+      });
+
+      if (!usedCoupon) {
+        await couponUsage.create({
+          couponId: coupon._id,
+          userId,
+        });
+
+        // increase used count
+        await Coupon.findByIdAndUpdate(coupon._id, { $inc: { usedCount: 1 } });
+      }
     }
   }
-
   console.log("orderData.selectedAddress is : ", orderData.selectedAddress);
 
   const orderAddress = await getAddressDetails(
@@ -231,9 +260,16 @@ export const cancelEntireOrder = async (orderId, reason) => {
 
   await order.save();
 
+  const totalCancelReturnedAmount = order.items
+    .filter((item) => item.status === "cancelled")
+    .reduce(
+      (total, item) => total + item.product.discountedPrice * item.quantity,
+      0,
+    );
+
   const transactionData = {
     userId: order.userId,
-    amount: order.totalAmount,
+    amount: order.totalAmount - totalCancelReturnedAmount,
     orderNumber: order.orderNumber,
     status: "cancelled",
   };
@@ -257,6 +293,8 @@ export const cancelSpecificOrderItem = async (
 
   const item = order.items.id(itemId);
 
+  if (item.status == "cancelled") return;
+
   if (statusTransitions[item.status].includes("cancelled")) {
     item.status = "cancelled";
     item.statusChangeReason = reason;
@@ -265,7 +303,7 @@ export const cancelSpecificOrderItem = async (
       order.items.length > 0 &&
       order.items.every((item) => item.status === "cancelled");
 
-    if (allItemsCancelled) {
+    if (allItemsCancelled && !isEntireCancel) {
       order.orderStatus = "cancelled";
       order.statusChangeReason = "All items cancelled individually";
     }
@@ -352,10 +390,65 @@ export const returnSpecificOrderItem = async (orderId, itemId, reason) => {
   await order.save();
 };
 
-export const updatePaymentStatus = async (orderId, status, transactionId) => {
+export const updatePaymentStatus = async (
+  orderId,
+  status,
+  transactionId,
+  reason,
+) => {
   console.log("Reached ststaus updater");
-  await Order.findByIdAndUpdate(orderId, {
-    "payment.status": status,
-    "payment.transactionId": transactionId,
-  });
+
+  const order = await Order.findById(orderId);
+
+  console.log("order from pdate paymenet staustus  ", order);
+  order.payment.status = status;
+
+  if (reason) order.payment.failureReason = reason;
+  else if (transactionId) order.payment.transactionId = transactionId;
+
+  order.save();
+};
+
+export const updateStockOnPaymentFailure = async (orderId) => {
+  const order = await Order.findById(orderId);
+
+  for (let item of order.items) {
+    await changeProductStock(
+      item.product.productId,
+      item.product.variantId,
+      item.quantity,
+      "increase",
+    );
+  }
+};
+
+export const retryOrderPayment = async (orderId, userId) => {
+  const order = await Order.findById(orderId);
+
+  // if (order.userId != userId) throw new Error("This order is not this users");
+
+  if (order.payment.status == "paid")
+    throw new Error("Order amount is already paid");
+
+  const paymentMethod = order.payment.method;
+
+  const amount = order.totalAmount;
+
+  if (paymentMethod == "razorpay") {
+    const razorpayOrder = await razorpay.orders.create({
+      amount: amount * 100,
+      currency: "INR",
+      receipt: order.orderNumber,
+    });
+
+    return {
+      razorpay: true,
+      orderId: order._id,
+      orderNumber: order.orderNumber,
+      userId: order.userId,
+      razorpayOrderId: razorpayOrder.id,
+      amount: razorpayOrder.amount,
+      key: process.env.RAZORPAY_KEY_ID,
+    };
+  }
 };

@@ -68,7 +68,7 @@ export const adminEditProductPage = async (req, res) => {
       return res.status(404).render("404-not-found");
     }
 
-    console.log(product);
+    console.log("product from admiEdit page : ", product);
 
     res.render("admin/edit-product.ejs", { product, categories });
   } catch (err) {

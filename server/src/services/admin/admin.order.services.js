@@ -1,5 +1,7 @@
 import Order from "../../models/order.model.js";
 import statusTransitions from "../../components/order.status.transitions.js";
+import { changeProductStock } from "../user.product.services.js";
+import { addRefundToWallet } from "../user.wallet.services.js";
 
 export const getAllOrders = async ({ page, limit, sort, search, filter }) => {
   page = parseInt(page);
@@ -25,6 +27,7 @@ export const getAllOrders = async ({ page, limit, sort, search, filter }) => {
 
   const result = await Order.aggregate([
     { $match: query },
+    { $match: { "payment.status": "paid" } },
     {
       $facet: {
         orders: [
@@ -84,46 +87,77 @@ export const acceptOrderReturn = async (orderId) => {
     throw new Error("No return request found for this order");
   }
 
+  for (let item of order.items) {
+    await acceptItemReturn(order._id, item._id, true);
+  }
+
   order.returnStatus = "returned";
   order.orderStatus = "returned";
 
-  order.items.forEach((item) => {
-    if (item.returnStatus === "requested") {
-      item.returnStatus = "returned";
-      item.status = "returned";
-    } else if (item.status === "delivered") {
-      // If the whole order return is accepted, all delivered items should be marked as returned
-      item.returnStatus = "returned";
-      item.status = "returned";
-    }
-  });
-
   await order.save();
+
+  const totalItemReturnedAmount = order.items
+    .filter((item) => item.status === "returned")
+    .reduce(
+      (total, item) => total + item.product.discountedPrice * item.quantity,
+      0,
+    );
+
+  const transactionData = {
+    userId: order.userId,
+    amount: order.totalAmount - totalItemReturnedAmount,
+    orderNumber: order.orderNumber,
+    status: "returned",
+  };
+
+  await addRefundToWallet(transactionData);
   return order;
 };
 
-export const acceptItemReturn = async (orderId, itemId) => {
+export const acceptItemReturn = async (orderId, itemId, isEntireReturn) => {
   const order = await Order.findById(orderId);
   if (!order) throw new Error("Order not found");
 
   const item = order.items.id(itemId);
   if (!item) throw new Error("Item not found");
 
-  if (item.returnStatus !== "requested") {
+  if (item.returnStatus !== "requested" && order.returnStatus !== "requested") {
     throw new Error("No return request found for this item");
+  }
+
+  //Setting all return if all are returned
+
+  item.status = "returned";
+
+  const allItemsReturned =
+    order.items.length > 0 &&
+    order.items.every((item) => item.status === "returned");
+
+  if (allItemsReturned) {
+    order.returnStatus = "returned";
+    order.orderStatus = "returned";
+    order.statusChangeReason = "All items returned individually";
   }
 
   item.returnStatus = "returned";
   item.status = "returned";
 
-  // Check if all items are now returned or cancelled
-  const allReturnedOrCancelled = order.items.every(
-    (i) => i.status === "returned" || i.status === "cancelled",
+  await changeProductStock(
+    item.product.productId,
+    item.product.variantId,
+    item.quantity,
+    "increase",
   );
 
-  if (allReturnedOrCancelled) {
-    order.returnStatus = "returned";
-    order.orderStatus = "returned";
+  if (!isEntireReturn) {
+    const transactionData = {
+      userId: order.userId,
+      amount: item.product.discountedPrice * item.quantity,
+      orderNumber: order.orderNumber,
+      status: "returned",
+      itemName: item.product.name,
+    };
+    await addRefundToWallet(transactionData);
   }
 
   await order.save();

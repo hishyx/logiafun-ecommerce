@@ -243,6 +243,27 @@ function updateImagesUI() {
   currentPriceEl.textContent = "₹" + discountedPrice.toFixed(2);
   if (oldPriceEl) oldPriceEl.textContent = "₹" + basePrice.toFixed(2);
 
+  // Stock Badge Logic
+  const stockIndicator = document.getElementById("stock-indicator");
+  const lowStockBadge = document.getElementById("low-stock-badge");
+  const lowStockCount = document.getElementById("low-stock-count");
+
+  if (activeVariant.stock <= 0) {
+    if (stockIndicator) stockIndicator.innerHTML = '<i class="fa-solid fa-times-circle" style="color: #ef4444; margin-right: 6px;"></i> Out of Stock';
+    if (lowStockBadge) lowStockBadge.style.display = 'none';
+  } else {
+    if (stockIndicator) stockIndicator.innerHTML = '<i class="fa-solid fa-check-circle" style="color: #22c55e; margin-right: 6px;"></i> In Stock & Ready to Ship';
+
+    if (activeVariant.stock < 10) {
+      if (lowStockBadge) {
+        lowStockBadge.style.display = 'inline-block';
+        if (lowStockCount) lowStockCount.textContent = activeVariant.stock;
+      }
+    } else {
+      if (lowStockBadge) lowStockBadge.style.display = 'none';
+    }
+  }
+
   const images = activeVariant.images;
 
   // Update main image

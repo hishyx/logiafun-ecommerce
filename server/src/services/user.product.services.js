@@ -176,6 +176,24 @@ export const getAllProducts = async ({
       },
     },
     {
+      $addFields: {
+        variants: {
+          $filter: {
+            input: "$variants",
+            as: "variant",
+            cond: { $gt: ["$$variant.stock", 0] },
+          },
+        },
+      },
+    },
+
+    //  ensure at least one variant remains
+    {
+      $match: {
+        "variants.0": { $exists: true },
+      },
+    },
+    {
       $facet: {
         products: [{ $skip: skip }, { $limit: limit }],
         count: [{ $count: "total" }],
@@ -227,6 +245,24 @@ export const getRelatedProducts = async (categoryId, productId) => {
     {
       $match: {
         "category.isActive": true,
+      },
+    },
+    {
+      $addFields: {
+        variants: {
+          $filter: {
+            input: "$variants",
+            as: "variant",
+            cond: { $gt: ["$$variant.stock", 0] },
+          },
+        },
+      },
+    },
+
+    //  ensure at least one variant remains
+    {
+      $match: {
+        "variants.0": { $exists: true },
       },
     },
     {

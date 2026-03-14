@@ -123,3 +123,20 @@ export const returnSpecificItem = async (req, res) => {
     });
   }
 };
+
+export const orderFailedPage = (req, res) => {
+  try {
+    const message =
+      req.query.message || "Something went wrong while placing your order.";
+
+    const isPaymentFailure = req.query.payment ? true : false;
+    return res.render("user/order.failed.ejs", {
+      errorMessage: message,
+      isPaymentFailure,
+      orderId: req.query.orderId,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Internal Server Error");
+  }
+};
