@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Wishlist - logiaFun</title>
+  <link rel="stylesheet" href="/css/home.css" />
+  <link rel="stylesheet" href="/css/cart.css" />
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    .cart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Empty Cart Styles (reused for Empty Wishlist) */
+    .empty-cart-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 5rem 2rem;
+      text-align: center;
+      background: #fff;
+      border-radius: var(--radius-lg, 16px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      border: 1px solid #f1f5f9;
+      margin: 2rem 0;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    .empty-cart-icon {
+      width: 120px;
+      height: 120px;
+      background: #fef2f2;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 2rem;
+      color: #ef4444;
+      font-size: 3rem;
+      position: relative;
+    }
+
+    .empty-cart-icon::after {
+      content: '';
+      position: absolute;
+      width: 140px;
+      height: 140px;
+      border: 2px dashed #fecaca;
+      border-radius: 50%;
+      animation: rotate 20s linear infinite;
+    }
+
+    @keyframes rotate {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .empty-cart-section h2 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 0.75rem;
+    }
+
+    .empty-cart-section p {
+      color: #64748b;
+      font-size: 1rem;
+      max-width: 300px;
+      margin-bottom: 2.5rem;
+      line-height: 1.5;
+    }
+
+    .start-shopping-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 2.5rem;
+      background-color: #0f172a;
+      color: #fff;
+      border-radius: 50px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2);
+    }
+
+    .start-shopping-btn:hover {
+      background-color: #1e293b;
+      transform: translateY(-2px);
+      box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.2);
+    }
+
+    .start-shopping-btn svg {
+      transition: transform 0.3s ease;
+    }
+
+    .start-shopping-btn:hover svg {
+      transform: translateX(4px);
+    }
+
+    /* Wishlist layout adjustments */
+    .cart-container {
+      display: flex;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .cart-items-column {
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .add-to-cart-action {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 1.5rem;
+      margin-left: auto;
+    }
+
+    @media (max-width: 768px) {
+      .add-to-cart-action {
+        padding: 1rem 0 0 0;
+        width: 100%;
+        margin-left: 0;
+      }
+
+      .add-to-cart-action button {
+        width: 100%;
+      }
+    }
+
+    .btn-sm-cart {
+      padding: 0.6rem 1.2rem;
+      font-weight: 500;
+      font-size: 0.9rem;
+      border-radius: 8px;
+      background-color: #0f172a;
+      color: white;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-sm-cart:hover {
+      background-color: #1e293b;
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header -->
+  <%- include('../partials/header.ejs')%>
+
+    <main>
+      <div class="cart-container">
+        <div class="cart-items-column">
+
+          <% if (wishlistItems.length> 0) { %>
+            <div class="cart-header">
+              <div>
+                <h1 style="font-size: 2rem; font-weight: 800; color: #0f172a; margin-bottom: 0.25rem;">My Wishlist</h1>
+                <p style="color: #64748b;">You have <%=wishlistItems.length%> items in your wishlist</p>
+              </div>
+            </div>
+
+            <div class="cart-items">
+              <% wishlistItems.forEach(item=> { %>
+                <div class="cart-item wishlist-item" data-item-id="<%=item._id%>">
+                  <div class="cart-item-image">
+                    <a href="/products/<%=item.productId%>">
+                      <img src="<%=item.image%>" alt="<%=item.name%>" />
+                    </a>
+                  </div>
+
+                  <div class="cart-item-details">
+                    <a href="/products/<%=item.productId%>" class="cart-item-title"
+                      style="font-weight: 700; color: #0f172a; text-decoration: none; font-size: 1.1rem; display: block; margin-bottom: 0.25rem;">
+                      <%=item.name%>
+                    </a>
+                    <div class="cart-item-variant" style="margin-bottom: 0.5rem;">
+                      <span style="font-size: 0.85rem; color: #64748b; font-weight: 500;">Variant:</span>
+                      <span style="font-size: 0.85rem; color: #0f172a; font-weight: 600;">
+                        <%=item.variantName%>
+                      </span>
+                    </div>
+                    <div class="cart-item-price">₹<%=item.price.toFixed(2)%>
+                    </div>
+                  </div>
+
+                  <div class="add-to-cart-action">
+                    <button onclick="addToCartFromWishList(event)" class="btn-sm-cart"
+                      data-product-id="<%=item.productId%>" data-variant-id="<%=item.variantId%>">
+                      <i class="fa-solid fa-cart-plus"></i> Add to Cart
+                    </button>
+                  </div>
+
+                  <button class="remove-btn" title="Remove from wishlist" aria-label="Remove item"
+                    onclick="removeFromWishlist(event, '<%=item._id%>')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                  </button>
+                </div>
+                <% }) %>
+            </div>
+
+            <% } else { %>
+              <!-- Empty Wishlist Section -->
+              <div class="empty-cart-section">
+                <div class="empty-cart-icon">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path
+                      d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                    </path>
+                  </svg>
+                </div>
+                <h2>Your wishlist is empty</h2>
+                <p>Explore more products and shortlist some items.</p>
+                <a href="/products" class="start-shopping-btn">
+                  Explore Products
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                </a>
+              </div>
+              <% } %>
+
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <%- include('../partials/footer') %>
+
+      <script src="/js/user.wishlist.js"></script>
+</body>
+
+</html>

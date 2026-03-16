@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Product Management - Admin Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/css/admin/main.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" />
+  <style>
+    /* Shared Styles from Categories */
+    .btn-primary {
+      background-color: #0f172a;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-primary:hover {
+      background-color: #1e293b;
+      transform: translateY(-1px);
+    }
+
+    /* Restored Missing CSS for Product Table */
+    .action-btn {
+      background: white;
+      border: 1px solid #e2e8f0;
+      padding: 0.5rem;
+      border-radius: 6px;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+    }
+
+    .action-btn:hover {
+      background: #f8fafc;
+      color: #0f172a;
+      border-color: #cbd5e1;
+    }
+
+    .product-img {
+      width: 48px;
+      height: 48px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      margin-right: 12px;
+    }
+
+    .product-cell {
+      display: flex;
+      align-items: center;
+    }
+
+    .product-info span {
+      display: block;
+      font-weight: 500;
+      color: #0f172a;
+    }
+
+    .product-info small {
+      color: #64748b;
+      font-size: 0.75rem;
+    }
+
+    .badge-stock {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .stock-in {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .stock-low {
+      background: #fef9c3;
+      color: #854d0e;
+    }
+
+    .stock-out {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .status-active {
+      background: #eff6ff;
+      color: #1e40af;
+    }
+
+    .status-blocked {
+      background: #fef2f2;
+      color: #991b1b;
+    }
+
+    .status-indicator {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="admin-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo-area">
+        <h2>LogiaFun <span class="badge">Admin</span></h2>
+      </div>
+
+      <nav class="sidebar-nav">
+        <ul>
+          <li class="nav-item">
+            <a href="/admin/dashboard" class="nav-link">
+              <i class="fa-solid fa-chart-line"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/admin/analytics" class="nav-link">
+              <i class="fa-solid fa-chart-pie"></i>
+              <span>Analytics</span>
+            </a>
+          </li>
+          <li class="nav-item active">
+            <a href="/admin/products" class="nav-link">
+              <i class="fa-solid fa-box"></i>
+              <span>Products</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/admin/categories" class="nav-link">
+              <i class="fa-solid fa-layer-group"></i>
+              <span>Categories</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/admin/orders" class="nav-link">
+              <i class="fa-solid fa-cart-shopping"></i>
+              <span>Orders</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/admin/users" class="nav-link">
+              <i class="fa-solid fa-users"></i>
+              <span>Users</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/admin/coupons" class="nav-link">
+              <i class="fa-solid fa-ticket"></i>
+              <span>Coupons</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/admin/offers" class="nav-link">
+              <i class="fa-solid fa-tags"></i>
+              <span>Offers</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <div class="sidebar-footer">
+        <form action="/admin/logout" method="POST" class="logout-form">
+          <button type="submit" class="nav-link logout logout-btn">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
+          </button>
+        </form>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Top Bar -->
+      <header class="top-bar">
+        <div class="mobile-toggle">
+          <i class="fa-solid fa-bars"></i>
+        </div>
+        <div class="page-title">
+          <h1>Product Management</h1>
+        </div>
+        <div class="user-profile">
+          <div class="notification-icon">
+            <i class="fa-regular fa-bell"></i>
+            <span class="dot"></span>
+          </div>
+          <div class="profile-info">
+            <img src="https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff" alt="Admin" />
+            <span>Admin</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content Body -->
+      <div class="content-body">
+        <!-- Controls Area -->
+        <div class="controls-area">
+          <div class="search-wrapper">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="listSearch" value="<%= search%>" placeholder="Search products..." />
+            <button id="clearSearchBtn" class="action-btn clear-btn" aria-label="Clear Search">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
+          <div class="actions-wrapper">
+            <div class="sort-wrapper">
+              <label>Filter By:</label>
+              <select id="filterBy">
+                <option value="all" <%=filter==="all" ?"selected":"" %>>All</option>
+                <option value="active" <%=filter==="active" ?"selected":"" %>>Active</option>
+                <option value="blocked" <%=filter==="blocked" ?"selected":"" %>>Blocked</option>
+              </select>
+            </div>
+            <div class="sort-wrapper">
+              <label>Sort By:</label>
+              <select id="sortBy">
+                <option value="latest" <%=sort==="latest" ?"selected":"" %>>
+                  Newest First
+                </option>
+
+                <option value="oldest" <%=sort==="oldest" ?"selected":"" %>>
+                  Oldest First
+                </option>
+
+                <option value="name_asc" <%=sort==="name_asc" ?"selected":"" %>>
+                  Name (A-Z)
+                </option>
+
+                <option value="name_desc" <%=sort==="name_desc" ?"selected":"" %>>
+                  Name (Z-A)
+                </option>
+                <!-- 
+                <option value="price_asc" <%= sort==="price_asc" ?"selected":"" %>>
+                  Price (Low → High)
+                </option>
+
+                <option value="price_desc" <%= sort==="price_desc" ?"selected":"" %>>
+                  Price (High → Low)
+                </option> -->
+              </select>
+            </div>
+            <a href="/admin/products/add" class="btn-primary" id="addProductBtn"
+              style="padding: 0.5rem 1rem; margin-left: 10px">
+              <i class="fa-solid fa-plus"></i> Add Product
+            </a>
+          </div>
+        </div>
+
+        <!-- Product Table -->
+        <div class="table-container">
+          <% if (typeof products !=='undefined' && products.length> 0) { %>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th>Stock</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <% products.forEach(product=> { %>
+                  <tr>
+                    <td>
+                      <div class="product-cell">
+                        <img src="<%= product.variants[0].images[0] || '/images/product-placeholder.png' %>"
+                          alt="Product" class="product-img" onerror="this.src='https://placehold.co/40x40'" />
+
+                        <div class="product-info">
+                          <span>
+                            <%= product.name %>
+                          </span>
+                          <small>ID: <%= product._id %></small>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <%= product.category ? product.category.name : "No Category" %>
+                    </td>
+
+                    <td>
+                      ₹<%= product.variants[0]?.price?.toFixed(2) %>
+                    </td>
+
+                    <td>
+                      <% if (product.stock===0) { %>
+                        <span class="badge-stock stock-out">Out of Stock</span>
+                        <% } else if (product.stock <=10) { %>
+                          <span class="badge-stock stock-low">
+                            <%= product.stock %> Left
+                          </span>
+                          <% } else { %>
+                            <span class="badge-stock stock-in">
+                              <%= product.stock %> In Stock
+                            </span>
+                            <% } %>
+                    </td>
+
+                    <td>
+                      <% if (product.isActive) { %>
+                        <span class="status-badge status-active">
+                          <span class="status-indicator"></span> Active
+                        </span>
+                        <% } else { %>
+                          <span class="status-badge status-blocked">
+                            <span class="status-indicator"></span> Inactive
+                          </span>
+                          <% } %>
+                    </td>
+
+                    <td>
+                      <a href="/admin/products/<%= product._id %>/edit" class="action-btn edit-product-btn"
+                        title="Edit">
+                        <i class="fa-regular fa-pen-to-square"></i>
+                      </a>
+
+                      <button class="action-btn toggle-product-btn" title="<%= product.isActive ? 'Unlist' : 'List' %>"
+                        data-id="<%= product._id %>" data-active="<%= product.isActive %>"
+                        style="color: <%= product.isActive ? '#ef4444' : '#10b981' %>">
+                        <i class="fa-solid <%= product.isActive ? 'fa-eye-slash' : 'fa-eye' %>"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <% }) %>
+              </tbody>
+            </table>
+            <% } else { %>
+              <div class="empty-state" style="padding: 3rem; text-align: center; color: #64748b;">
+                <i class="fa-solid fa-box-open" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                <h3>No products found</h3>
+                <p>Try adjusting your search or filters to find what you're looking for.</p>
+              </div>
+              <% } %>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-area">
+          <div class="pagination-info">
+            Showing
+            <%= total===0 ? 0 : ((page - 1) * limit + 1) %>
+              -
+              <%= Math.min(page * limit, total) %>
+                of
+                <%= total %>
+          </div>
+          <div class="pagination-controls">
+            <button class="page-btn" <%=page===1 || totalPages===0 ? "disabled" : "" %> onclick="goToPage(<%= page - 1
+                %>)">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+
+            <div class="page-numbers">
+              <button class="page-btn active">
+                <%=page%>
+              </button>
+            </div>
+            <button class="page-btn" <%=page===totalPages || totalPages===0 ? "disabled" : "" %> onclick="goToPage(<%=
+                page + 1 %>)">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="/js/admin/admin.pagination.search.js"></script>
+
+  <script>
+    // Product toggle logic
+    document.addEventListener("DOMContentLoaded", () => {
+      const productTableBody = document.querySelector(".data-table tbody");
+      if (productTableBody) {
+        productTableBody.addEventListener("click", async function (e) {
+          const toggleBtn = e.target.closest(".toggle-product-btn");
+          if (toggleBtn) {
+            e.preventDefault();
+            const id = toggleBtn.dataset.id;
+            const currentActive = toggleBtn.dataset.active === "true";
+            const action = currentActive ? "unlist" : "list";
+
+            const result = await Swal.fire({
+              title: `Are you sure?`,
+              text: `Do you want to ${action} this product?`,
+              icon: "warning",
+              showCancelButton: true,
+              confirmButtonColor: currentActive ? "#ef4444" : "#10b981",
+              cancelButtonColor: "#64748b",
+              confirmButtonText: `Yes, ${action} it!`,
+            });
+
+            if (!result.isConfirmed) return;
+
+            try {
+              const response = await fetch(`/admin/products/${id}/toggle`, {
+                method: "PATCH",
+              });
+              const data = await response.json();
+              if (response.ok) {
+                location.reload();
+              } else {
+                showToast(data.message || "Failed to update product", "error");
+              }
+            } catch (error) {
+              console.error(error);
+              showToast("Something went wrong", "error");
+            }
+          }
+        });
+      }
+    });
+  </script>
+</body>
+
+</html>

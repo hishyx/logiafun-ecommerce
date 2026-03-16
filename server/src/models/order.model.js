@@ -1,0 +1,180 @@
+import mongoose from "mongoose";
+
+const productSnapshotSchema = new mongoose.Schema(
+  {
+    productId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Product",
+      required: true,
+    },
+    variantId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Variant",
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+    image: {
+      type: String,
+      required: true,
+    },
+    discountedPrice: {
+      type: Number,
+      required: true,
+    },
+    originalPrice: {
+      type: Number,
+      required: true,
+    },
+  },
+  { _id: false },
+);
+
+const addressSchema = new mongoose.Schema(
+  {
+    addressName: String,
+    name: String,
+    phone: String,
+    street: String,
+    city: String,
+    pincode: String,
+  },
+  { _id: false },
+);
+
+const paymentSchema = new mongoose.Schema(
+  {
+    method: String,
+
+    transactionId: String,
+
+    status: {
+      type: String,
+      enum: ["pending", "paid", "failed", "refunded"],
+      default: "pending",
+    },
+
+    amount: Number, // final payable
+    subtotal: Number, // before discount
+    discount: Number, // coupon discount
+    shipping: Number,
+    gst: Number,
+
+    failureReason: String,
+  },
+  { _id: false },
+);
+
+const shippingSchema = new mongoose.Schema(
+  {
+    trackingNumber: String,
+    carrier: String,
+    shippedAt: Date,
+    deliveredAt: Date,
+  },
+  { _id: false },
+);
+
+const orderItemSchema = new mongoose.Schema(
+  {
+    product: productSnapshotSchema,
+
+    quantity: {
+      type: Number,
+      required: true,
+      min: 1,
+    },
+
+    status: {
+      type: String,
+      enum: [
+        "pending",
+        "processing",
+        "shipped",
+        "in_transit",
+        "delivered",
+        "cancelled",
+        "returned",
+      ],
+      default: "pending",
+      index: true,
+    },
+    statusChangeReason: {
+      type: String,
+      default: null,
+    },
+    returnStatus: {
+      type: String,
+      required: false,
+      enum: ["requested", "returned"],
+    },
+    shipping: shippingSchema,
+  },
+  { _id: true },
+);
+
+const orderSchema = new mongoose.Schema(
+  {
+    orderNumber: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true,
+    },
+
+    checkoutId: {
+      type: String,
+      required: true,
+      index: true,
+    },
+    orderStatus: {
+      type: String,
+      enum: [
+        "pending",
+        "processing",
+        "shipped",
+        "in_transit",
+        "delivered",
+        "cancelled",
+        "returned",
+      ],
+      default: "pending",
+      index: true,
+    },
+    statusChangeReason: {
+      type: String,
+      default: null,
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
+
+    items: {
+      type: [orderItemSchema],
+      required: true,
+    },
+
+    payment: paymentSchema,
+
+    address: addressSchema,
+
+    returnStatus: {
+      type: String,
+      required: false,
+      enum: ["requested", "returned"],
+    },
+    refundSummary: {
+      totalRefundedAmount: { type: Number, default: 0 },
+    },
+  },
+  { timestamps: true },
+);
+
+const Order = mongoose.model("Order", orderSchema);
+
+export default Order;

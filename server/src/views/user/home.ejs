@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>logiaFun - Play, learn, & grow!</title>
+  <link rel="stylesheet" href="/css/home.css" />
+</head>
+
+<body>
+  <!-- Header -->
+  <%- include('../partials/header.ejs')%>
+
+    <main>
+      <!-- Hero Section -->
+      <section class="hero">
+        <img src="/images/banner.jpeg" alt="Children playing" class="hero-image" />
+        <div class="container">
+          <div class="hero-content">
+            <h1>Play, learn, & grow!</h1>
+            <p>
+              Crafting smiles with every toy, making learning fun and growth
+              joyful.
+            </p>
+            <a href="/products" class="btn btn-primary">Shop now</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Categories Section -->
+      <section class="section">
+        <div class="container">
+          <div class="section-header">
+            <h2>Find the Perfect Toy</h2>
+            <p>Our Collections</p>
+          </div>
+
+          <div class="categories-grid">
+            <% if (typeof categories !=='undefined' && categories.length> 0) { %>
+              <% categories.forEach(category=> { %>
+                <a href="/products?category=<%= category._id %>" class="category-card-styled">
+                  <h3>
+                    <%= category.name %>
+                  </h3>
+                </a>
+                <% }) %>
+                  <% } else { %>
+                    <p style="text-align: center; width: 100%; color: var(--text-muted);">No categories available at the
+                      moment.</p>
+                    <% } %>
+          </div>
+        </div>
+      </section>
+
+      <!-- Top Discounted Products -->
+      <section class="section section-discounted">
+        <div class="container">
+          <div class="section-header">
+            <h2>Top Discounted Toys</h2>
+            <p>Grab them before they're gone!</p>
+          </div>
+          <div class="products-grid">
+            <% if (locals.discountedProducts && discountedProducts.length > 0) { %>
+              <% discountedProducts.forEach(product => { %>
+                <% const variant = product.variants && product.variants[0]; %>
+                <% const price = variant ? variant.price : 0; %>
+                <% const discountAmount = (price * (product.discount || 0)) / 100; %>
+                <% const discountedPrice = price - discountAmount; %>
+                <a href="/products/<%= product._id %>" class="product-card" style="text-decoration: none; color: inherit;">
+                  <div class="product-image">
+                    <% if (product.discount > 0) { %>
+                      <span class="product-badge badge-sale">SAVE <%= product.discount %>%</span>
+                    <% } %>
+                    <img src="<%= (variant && variant.images && variant.images[0]) || '/images/placeholder.png' %>" alt="<%= product.name %>" />
+                  </div>
+                  <div class="product-info">
+                    <h3><%= product.name %></h3>
+                    <div class="product-price-row">
+                      <div class="product-price">
+                        <span class="price-current">₹<%= Math.round(discountedPrice).toLocaleString() %></span>
+                        <% if (product.discount > 0) { %>
+                          <span class="price-old">₹<%= price.toLocaleString() %></span>
+                        <% } %>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              <% }) %>
+            <% } else { %>
+              <p style="text-align: center; width: 100%; color: #64748b;">No discounted toys found.</p>
+            <% } %>
+          </div>
+        </div>
+      </section>
+
+      <!-- Top Selling Products -->
+      <section class="section section-selling" style="background: #f8f9fa">
+        <div class="container">
+          <div class="section-header">
+            <h2>Top Selling Products</h2>
+            <p>Most loved by our little customers</p>
+          </div>
+          <div class="products-grid">
+            <% if (locals.topSellingProducts && topSellingProducts.length > 0) { %>
+              <% topSellingProducts.forEach(product => { %>
+                <% const variant = product.variants && product.variants[0]; %>
+                <% const price = variant ? variant.price : 0; %>
+                <% const discountAmount = (price * (product.discount || 0)) / 100; %>
+                <% const discountedPrice = price - discountAmount; %>
+                <a href="/products/<%= product._id %>" class="product-card" style="text-decoration: none; color: inherit;">
+                  <div class="product-image">
+                    <img src="<%= (variant && variant.images && variant.images[0]) || '/images/placeholder.png' %>" alt="<%= product.name %>" />
+                  </div>
+                  <div class="product-info">
+                    <h3><%= product.name %></h3>
+                    <div class="product-price-row">
+                      <div class="product-price">
+                        <span class="price-current">₹<%= Math.round(discountedPrice).toLocaleString() %></span>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              <% }) %>
+            <% } else { %>
+              <p style="text-align: center; width: 100%; color: #64748b;">No products found.</p>
+            <% } %>
+          </div>
+        </div>
+      </section>
+
+      <!-- Eco Section -->
+      <section class="eco-section">
+        <div class="eco-image">
+          <img src="https://images.unsplash.com/photo-1545558014-8692077e9b5c?q=80&w=2070&auto=format&fit=crop"
+            alt="Children playing outdoors" />
+          <div class="eco-overlay">
+            <h3>Discover the Joy of Play</h3>
+            <p>Quality toys that inspire imagination</p>
+          </div>
+        </div>
+        <div class="eco-content">
+          <h2>Eco - Friendly Toys</h2>
+          <p>
+            Made from 100% recycled materials for a sustainable future for our
+            children.
+          </p>
+          <a href="#" class="btn btn-secondary">Buy Now</a>
+        </div>
+      </section>
+
+      <!-- New Arrivals -->
+      <section class="section section-arrivals">
+        <div class="container">
+          <div class="section-header">
+            <h2>New Arrivals</h2>
+            <p>Fresh from the factory!</p>
+          </div>
+          <div class="products-grid">
+            <% if (locals.newArrivals && newArrivals.length > 0) { %>
+              <% newArrivals.forEach(product => { %>
+                <% const variant = product.variants && product.variants[0]; %>
+                <% const price = variant ? variant.price : 0; %>
+                <% const discountAmount = (price * (product.discount || 0)) / 100; %>
+                <% const discountedPrice = price - discountAmount; %>
+                <a href="/products/<%= product._id %>" class="product-card" style="text-decoration: none; color: inherit;">
+                  <div class="product-image">
+                    <span class="product-badge badge-hot">NEW</span>
+                    <img src="<%= (variant && variant.images && variant.images[0]) || '/images/placeholder.png' %>" alt="<%= product.name %>" />
+                  </div>
+                  <div class="product-info">
+                    <h3><%= product.name %></h3>
+                    <div class="product-price-row">
+                      <div class="product-price">
+                        <span class="price-current">₹<%= Math.round(discountedPrice).toLocaleString() %></span>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              <% }) %>
+            <% } else { %>
+              <p style="text-align: center; width: 100%; color: #64748b;">No new arrivals found.</p>
+            <% } %>
+          </div>
+        </div>
+      </section>
+
+      <!-- Testimonials -->
+      <section class="section" style="background: #f8f9fa">
+        <div class="container">
+          <div class="section-header">
+            <h2>Hear from Other Happy Parents</h2>
+            <p>Customer testimonials</p>
+          </div>
+
+          <div class="testimonials-wrapper">
+            <button class="nav-arrow">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+
+            <div class="testimonials-grid">
+              <div class="testimonial-card">
+                <div class="testimonial-rating">
+                  <span class="star">★</span><span class="star">★</span><span class="star">★</span><span
+                    class="star">★</span><span class="star">★</span>
+                </div>
+                <p class="testimonial-text">
+                  "Sagittis vitae et leo duis ut diam quam. Nulla porttitor
+                  massa id neque."
+                </p>
+                <div class="testimonial-author">
+                  <div class="author-avatar">H</div>
+                  <span class="author-name">Hisham</span>
+                </div>
+              </div>
+              <div class="testimonial-card">
+                <div class="testimonial-rating">
+                  <span class="star">★</span><span class="star">★</span><span class="star">★</span><span
+                    class="star">★</span><span class="star">★</span>
+                </div>
+                <p class="testimonial-text">
+                  "Sagittis vitae et leo duis ut diam quam nulla porttitor massa
+                  id neque adipiscing vestibulum."
+                </p>
+                <div class="testimonial-author">
+                  <div class="author-avatar">H</div>
+                  <span class="author-name">Hasheem</span>
+                </div>
+              </div>
+              <div class="testimonial-card">
+                <div class="testimonial-rating">
+                  <span class="star">★</span><span class="star">★</span><span class="star">★</span><span
+                    class="star">★</span><span class="star">★</span>
+                </div>
+                <p class="testimonial-text">
+                  "Sagittis vitae et leo duis ut diam quam nulla porttitor massa
+                  id neque."
+                </p>
+                <div class="testimonial-author">
+                  <div class="author-avatar">H</div>
+                  <span class="author-name">Haseeb</span>
+                </div>
+              </div>
+            </div>
+
+            <button class="nav-arrow">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Gallery -->
+      <section class="section">
+        <div class="container">
+          <div class="section-header">
+            <h2>Recent photoshoots</h2>
+            <p>Check gallery</p>
+          </div>
+        </div>
+        <div class="gallery-grid">
+          <div class="gallery-item">
+            <img src="https://placehold.co/500x500/f8f9fa/1e3a5f?text=Photo+1" alt="Gallery" />
+          </div>
+          <div class="gallery-item">
+            <img src="https://placehold.co/500x500/f8f9fa/1e3a5f?text=Photo+2" alt="Gallery" />
+          </div>
+          <div class="gallery-item">
+            <img src="https://placehold.co/500x500/f8f9fa/1e3a5f?text=Photo+3" alt="Gallery" />
+          </div>
+          <div class="gallery-item">
+            <img src="https://placehold.co/500x500/f8f9fa/1e3a5f?text=Photo+4" alt="Gallery" />
+          </div>
+        </div>
+      </section>
+
+      <!-- Features -->
+      <section class="section">
+        <div class="container">
+          <div class="features-grid">
+            <div class="feature-card">
+              <div class="feature-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+              </div>
+              <h3>Customer care</h3>
+              <p>24H hour follow up</p>
+            </div>
+
+            <div class="feature-card">
+              <div class="feature-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <rect x="1" y="3" width="15" height="13" />
+                  <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
+                  <circle cx="5.5" cy="18.5" r="2.5" />
+                  <circle cx="18.5" cy="18.5" r="2.5" />
+                </svg>
+              </div>
+              <h3>Free ship</h3>
+              <p>Free shipping for $100 and up</p>
+            </div>
+
+            <div class="feature-card">
+              <div class="feature-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <polyline points="23 4 23 10 17 10" />
+                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
+                </svg>
+              </div>
+              <h3>Return</h3>
+              <p>Within 7 days</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Newsletter -->
+      <section class="newsletter">
+        <div class="container">
+          <h2>Newsletter</h2>
+          <p>
+            Get 15% off your first purchase! Plus, be the first to know about
+            sales, new product launches, and exclusive offers!
+          </p>
+          <form class="newsletter-form">
+            <input type="email" placeholder="Enter your email" />
+            <button type="submit">Join</button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <%- include('../partials/footer') %>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <% if (locals.user && locals.user.isNew) { %>
+      <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+          const { value: referralCode } = await Swal.fire({
+            title: 'Welcome to logiaFun! 🎉',
+            text: 'Do you have a referral code? Enter it below to get ₹2 in your wallet, and your friend gets ₹5!',
+            input: 'text',
+            inputPlaceholder: 'Enter Referral Code',
+            showCancelButton: true,
+            confirmButtonText: 'Apply Code',
+            cancelButtonText: 'Skip for now',
+            confirmButtonColor: '#1e3a5f',
+            cancelButtonColor: '#94a3b8',
+            inputValidator: (value) => {
+              if (!value) {
+                return 'Please enter a code or skip.'
+              }
+            },
+            backdrop: `rgba(30, 58, 95, 0.4)`,
+            allowOutsideClick: false
+          });
+
+          if (referralCode) {
+            try {
+              const response = await fetch('/newuser/referral-code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ referralCode })
+              });
+
+              const result = await response.json();
+
+              if (response.ok) {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Success!',
+                  text: result.message || 'Referral code applied successfully!',
+                  confirmButtonColor: '#1e3a5f'
+                });
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Oops...',
+                  text: result.message || 'Invalid referral code.',
+                  confirmButtonColor: '#1e3a5f'
+                });
+              }
+            } catch (error) {
+              console.error('Error applying referral:', error);
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Something went wrong while applying the code.',
+                confirmButtonColor: '#1e3a5f'
+              });
+            }
+          }
+        });
+      </script>
+      <% } %>
+  </body>
+
+</html>

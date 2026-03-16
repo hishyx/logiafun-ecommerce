@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Analytics - LogiaFun</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/css/admin/main.css" />
+  <style>
+    .analytics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .chart-card {
+      background: white;
+      border-radius: 20px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      border: 1px solid #f1f5f9;
+    }
+
+    .section-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 1.5rem;
+    }
+
+    .top-products-card {
+      background: white;
+      border-radius: 20px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      border: 1px solid #f1f5f9;
+    }
+
+    .product-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      border-bottom: 1px solid #f1f5f9;
+      transition: background 0.2s;
+    }
+
+    .product-item:hover {
+      background: #f8fafc;
+    }
+
+    .product-image {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .product-info {
+      flex: 1;
+    }
+
+    .product-name {
+      font-weight: 600;
+      color: #1e293b;
+      display: block;
+    }
+
+    .product-stats {
+      font-size: 0.825rem;
+      color: #64748b;
+    }
+
+    .product-revenue {
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    /* Modern Form Controls */
+    .premium-controls {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 20px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      margin-bottom: 2.5rem;
+      border: 1px solid #f1f5f9;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      align-items: flex-end;
+    }
+
+    .control-group {
+      flex: 1;
+      min-width: 220px;
+    }
+
+    .control-label {
+      display: block;
+      margin-bottom: 0.6rem;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .premium-input, .premium-select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 2px solid #f1f5f9;
+      border-radius: 12px;
+      background: #f8fafc;
+      color: #1e293b;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+
+    .premium-input:focus, .premium-select:focus {
+      border-color: #3b82f6;
+      background: white;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+
+    .btn-generate {
+      height: 48px;
+      padding: 0 2rem;
+      background: #0f172a;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.2);
+    }
+
+    .btn-generate:hover {
+      background: #1e293b;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.3);
+    }
+
+    .btn-generate i {
+      font-size: 1.1rem;
+    }
+
+    .btn-download {
+      height: 48px;
+      width: 48px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      color: white;
+    }
+
+    .btn-excel { background: #10b981; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2); }
+    .btn-pdf { background: #ef4444; box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2); }
+
+    @media (max-width: 640px) {
+      .analytics-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="admin-container">
+    <aside class="sidebar">
+      <div class="logo-area">
+        <h2>LogiaFun <span class="badge">Admin</span></h2>
+      </div>
+      <nav class="sidebar-nav">
+        <ul>
+          <li class="nav-item">
+            <a href="/admin/dashboard" class="nav-link">
+              <i class="fa-solid fa-chart-line"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item active">
+            <a href="/admin/analytics" class="nav-link">
+              <i class="fa-solid fa-chart-pie"></i>
+              <span>Analytics</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/admin/products" class="nav-link">
+              <i class="fa-solid fa-box"></i>
+              <span>Products</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/admin/categories" class="nav-link">
+              <i class="fa-solid fa-layer-group"></i>
+              <span>Categories</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/admin/orders" class="nav-link">
+              <i class="fa-solid fa-cart-shopping"></i>
+              <span>Orders</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/admin/users" class="nav-link">
+              <i class="fa-solid fa-users"></i>
+              <span>Users</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/admin/coupons" class="nav-link">
+              <i class="fa-solid fa-ticket"></i>
+              <span>Coupons</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/admin/offers" class="nav-link">
+              <i class="fa-solid fa-tags"></i>
+              <span>Offers</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <div class="sidebar-footer">
+        <form action="/admin/logout" method="POST" class="logout-form">
+          <button type="submit" class="nav-link logout logout-btn">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
+          </button>
+        </form>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="top-bar">
+        <div class="mobile-toggle">
+          <i class="fa-solid fa-bars"></i>
+        </div>
+        <div class="page-title">
+          <h1>Detailed Analytics</h1>
+        </div>
+        <div class="user-profile">
+          <div class="notification-icon">
+            <i class="fa-regular fa-bell"></i>
+          </div>
+          <div class="profile-info">
+            <img src="https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff" alt="Admin" />
+            <span>Admin</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="content-body">
+        <div class="premium-controls">
+          <div class="control-group">
+            <label class="control-label">Report Period</label>
+            <select id="reportPeriod" class="premium-select">
+              <option value="daily" <%= period === 'daily' ? 'selected' : '' %>>Daily</option>
+              <option value="weekly" <%= period === 'weekly' ? 'selected' : '' %>>Weekly</option>
+              <option value="yearly" <%= period === 'yearly' ? 'selected' : '' %>>Yearly</option>
+              <option value="custom" <%= period === 'custom' ? 'selected' : '' %>>Custom Range</option>
+            </select>
+          </div>
+          
+          <div id="customDates" style="display: <%= period === 'custom' ? 'flex' : 'none' %>; gap: 1rem; flex: 2; min-width: 320px;">
+            <div class="control-group">
+              <label class="control-label">Start Date</label>
+              <input type="date" id="reportStartDate" value="<%= startDate %>" class="premium-input">
+            </div>
+            <div class="control-group">
+              <label class="control-label">End Date</label>
+              <input type="date" id="reportEndDate" value="<%= endDate %>" class="premium-input">
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem;">
+            <button onclick="applyReportFilter()" class="btn-generate">
+              <i class="fa-solid fa-arrows-rotate"></i> Generate Report
+            </button>
+            <button onclick="downloadReport('excel')" class="btn-download btn-excel" title="Download Excel">
+              <i class="fa-solid fa-file-excel"></i>
+            </button>
+            <button onclick="downloadReport('pdf')" class="btn-download btn-pdf" title="Download PDF">
+              <i class="fa-solid fa-file-pdf"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Sales Summary -->
+         <div class="analytics-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 2rem;">
+            <div class="chart-card" style="text-align: center; padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+              <span style="color: #64748b; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Orders</span>
+              <h2 style="font-size: 1.75rem; color: #0f172a; margin: 0.5rem 0;"><%= reportSummary.totalSalesCount %></h2>
+              <span style="color: #10b981; font-size: 0.75rem;"><i class="fa-solid fa-cart-shopping"></i> Total Sales</span>
+            </div>
+            <div class="chart-card" style="text-align: center; padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+              <span style="color: #64748b; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Subtotal</span>
+              <h2 style="font-size: 1.75rem; color: #0f172a; margin: 0.5rem 0;">₹<%= reportSummary.totalSubtotal.toLocaleString() %></h2>
+              <span style="color: #64748b; font-size: 0.75rem;"><i class="fa-solid fa-receipt"></i> Gross Value</span>
+            </div>
+            <div class="chart-card" style="text-align: center; padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+              <span style="color: #64748b; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Offer Disc.</span>
+              <h2 style="font-size: 1.75rem; color: #f59e0b; margin: 0.5rem 0;">₹<%= reportSummary.totalOfferDiscount.toLocaleString() %></h2>
+              <span style="color: #f59e0b; font-size: 0.75rem;"><i class="fa-solid fa-tag"></i> Market Offers</span>
+            </div>
+            <div class="chart-card" style="text-align: center; padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+              <span style="color: #64748b; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Coupon Disc.</span>
+              <h2 style="font-size: 1.75rem; color: #ef4444; margin: 0.5rem 0;">₹<%= reportSummary.totalCouponDiscount.toLocaleString() %></h2>
+              <span style="color: #ef4444; font-size: 0.75rem;"><i class="fa-solid fa-ticket"></i> Promo Savings</span>
+            </div>
+            <div class="chart-card" style="background: #0f172a; text-align: center; padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+              <span style="color: #94a3b8; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Final Revenue</span>
+              <h2 style="font-size: 1.75rem; color: #ffffff; margin: 0.5rem 0;">₹<%= reportSummary.totalRevenue.toLocaleString() %></h2>
+              <span style="color: #10b981; font-size: 0.75rem;"><i class="fa-solid fa-money-bill-trend-up"></i> Net Collection</span>
+            </div>
+         </div>
+
+        <div class="analytics-grid">
+          <!-- Category Distribution -->
+          <div class="chart-card">
+            <h2 class="section-title">Sales by Category</h2>
+            <canvas id="categoryChart"></canvas>
+          </div>
+
+          <!-- Payment Methods -->
+          <div class="chart-card">
+            <h2 class="section-title">Payment Methods</h2>
+            <canvas id="paymentChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Top Products -->
+        <div class="top-products-card">
+          <h2 class="section-title">Top Selling Products</h2>
+          <div class="products-list">
+            <% topProducts.forEach(product => { %>
+              <div class="product-item">
+                <img src="<%= product.image %>" alt="<%= product.name %>" class="product-image">
+                <div class="product-info">
+                  <span class="product-name"><%= product.name %></span>
+                  <span class="product-stats">Sold: <%= product.totalSold %> units</span>
+                </div>
+                <div class="product-revenue">
+                  ₹<%= product.revenue.toLocaleString() %>
+                </div>
+              </div>
+            <% }) %>
+            <% if (topProducts.length === 0) { %>
+              <div style="text-align: center; padding: 2rem;">No data available</div>
+            <% } %>
+          </div>
+        </div>
+        <!-- Sales Report Table -->
+        <div class="top-products-card" style="margin-top: 2rem;">
+          <h2 class="section-title">In-Depth Sales Report</h2>
+          <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse;">
+              <thead style="background: #f8fafc;">
+                <tr>
+                  <th style="padding: 1rem; text-align: left; color: #64748b; font-weight: 600; font-size: 0.875rem;">Order Number</th>
+                  <th style="padding: 1rem; text-align: left; color: #64748b; font-weight: 600; font-size: 0.875rem;">Date</th>
+                  <th style="padding: 1rem; text-align: left; color: #64748b; font-weight: 600; font-size: 0.875rem;">Subtotal</th>
+                  <th style="padding: 1rem; text-align: left; color: #64748b; font-weight: 600; font-size: 0.875rem;">Offer Disc.</th>
+                  <th style="padding: 1rem; text-align: left; color: #64748b; font-weight: 600; font-size: 0.875rem;">Coupon</th>
+                  <th style="padding: 1rem; text-align: left; color: #64748b; font-weight: 600; font-size: 0.875rem;">Paid Amount</th>
+                  <th style="padding: 1rem; text-align: left; color: #64748b; font-weight: 600; font-size: 0.875rem;">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (orders && orders.length > 0) { %>
+                  <% orders.forEach(order => { %>
+                    <% const offerDiscount = order.items.reduce((acc, item) => acc + (item.product.originalPrice - item.product.discountedPrice) * item.quantity, 0); %>
+                    <tr style="border-bottom: 1px solid #f1f5f9;">
+                      <td style="padding: 1.25rem 1rem; font-weight: 500; font-size: 0.9rem;"><%= order.orderNumber %></td>
+                      <td style="padding: 1.25rem 1rem; color: #64748b; font-size: 0.9rem;"><%= new Date(order.createdAt).toLocaleDateString() %></td>
+                      <td style="padding: 1.25rem 1rem; color: #64748b; font-size: 0.9rem;">₹<%= (order.payment.subtotal || order.payment.amount).toLocaleString() %></td>
+                      <td style="padding: 1.25rem 1rem; color: #f59e0b; font-weight: 500; font-size: 0.9rem;">₹<%= offerDiscount.toLocaleString() %></td>
+                      <td style="padding: 1.25rem 1rem; color: #ef4444; font-weight: 500; font-size: 0.9rem;">₹<%= (order.payment.discount || 0).toLocaleString() %></td>
+                      <td style="padding: 1.25rem 1rem; font-weight: 700; color: #0f172a; font-size: 0.9rem;">₹<%= order.payment.amount.toLocaleString() %></td>
+                      <td style="padding: 1.25rem 1rem;">
+                        <span style="background: #eff6ff; color: #3b82f6; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; text-transform: capitalize;">
+                          <%= order.orderStatus %>
+                        </span>
+                      </td>
+                    </tr>
+                  <% }) %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="6" style="padding: 3rem; text-align: center; color: #64748b;">No orders found for this period</td>
+                  </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    document.getElementById('reportPeriod').addEventListener('change', function() {
+      const customDates = document.getElementById('customDates');
+      customDates.style.display = this.value === 'custom' ? 'flex' : 'none';
+    });
+
+    function applyReportFilter() {
+      const period = document.getElementById('reportPeriod').value;
+      const startDate = document.getElementById('reportStartDate').value;
+      const endDate = document.getElementById('reportEndDate').value;
+      
+      const params = new URLSearchParams(window.location.search);
+      params.set('period', period);
+      if (period === 'custom') {
+        params.set('startDate', startDate);
+        params.set('endDate', endDate);
+      } else {
+        params.delete('startDate');
+        params.delete('endDate');
+      }
+      window.location.search = params.toString();
+    }
+
+    function downloadReport(type) {
+      const period = document.getElementById('reportPeriod').value;
+      const startDate = document.getElementById('reportStartDate').value;
+      const endDate = document.getElementById('reportEndDate').value;
+      
+      let url = `/admin/analytics/${type}?period=${period}`;
+      if (period === 'custom') {
+        url += `&startDate=${startDate}&endDate=${endDate}`;
+      }
+      window.location.href = url;
+    }
+
+    // Category Chart
+    const catCtx = document.getElementById('categoryChart').getContext('2d');
+    new Chart(catCtx, {
+      type: 'doughnut',
+      data: {
+        labels: <%- categoryLabels %>,
+        datasets: [{
+          data: <%- categoryValues %>,
+          backgroundColor: ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#ec4899', '#06b6d4'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'bottom' }
+        }
+      }
+    });
+
+    // Payment Chart
+    const payCtx = document.getElementById('paymentChart').getContext('2d');
+    new Chart(payCtx, {
+      type: 'pie',
+      data: {
+        labels: <%- paymentLabels %>,
+        datasets: [{
+          data: <%- paymentValues %>,
+          backgroundColor: ['#3b82f6', '#f59e0b', '#10b981'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'bottom' }
+        }
+      }
+    });
+  </script>
+</body>
+
+</html>

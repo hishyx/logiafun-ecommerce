@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login - LogiaFun</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/css/admin/login.css" />
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="brand-header">
+        <div class="logo-icon">
+          <i class="fa-solid fa-code-branch"></i>
+        </div>
+        <h2>LogiaFun <span class="badge">Admin</span></h2>
+        <p>Welcome back! Please login to your account.</p>
+      </div>
+
+      <form action="/admin/auth/login" method="POST" autocomplete="off" novalidate>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <div class="input-wrapper">
+            <i class="fa-regular fa-envelope"></i>
+            <input type="email" id="email" name="email" value="admin@logiafun.com" placeholder="admin@logiafun.com" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-lock"></i>
+            <input type="password" id="password" name="password" value="2007" placeholder="••••••••" required data-skip-strength />
+            <i class="fa-solid fa-eye password-toggle-icon" id="togglePassword"></i>
+          </div>
+        </div>
+
+        <p style="color: red; font-weight: bold">
+          <%=error%>
+        </p>
+
+        <div class="form-options">
+          <label class="checkbox-container">
+            <input type="checkbox" checked />
+            <span class="checkmark"></span>
+            Remember me
+          </label>
+          <!-- <a href="#" class="forgot-link">Forgot Password?</a> -->
+        </div>
+
+        <button type="submit" class="login-btn">
+          Login to Dashboard <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+
+      <div class="card-footer">
+        <p>&copy; 2026 LogiaFun. All rights reserved.</p>
+      </div>
+    </div>
+  </div>
+  <script src="/js/helpers/formValidator.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const toggleIcons = document.querySelectorAll(".password-toggle-icon");
+
+      toggleIcons.forEach((icon) => {
+        icon.addEventListener("click", function() {
+          const wrapper = this.closest(".input-wrapper");
+          if (!wrapper) return;
+
+          const passwordInput = wrapper.querySelector("input");
+          if (!passwordInput) return;
+
+          const type =
+            passwordInput.getAttribute("type") === "password" ?
+            "text" :
+            "password";
+          passwordInput.setAttribute("type", type);
+
+          // Toggle FontAwesome classes
+          if (type === "text") {
+            this.classList.remove("fa-eye");
+            this.classList.add("fa-eye-slash");
+          } else {
+            this.classList.remove("fa-eye-slash");
+            this.classList.add("fa-eye");
+          }
+        });
+      });
+    });
+  </script>
+
+</body>
+
+</html>

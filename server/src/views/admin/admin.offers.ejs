@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Offer Management - Admin Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/css/admin/main.css" />
+  <style>
+    .btn-primary {
+      background-color: #0f172a;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-primary:hover {
+      background-color: #1e293b;
+      transform: translateY(-1px);
+    }
+
+    .table-container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      margin-top: 1.5rem;
+    }
+
+    .empty-state {
+      padding: 4rem 2rem;
+      text-align: center;
+      color: #64748b;
+    }
+
+    .empty-state i {
+      font-size: 3.5rem;
+      margin-bottom: 1.5rem;
+      opacity: 0.4;
+    }
+
+    .empty-state h3 {
+      font-size: 1.5rem;
+      color: #0f172a;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="admin-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo-area">
+        <h2>LogiaFun <span class="badge">Admin</span></h2>
+      </div>
+
+      <nav class="sidebar-nav">
+        <ul>
+          <li class="nav-item">
+            <a href="/admin/dashboard" class="nav-link">
+              <i class="fa-solid fa-chart-line"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/admin/analytics" class="nav-link">
+              <i class="fa-solid fa-chart-pie"></i>
+              <span>Analytics</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/admin/products" class="nav-link">
+              <i class="fa-solid fa-box"></i>
+              <span>Products</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/admin/categories" class="nav-link">
+              <i class="fa-solid fa-layer-group"></i>
+              <span>Categories</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/admin/orders" class="nav-link">
+              <i class="fa-solid fa-cart-shopping"></i>
+              <span>Orders</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/admin/users" class="nav-link">
+              <i class="fa-solid fa-users"></i>
+              <span>Users</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/admin/coupons" class="nav-link">
+              <i class="fa-solid fa-ticket"></i>
+              <span>Coupons</span>
+            </a>
+          </li>
+          <li class="nav-item active">
+            <a href="/admin/offers" class="nav-link">
+              <i class="fa-solid fa-tags"></i>
+              <span>Offers</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      <div class="sidebar-footer">
+        <form action="/admin/logout" method="POST" class="logout-form">
+          <button type="submit" class="nav-link logout logout-btn">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
+          </button>
+        </form>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="top-bar">
+        <div class="mobile-toggle">
+          <i class="fa-solid fa-bars"></i>
+        </div>
+        <div class="page-title">
+          <h1>Offer Management</h1>
+        </div>
+        <div class="user-profile">
+          <div class="profile-info">
+            <img src="https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff" alt="Admin" />
+            <span>Admin</span>
+          </div>
+        </div>
+      </header>
+
+      <div class="content-body">
+        <!-- Controls Area -->
+        <div class="controls-area">
+          <div class="search-wrapper">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="listSearch" value="<%= search%>" placeholder="Search offers..." />
+            <button id="clearSearchBtn" class="action-btn clear-btn" aria-label="Clear Search">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
+          <div class="actions-wrapper">
+            <div class="sort-wrapper">
+              <label for="filterBy">Filter By:</label>
+              <select id="filterBy">
+                <option value="all" <%=filter==="all" ?"selected":"" %>>All</option>
+                <option value="active" <%=filter==="active" ?"selected":"" %>>Active</option>
+                <option value="inactive" <%=filter==="inactive" ?"selected":"" %>>Inactive</option>
+              </select>
+            </div>
+            <div class="sort-wrapper">
+              <label for="sortBy">Sort By:</label>
+              <select id="sortBy">
+                <option value="latest" <%=sort==="latest" ?"selected":"" %>>Newest First</option>
+                <option value="oldest" <%=sort==="oldest" ?"selected":"" %>>Oldest First</option>
+              </select>
+            </div>
+            <button class="btn-primary" style="padding: 0.5rem 1rem; margin-left: 10px" onclick="openModal('addOfferModal')">
+              <i class="fa-solid fa-plus"></i> Add Offer
+            </button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Offer Name</th>
+                <th>Discount</th>
+                <th>Target</th>
+                <th>Period</th>
+                <th>Status</th>
+                <th style="text-align: right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (locals.offers && offers.length > 0) { %>
+                <% offers.forEach(offer => { %>
+                  <tr>
+                    <td>
+                      <div class="product-cell">
+                        <div class="product-info">
+                          <span style="font-weight: 600; color: #0f172a;"><%= offer.name %></span>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <span style="font-weight: 600; color: #1e40af;">
+                        <%= offer.discountValue %>%
+                      </span>
+                    </td>
+                    <td>
+                      <div style="display: flex; flex-direction: column; gap: 2px;">
+                        <span class="status-badge" style="background: #f1f5f9; color: #475569; padding: 2px 8px; font-size: 0.75rem;">
+                          <%= offer.offerType %>
+                        </span>
+                        <small style="color: #64748b;">
+                          <% if (offer.offerType === 'product') { %>
+                            <%= products.find(p => p._id.toString() === offer.targetId.toString())?.name || 'Unknown Product' %>
+                          <% } else { %>
+                            <%= categories.find(c => c._id.toString() === offer.targetId.toString())?.name || 'Unknown Category' %>
+                          <% } %>
+                        </small>
+                      </div>
+                    </td>
+                    <td>
+                      <div style="display: flex; flex-direction: column; gap: 4px;">
+                        <small style="color: #64748b;">Start: <%= new Date(offer.startDate).toLocaleDateString() %></small>
+                        <small style="color: #ef4444; font-weight: 500;">Exp: <%= new Date(offer.expiryDate).toLocaleDateString() %></small>
+                      </div>
+                    </td>
+                    <td>
+                      <% if (offer.isActive) { %>
+                        <span class="status-badge status-active">
+                          <span class="status-indicator"></span> Active
+                        </span>
+                      <% } else { %>
+                        <span class="status-badge status-blocked">
+                          <span class="status-indicator"></span> Inactive
+                        </span>
+                      <% } %>
+                    </td>
+                    <td style="text-align: right;">
+                      <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                        <button class="action-btn" title="Edit" onclick="openEditModal(<%= JSON.stringify(offer) %>)">
+                          <i class="fa-regular fa-pen-to-square"></i>
+                        </button>
+                        <button class="action-btn" title="<%= offer.isActive ? 'Deactivate' : 'Activate' %>" 
+                                onclick="toggleOfferStatus('<%= offer._id %>')"
+                                style="color: <%= offer.isActive ? '#ef4444' : '#10b981' %>">
+                          <i class="fa-solid <%= offer.isActive ? 'fa-ban' : 'fa-check' %>"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% } else { %>
+                <tr>
+                  <td colspan="6" style="text-align: center; padding: 3rem; color: #64748b;">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                      <i class="fa-solid fa-tags" style="font-size: 3rem; opacity: 0.3;"></i>
+                      <div style="font-weight: 500; font-size: 1.1rem; color: #0f172a;">No offers found</div>
+                      <p style="margin: 0;">Try adjusting your filters or create a new offer.</p>
+                    </div>
+                  </td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination-area" style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; background: white; padding: 1rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <div class="pagination-info" style="color: #64748b; font-size: 0.9rem;">
+            Showing <%= total === 0 ? 0 : ((page - 1) * limit + 1) %> - <%= Math.min(page * limit, total) %> of <%= total %>
+          </div>
+          <div class="pagination-controls" style="display: flex; gap: 0.5rem;">
+            <button class="page-btn" <%= page === 1 || totalPages === 0 ? "disabled" : "" %> onclick="goToPage(<%= page - 1 %>)" 
+                    style="border: 1px solid #e2e8f0; background: white; width: 32px; height: 32px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+              <i class="fa-solid fa-chevron-left" style="color: #64748b;"></i>
+            </button>
+            <div class="page-numbers" style="display: flex; gap: 0.25rem;">
+              <% for(let i=1; i <= totalPages; i++) { %>
+                <button onclick="goToPage(<%= i %>)" style="<%= page === i ? 'border: 1px solid #3b82f6; background-color: #eff6ff; color: #1e40af;' : 'border: 1px solid #e2e8f0; background-color: white; color: #64748b;' %> font-weight: 500; width: 32px; height: 32px; border-radius: 6px; cursor: pointer;">
+                  <%= i %>
+                </button>
+              <% } %>
+            </div>
+            <button class="page-btn" <%= page === totalPages || totalPages === 0 ? "disabled" : "" %> onclick="goToPage(<%= page + 1 %>)"
+                    style="border: 1px solid #e2e8f0; background: white; width: 32px; height: 32px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+              <i class="fa-solid fa-chevron-right" style="color: #64748b;"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add Offer Modal -->
+  <div class="modal-overlay" id="addOfferModal">
+    <div class="modal-container" style="background: white; width: 100%; max-width: 500px; border-radius: 16px; padding: 2rem; position: relative;">
+      <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h3 style="margin: 0;">Add New Offer</h3>
+        <button onclick="closeModal('addOfferModal')" style="background: none; border: none; font-size: 1.25rem; cursor: pointer; color: #64748b;"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="addOfferForm">
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Offer Name</label>
+          <input type="text" name="name" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Discount Percentage (%)</label>
+          <input type="number" name="discountValue" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;" min="1" max="100" required>
+          <input type="hidden" name="discountType" value="percentage">
+        </div>
+        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+          <div class="form-group">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Offer Type</label>
+            <select name="offerType" id="offerTypeAdd" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;" onchange="updateTargetOptions('Add')">
+              <option value="product">Product</option>
+              <option value="category">Category</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Target</label>
+            <select name="targetId" id="targetIdAdd" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;" required>
+              <!-- Options loaded dynamically -->
+            </select>
+          </div>
+        </div>
+        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+          <div class="form-group">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Start Date</label>
+            <input type="date" name="startDate" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;" required>
+          </div>
+          <div class="form-group">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Expiry Date</label>
+            <input type="date" name="expiryDate" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;" required>
+          </div>
+        </div>
+        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 1rem;">Save Offer</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Offer Modal -->
+  <div class="modal-overlay" id="editOfferModal">
+    <div class="modal-container" style="background: white; width: 100%; max-width: 500px; border-radius: 16px; padding: 2rem; position: relative;">
+      <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h3 style="margin: 0;">Edit Offer</h3>
+        <button onclick="closeModal('editOfferModal')" style="background: none; border: none; font-size: 1.25rem; cursor: pointer; color: #64748b;"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="editOfferForm">
+        <input type="hidden" name="offerId" id="editOfferId">
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Offer Name</label>
+          <input type="text" name="name" id="editName" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Discount Percentage (%)</label>
+          <input type="number" name="discountValue" id="editDiscountValue" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;" min="1" max="100" required>
+          <input type="hidden" name="discountType" value="percentage">
+        </div>
+        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+          <div class="form-group">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Offer Type</label>
+            <select name="offerType" id="offerTypeEdit" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;" onchange="updateTargetOptions('Edit')">
+              <option value="product">Product</option>
+              <option value="category">Category</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Target</label>
+            <select name="targetId" id="targetIdEdit" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;" required>
+              <!-- Options loaded dynamically -->
+            </select>
+          </div>
+        </div>
+        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+          <div class="form-group">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Start Date</label>
+            <input type="date" name="startDate" id="editStartDate" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;" required>
+          </div>
+          <div class="form-group">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Expiry Date</label>
+            <input type="date" name="expiryDate" id="editExpiryDate" class="form-control" style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;" required>
+          </div>
+        </div>
+        <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; padding: 1rem;">Update Offer</button>
+      </form>
+    </div>
+  </div>
+
+  <style>
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center;
+      z-index: 1000; backdrop-filter: blur(4px);
+    }
+    .modal-overlay.active { display: flex; }
+    .status-badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; font-weight: 500; }
+    .status-active { background: #eff6ff; color: #1e40af; }
+    .status-blocked { background: #fef2f2; color: #991b1b; }
+    .status-indicator { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .action-btn { background: white; border: 1px solid #e2e8f0; padding: 0.5rem; border-radius: 6px; color: #64748b; cursor: pointer; }
+    .action-btn:hover { background: #f8fafc; color: #0f172a; }
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th, .data-table td { padding: 1rem 1.5rem; text-align: left; border-bottom: 1px solid #f1f5f9; }
+    .data-table th { background: #f8fafc; color: #475569; font-size: 0.875rem; }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    const products = <%- JSON.stringify(products) %>;
+    const categories = <%- JSON.stringify(categories) %>;
+
+    function openModal(id) { document.getElementById(id).classList.add('active'); if(id === 'addOfferModal') updateTargetOptions('Add'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    function updateTargetOptions(mode, selectedId = null) {
+      const type = document.getElementById(`offerType${mode}`).value;
+      const targetSelect = document.getElementById(`targetId${mode}`);
+      targetSelect.innerHTML = '';
+      const items = type === 'product' ? products : categories;
+      items.forEach(item => {
+        const option = new Option(item.name, item._id);
+        if(selectedId && item._id === selectedId) option.selected = true;
+        targetSelect.add(option);
+      });
+    }
+
+    function openEditModal(offer) {
+      document.getElementById('editOfferId').value = offer._id;
+      document.getElementById('editName').value = offer.name;
+      document.getElementById('editDiscountValue').value = offer.discountValue;
+      document.getElementById('offerTypeEdit').value = offer.offerType;
+      updateTargetOptions('Edit', offer.targetId);
+      document.getElementById('editStartDate').value = new Date(offer.startDate).toISOString().split('T')[0];
+      document.getElementById('editExpiryDate').value = new Date(offer.expiryDate).toISOString().split('T')[0];
+      openModal('editOfferModal');
+    }
+
+    document.querySelector('.btn-primary').addEventListener('click', () => openModal('addOfferModal'));
+
+    document.getElementById('addOfferForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData.entries());
+      try {
+        const res = await fetch('/admin/offers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        if(result.success) {
+          Swal.fire('Success', result.message, 'success').then(() => window.location.reload());
+        } else {
+          Swal.fire('Error', result.message, 'error');
+        }
+      } catch (err) { Swal.fire('Error', 'Something went wrong', 'error'); }
+    });
+
+    document.getElementById('editOfferForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const offerId = document.getElementById('editOfferId').value;
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData.entries());
+      try {
+        const res = await fetch(`/admin/offers/${offerId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        if(result.success) {
+          Swal.fire('Success', result.message, 'success').then(() => window.location.reload());
+        } else {
+          Swal.fire('Error', result.message, 'error');
+        }
+      } catch (err) { Swal.fire('Error', 'Something went wrong', 'error'); }
+    });
+
+    async function toggleOfferStatus(id) {
+      try {
+        const res = await fetch(`/admin/offers/${id}/toggle`, { method: 'PATCH' });
+        const result = await res.json();
+        if(result.success) {
+          Swal.fire('Success', result.message, 'success').then(() => window.location.reload());
+        }
+      } catch (err) { Swal.fire('Error', 'Something went wrong', 'error'); }
+    }
+  </script>
+  <script src="/js/admin/admin.pagination.search.js"></script>
+</body>
+
+</html>

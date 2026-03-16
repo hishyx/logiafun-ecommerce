@@ -1,0 +1,41 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon src/server.js",
+    "dev": "nodemon src/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cloudinary": "^2.9.0",
+    "connect-flash": "^0.1.1",
+    "dotenv": "^17.2.3",
+    "ejs": "^4.0.1",
+    "exceljs": "^4.4.0",
+    "express": "^5.2.1",
+    "express-session": "^1.18.2",
+    "method-override": "^3.0.0",
+    "mongodb": "^7.1.0",
+    "mongoose": "^9.1.4",
+    "multer": "^2.0.2",
+    "nocache": "^4.0.0",
+    "nodemailer": "^7.0.12",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "puppeteer": "^24.37.5",
+    "razorpay": "^2.9.6"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "^7.0.5",
+    "autoprefixer": "^10.4.27",
+    "nodemon": "^3.1.11",
+    "postcss": "^8.5.8",
+    "tailwindcss": "^4.2.1"
+  }
+}

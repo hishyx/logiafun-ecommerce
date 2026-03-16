@@ -1,0 +1,160 @@
+<style>
+  .login-header-btn {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1.25rem;
+    background-color: #0f172a;
+    color: white !important;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    border: none;
+  }
+
+  .login-header-btn:hover {
+    background-color: #1e293b;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+  }
+
+  .login-header-btn svg {
+    transition: transform 0.3s ease;
+  }
+
+  .login-header-btn:hover svg {
+    transform: translateX(2px);
+  }
+</style>
+
+<header class="header">
+  <div class="container">
+    <div class="header-content">
+      <a href="/home" class="logo">logia<span>Fun</span></a>
+
+      <nav class="nav">
+        <a href="/home">Home</a>
+        <a href="/products">Shop</a>
+        <!-- <a href="/pages">Pages</a>
+        <a href="/blog">Blog</a>
+        <a href="/contact">Contact</a> -->
+      </nav>
+
+      <div class="header-right">
+        <div class="header-icons-group">
+          <div class="search-box">
+            <label for="searchBox" style="cursor: pointer; display: flex; align-items: center;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
+              </svg>
+            </label>
+
+            <input type="text" placeholder="Search" id="searchBox"
+              value="<%= typeof searchValue !== 'undefined' ? searchValue : '' %>" />
+
+
+            <!-- Cancel Button -->
+            <button type="button" class="clear-search" id="clearSearchBtn">
+              ✕
+            </button>
+          </div>
+
+
+          <% if (locals.user) { %>
+            <a href="/user/profile" class="profile-btn">
+              <div class="profile-icon">
+                <img src="<%=user.profileImage%>" style="border-radius: 30px;border-color: black;border-width: 1px;">
+              </div>
+
+              <span class="profile-name">
+                <%= user.name %>
+              </span>
+            </a>
+            <% } else { %>
+              <a href="/auth/login" class="login-header-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  style="margin-right: 8px;">
+                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3" />
+                </svg>
+                Login
+              </a>
+              <% } %>
+
+                <a href="/user/wishlist" class="cart-icon" style="margin-right: 15px;">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path
+                      d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                    </path>
+                  </svg>
+                  <span class="cart-badge">
+                    <%=wishlistCount%>
+                  </span>
+                </a>
+
+                <a href="/user/cart" class="cart-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="9" cy="21" r="1" />
+                    <circle cx="20" cy="21" r="1" />
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                  </svg>
+                  <span class="cart-badge">
+                    <%=cartCount%>
+                  </span>
+                </a>
+        </div>
+
+        <button class="menu-toggle" aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script>
+  window.showToast = function (message, type = 'success') {
+    let bgColor = 'linear-gradient(to right, #00b09b, #96c93d)'; // success green
+    if (type === 'error') {
+      bgColor = 'linear-gradient(to right, #ff5f6d, #ffc371)'; // error red/orange
+    } else if (type === 'info') {
+      bgColor = 'linear-gradient(to right, #2193b0, #6dd5ed)'; // info blue
+    }
+
+    Toastify({
+      text: message,
+      duration: 3000,
+      newWindow: true,
+      close: true,
+      gravity: "top",
+      position: "right",
+      stopOnFocus: true,
+      style: {
+        background: bgColor,
+        borderRadius: "8px",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+        padding: "12px 24px",
+        fontSize: "14px",
+        fontWeight: "500"
+      }
+    }).showToast();
+  };
+
+  // Mobile navigation toggle
+  document.addEventListener('DOMContentLoaded', () => {
+    const menuToggle = document.querySelector('.menu-toggle');
+    const nav = document.querySelector('.nav');
+
+    if (menuToggle && nav) {
+      menuToggle.addEventListener('click', () => {
+        nav.classList.toggle('nav-active');
+        menuToggle.classList.toggle('active');
+      });
+    }
+  });
+</script>
+<script src="/js/helpers/user.search.js"></script>

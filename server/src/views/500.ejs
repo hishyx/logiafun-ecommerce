@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>500 - Internal Server Error | logiaFun</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #33bbc5;
+            --secondary: #ff9fb2;
+            --text-dark: #2c3e50;
+            --bg-light: #f0f7f9;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            perspective: 1000px;
+        }
+
+        .error-container {
+            text-align: center;
+            max-width: 800px;
+            width: 90%;
+            z-index: 10;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .illustration-wrapper {
+            position: relative;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .number-bg {
+            position: absolute;
+            font-size: 20rem;
+            font-weight: 800;
+            color: rgba(51, 187, 197, 0.1);
+            z-index: -1;
+            user-select: none;
+            display: flex;
+            gap: 15rem;
+            line-height: 1;
+        }
+
+        .main-illustration {
+            width: 450px;
+            max-width: 100%;
+            filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.1));
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .error-content h1 {
+            font-size: 2rem;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+            font-weight: 800;
+        }
+
+        .error-content p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            margin-bottom: 2.5rem;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .home-btn {
+            display: inline-block;
+            padding: 1rem 3.5rem;
+            background-color: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 700;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 20px rgba(51, 187, 197, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+
+        .home-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 30px rgba(51, 187, 197, 0.4);
+            background-color: #2daab4;
+        }
+
+        /* Decorative elements/stars */
+        .decor {
+            position: absolute;
+            border-radius: 50%;
+            background: white;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-25px) rotate(3deg);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .number-bg {
+                font-size: 12rem;
+                gap: 10rem;
+            }
+
+            .main-illustration {
+                width: 320px;
+            }
+
+            .error-content h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="stars-container"></div>
+
+    <div class="error-container">
+        <div class="illustration-wrapper">
+            <div class="number-bg">
+                <span>5</span>
+                <span>0</span>
+            </div>
+            <img src="/img/500-error.png" alt="Server Error" class="main-illustration">
+        </div>
+
+        <div class="error-content">
+            <h1>Oops! Internal Server Error</h1>
+            <p>Our cosmic engines are experiencing some turbulence. Astronauts have been dispatched to fix the issue!
+            </p>
+            <a href="/home" class="home-btn">Return to Home</a>
+        </div>
+    </div>
+
+    <script>
+        // Generate sparkling stars
+        const container = document.getElementById('stars-container');
+        const count = 50;
+
+        for (let i = 0; i < count; i++) {
+            const star = document.createElement('div');
+            star.className = 'decor';
+            const size = Math.random() * 6 + 2;
+            star.style.width = size + 'px';
+            star.style.height = size + 'px';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.left = Math.random() * 100 + '%';
+
+            // Random floating animation
+            const duration = Math.random() * 3 + 3;
+            const delay = Math.random() * 5;
+            star.style.animation = `float ${duration}s ease-in-out ${delay}s infinite`;
+            star.style.opacity = Math.random();
+
+            container.appendChild(star);
+        }
+    </script>
+</body>
+
+</html>

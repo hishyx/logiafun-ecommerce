@@ -1,0 +1,19 @@
+ server/                (Everything for the backend)
+    ├── node_modules/      (Installed libraries)
+    ├── public/            (CSS, Images, Browser JS)
+    ├── src/               (THE CORE CODE)
+    │   ├── server.js      (Starts the database + listens on port)
+    │   ├── app.js         (Configures Express, routes, & middleware)
+    │   ├── config/        (DB connection logic)
+    │   ├── routes/        (URL paths: /login, /products)
+    │   ├── controllers/   (Logic: "What happens when I click login")
+    │   ├── models/        (Database schemas: User, Product)
+    │   └── views/         (EJS templates)
+    ├── .env               (Secret keys)
+    ├── .gitignore         (Files to hide from Git)
+    └── package.json       (Project info & dependencies)
+
+
+;     //logiafun/ (Root)
+; ├── docs/                  (Your notes/documentation)
+; └──
