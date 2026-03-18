@@ -2,6 +2,8 @@ import * as adminOrderServices from "../../services/admin/admin.order.services.j
 
 import statusTransitions from "../../components/order.status.transitions.js";
 import { getOrderDetails } from "../../services/user.order.services.js";
+import * as statusCodes from "../../constants/statusCodes.js";
+import * as messages from "../../constants/messages.js";
 
 export const adminOrderListPage = async (req, res) => {
   try {
@@ -57,7 +59,7 @@ export const adminOrderListPage = async (req, res) => {
     });
   } catch (err) {
     console.error("Error in adminOrderListPage:", err);
-    res.status(500).send("Internal Server Error");
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).send(messages.INTERNAL_SERVER_ERROR);
   }
 };
 
@@ -101,7 +103,7 @@ export const updateAdminOrderStatus = async (req, res) => {
       req.body.newStatus,
     );
 
-    res.sendStatus(200);
+    res.sendStatus(statusCodes.OK);
   } catch (err) {
     console.log(err);
   }
@@ -124,21 +126,21 @@ export const acceptReturn = async (req, res) => {
         doIncreaseStock,
       );
     } else {
-      return res.status(400).json({
+      return res.status(statusCodes.BAD_REQUEST).json({
         success: false,
         message: "Invalid return request",
       });
     }
 
-    res.status(200).json({
+    res.status(statusCodes.OK).json({
       success: true,
       message: "Return accepted successfully",
     });
   } catch (err) {
     console.error("Error in acceptReturn:", err);
-    res.status(500).json({
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
-      message: err.message || "Internal Server Error",
+      message: err.message || messages.INTERNAL_SERVER_ERROR,
     });
   }
 };
@@ -153,13 +155,13 @@ export const updateAdminOrderItemStatus = async (req, res) => {
       newStatus,
     );
 
-    res.status(200).json({
+    res.status(statusCodes.OK).json({
       success: true,
       message: "Item status updated successfully",
     });
   } catch (err) {
     console.error("Error in updateAdminOrderItemStatus:", err);
-    res.status(400).json({
+    res.status(statusCodes.BAD_REQUEST).json({
       success: false,
       message: err.message || "Failed to update item status",
     });

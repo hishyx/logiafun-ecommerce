@@ -15,6 +15,8 @@ import {
 import User from "../models/user.model.js";
 import { getAvailableCategories } from "../services/admin/admin.category.services.js";
 import { getSelectedProductForHomePage } from "../services/admin/admin.product.services.js";
+import * as statusCodes from "../constants/statusCodes.js";
+import * as messages from "../constants/messages.js";
 
 export const homePage = async (req, res) => {
   console.log(req.user);
@@ -30,7 +32,7 @@ export const homePage = async (req, res) => {
     });
   } catch (err) {
     console.error("Home page error:", err);
-    res.status(500).render("404-not-found");
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).render("404-not-found");
   }
 };
 
@@ -46,7 +48,7 @@ export const profilePage = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).send("Something went wrong");
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).send(messages.ERROR);
   }
 };
 export const editProfile = async (req, res) => {
@@ -74,14 +76,14 @@ export const changeEmail = async (req, res) => {
     await createAndSendEmailChangeOTP(req.user._id, req.body.newEmail, false);
 
     req.session.newMail = req.body.newEmail;
-    return res.status(200).json({
+    return res.status(statusCodes.OK).json({
       success: true,
       message: "OTP sent to your new email address",
     });
   } catch (err) {
     console.error("Change email error:", err);
 
-    return res.status(400).json({
+    return res.status(statusCodes.BAD_REQUEST).json({
       success: false,
       message: err.message || "Failed to send OTP",
     });
@@ -102,7 +104,7 @@ export const resendEmailChangeOTP = async (req, res) => {
   } catch (err) {
     console.error("Resend email change OTP error:", err);
 
-    return res.status(400).json({
+    return res.status(statusCodes.BAD_REQUEST).json({
       success: false,
       message: err.message || "Failed to resend OTP",
     });
@@ -120,7 +122,7 @@ export const emailChangeOTPVerification = async (req, res) => {
     delete req.session.newEmail;
     res.redirect("/user/profile");
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(statusCodes.BAD_REQUEST).json({ message: err.message });
   }
 };
 
@@ -143,7 +145,7 @@ export const addAddress = async (req, res) => {
   try {
     const newAddress = await createNewAddress(req.user._id, req.body);
 
-    res.status(200).json({
+    res.status(statusCodes.OK).json({
       address: newAddress,
     });
   } catch (err) {
@@ -155,7 +157,7 @@ export const deleteAddress = async (req, res) => {
   try {
     await deleteOneAddress(req.user._id, req.params.addressId);
 
-    res.status(201).json({
+    res.status(statusCodes.CREATED).json({
       success: true,
     });
   } catch (err) {
@@ -171,7 +173,7 @@ export const editAddress = async (req, res) => {
       req.body,
     );
 
-    res.status(201).json({
+    res.status(statusCodes.CREATED).json({
       address: editedAddress,
     });
   } catch (err) {
@@ -186,7 +188,7 @@ export const setDefault = async (req, res) => {
       req.params.addressId,
     );
 
-    res.sendStatus(204);
+    res.sendStatus(statusCodes.NO_CONTENT);
   } catch (err) {
     console.log(err);
   }
@@ -202,7 +204,7 @@ export const changeProfilePicture = async (req, res) => {
     });
   } catch (err) {
     console.error("Cloudinary upload error:", err);
-    res.status(500).json({ message: err.message });
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ message: err.message });
   }
 };
 

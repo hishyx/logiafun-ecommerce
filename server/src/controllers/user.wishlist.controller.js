@@ -1,5 +1,7 @@
 import * as userWishListServices from "../services/user.wishlist.services.js";
 import { getProductVariantDetails } from "../services/user.product.services.js";
+import * as statusCodes from "../constants/statusCodes.js";
+import * as messages from "../constants/messages.js";
 
 export const wishlistPage = async (req, res) => {
   let wishlistItems;
@@ -24,7 +26,7 @@ export const wishlistPage = async (req, res) => {
     });
   } catch (err) {
     console.log(err);
-    res.status(500).render("500");
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).render("500");
   }
 };
 
@@ -38,10 +40,10 @@ export const addToWishList = async (req, res) => {
       req.user._id,
     );
 
-    res.status(200).json({ message: "Added to wishList successfully" });
+    res.status(statusCodes.OK).json({ message: messages.WISHLIST_ADD_SUCCESS });
   } catch (err) {
     console.log(err);
-    res.status(400).json({ message: err.message });
+    res.status(statusCodes.BAD_REQUEST).json({ message: err.message });
   }
 };
 
@@ -53,11 +55,11 @@ export const removeWishlistItem = async (req, res) => {
       itemId,
     );
 
-    res.status(200).json({
-      message: "Item removed from wishlist",
+    res.status(statusCodes.OK).json({
+      message: messages.WISHLIST_REMOVE_SUCCESS,
     });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: "Failed to remove item" });
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ message: messages.WISHLIST_REMOVE_FAIL });
   }
 };

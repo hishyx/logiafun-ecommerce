@@ -1,5 +1,7 @@
 import * as userOrderServices from "../services/user.order.services.js";
 import transitions from "../components/order.status.transitions.js";
+import * as statusCodes from "../constants/statusCodes.js";
+import * as messages from "../constants/messages.js";
 
 export const orderPage = async (req, res) => {
   try {
@@ -57,7 +59,7 @@ export const orderDetailsPage = async (req, res) => {
     });
   } catch (err) {
     console.log("Error in orderDetailsPage:", err);
-    res.status(500).send("Internal Server Error");
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).send(messages.INTERNAL_SERVER_ERROR);
   }
 };
 
@@ -70,7 +72,7 @@ export const cancelOrderEntirely = async (req, res) => {
       req.body.reason,
     );
 
-    res.sendStatus(200);
+    res.sendStatus(statusCodes.OK);
   } catch (err) {
     console.log(err);
   }
@@ -83,16 +85,16 @@ export const cancelSpecificItem = async (req, res) => {
 
     await userOrderServices.cancelSpecificOrderItem(orderId, itemId, reason);
 
-    res.status(200).json({
+    res.status(statusCodes.OK).json({
       success: true,
       message: "Item cancelled successfully",
     });
   } catch (error) {
     console.error(error);
 
-    res.status(500).json({
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
-      message: error.message || "Failed to cancel item",
+      message: error.message || messages.ERROR,
     });
   }
 };
@@ -107,9 +109,9 @@ export const returnOrderEntirely = async (req, res) => {
     res.sendStatus(200);
   } catch (err) {
     console.log(err);
-    res.status(500).json({
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
-      message: err.message || "Failed to return order",
+      message: err.message || messages.ERROR,
     });
   }
 };
@@ -123,16 +125,16 @@ export const returnSpecificItem = async (req, res) => {
 
     await userOrderServices.returnSpecificOrderItem(orderId, itemId, reason);
 
-    res.status(200).json({
+    res.status(statusCodes.OK).json({
       success: true,
       message: "Item return request send",
     });
   } catch (error) {
     console.error(error);
 
-    res.status(500).json({
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
-      message: error.message || "Failed to return item",
+      message: error.message || messages.ERROR,
     });
   }
 };
@@ -150,6 +152,6 @@ export const orderFailedPage = (req, res) => {
     });
   } catch (err) {
     console.log(err);
-    res.status(500).send("Internal Server Error");
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).send(messages.INTERNAL_SERVER_ERROR);
   }
 };

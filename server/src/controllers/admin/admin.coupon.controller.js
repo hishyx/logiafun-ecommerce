@@ -1,4 +1,6 @@
 import * as adminCouponServices from "../../services/admin/admin.coupon.service.js";
+import * as statusCodes from "../../constants/statusCodes.js";
+import * as messages from "../../constants/messages.js";
 
 export const adminCouponListPage = async (req, res) => {
   try {
@@ -36,7 +38,7 @@ export const adminCouponListPage = async (req, res) => {
     });
   } catch (error) {
     console.error("Error in adminCouponListPage:", error);
-    res.status(500).render("500-internal-server-error");
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).render("500-internal-server-error");
   }
 };
 
@@ -49,12 +51,12 @@ export const addCoupon = async (req, res) => {
     const coupon = await adminCouponServices.createCoupon(couponData);
 
     return res
-      .status(201)
-      .json({ success: true, message: "Coupon created successfully!" });
+      .status(statusCodes.CREATED)
+      .json({ success: true, message: messages.COUPON_ADDED });
   } catch (error) {
     console.error("Error in addCoupon:", error);
     return res
-      .status(500)
+      .status(statusCodes.INTERNAL_SERVER_ERROR)
       .json({
         success: false,
         message: error.message || "Failed to create coupon",
@@ -71,11 +73,11 @@ export const editCoupon = async (req, res) => {
     console.log("Updated coupon with data:", couponData);
 
     return res
-      .status(200)
-      .json({ success: true, message: "Coupon updated successfully!", coupon });
+      .status(statusCodes.OK)
+      .json({ success: true, message: messages.COUPON_UPDATED, coupon });
   } catch (error) {
     console.error("Error in editCoupon:", error);
-    return res.status(500).json({
+    return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: error.message || "Failed to update coupon",
     });
@@ -88,14 +90,14 @@ export const toggleCoupon = async (req, res) => {
     const { coupon, action } =
       await adminCouponServices.toggleCouponStatus(couponId);
 
-    return res.status(200).json({
+    return res.status(statusCodes.OK).json({
       success: true,
       message: `Coupon ${action}d successfully.`,
       coupon,
     });
   } catch (error) {
     console.error("Error in toggleCoupon:", error);
-    return res.status(500).json({
+    return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: error.message || "Failed to toggle coupon status.",
     });

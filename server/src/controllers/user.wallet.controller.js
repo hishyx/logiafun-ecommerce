@@ -1,5 +1,7 @@
 import User from "../models/user.model.js";
 import { getWalletByUserId } from "../services/user.wallet.services.js";
+import * as statusCodes from "../constants/statusCodes.js";
+import * as messages from "../constants/messages.js";
 
 export const walletPage = async (req, res) => {
   try {
@@ -16,7 +18,7 @@ export const walletPage = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).send("Something went wrong");
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).send(messages.ERROR);
   }
 };
 
@@ -29,6 +31,6 @@ export const walletTransactionsPage = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).send("Something went wrong");
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).send(messages.ERROR);
   }
 };

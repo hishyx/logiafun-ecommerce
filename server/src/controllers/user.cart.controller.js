@@ -1,5 +1,7 @@
 import * as userCartServices from "../services/user.cart.services.js";
 import { getProductVariantDetails } from "../services/user.product.services.js";
+import * as statusCodes from "../constants/statusCodes.js";
+import * as messages from "../constants/messages.js";
 
 export const addToCart = async (req, res) => {
   try {
@@ -12,10 +14,10 @@ export const addToCart = async (req, res) => {
 
     const cartCount = await userCartServices.getCartCount(req.user._id);
 
-    res.status(200).json({ message: "Added to cart successfully", cartCount });
+    res.status(statusCodes.OK).json({ message: "Added to cart successfully", cartCount });
   } catch (err) {
     console.log(err);
-    res.status(400).json({ message: err.message });
+    res.status(statusCodes.BAD_REQUEST).json({ message: err.message });
   }
 };
 
@@ -57,11 +59,11 @@ export const deleteCartItem = async (req, res) => {
     const cartCount = await userCartServices.getCartCount(userId);
 
     return res
-      .status(200)
+      .status(statusCodes.OK)
       .json({ message: "Item removed", cartCount, calculations });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: "Failed to remove item" });
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ message: messages.WISHLIST_REMOVE_FAIL });
   }
 };
 
@@ -77,14 +79,14 @@ export const updateCartItem = async (req, res) => {
       Number(quantity),
     );
 
-    res.status(200).json({
+    res.status(statusCodes.OK).json({
       message: "Cart updated successfully",
       calculations,
     });
   } catch (err) {
     console.log(err);
     res
-      .status(400)
+      .status(statusCodes.BAD_REQUEST)
       .json({ message: err.message, newQuantity: err.newQuantity });
   }
 };
@@ -96,7 +98,7 @@ export const clearAllItems = async (req, res) => {
 
     console.log("delted");
 
-    res.sendStatus(200);
+    res.sendStatus(statusCodes.OK);
   } catch (err) {
     console.log(err);
   }

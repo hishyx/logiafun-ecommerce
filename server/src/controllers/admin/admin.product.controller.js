@@ -1,5 +1,7 @@
 import * as adminProductServices from "../../services/admin/admin.product.services.js";
 import * as adminCategoryServices from "../../services/admin/admin.category.services.js";
+import * as statusCodes from "../../constants/statusCodes.js";
+import * as messages from "../../constants/messages.js";
 
 export const adminProductListPage = async (req, res) => {
   try {
@@ -44,7 +46,7 @@ export const adminProductListPage = async (req, res) => {
     });
   } catch (err) {
     console.error("Error in adminProductListPage:", err);
-    res.status(500).render("404-not-found");
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).render("404-not-found");
   }
 };
 
@@ -54,7 +56,7 @@ export const adminAddProductPage = async (req, res) => {
     res.render("admin/add-product.ejs", { categories });
   } catch (err) {
     console.error("Error in adminAddProductPage:", err);
-    res.status(500).render("404-not-found");
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).render("404-not-found");
   }
 };
 
@@ -65,7 +67,7 @@ export const adminEditProductPage = async (req, res) => {
     const categories = await adminCategoryServices.getAvailableCategories();
 
     if (!product) {
-      return res.status(404).render("404-not-found");
+      return res.status(statusCodes.NOT_FOUND).render("404-not-found");
     }
 
     console.log("product from admiEdit page : ", product);
@@ -73,7 +75,7 @@ export const adminEditProductPage = async (req, res) => {
     res.render("admin/edit-product.ejs", { product, categories });
   } catch (err) {
     console.error("Error in adminEditProductPage:", err);
-    res.status(500).render("404-not-found");
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).render("404-not-found");
   }
 };
 
@@ -86,17 +88,17 @@ export const addProduct = async (req, res) => {
       req.files,
     );
 
-    res.status(201).json({
+    res.status(statusCodes.CREATED).json({
       success: true,
-      message: "Product added successfully",
+      message: messages.PRODUCT_ADDED,
       product: newProduct,
     });
   } catch (error) {
     console.error("Error adding product:", error);
     // Return 400 for validation errors
-    res.status(400).json({
+    res.status(statusCodes.BAD_REQUEST).json({
       success: false,
-      message: error.message || "Failed to add product",
+      message: error.message || messages.ERROR,
     });
   }
 };
@@ -112,14 +114,14 @@ export const editProduct = async (req, res) => {
 
     return res.json({
       success: true,
-      message: "Product updated successfully",
+      message: messages.PRODUCT_UPDATED,
       product: updatedData,
     });
   } catch (err) {
     console.log(err);
-    return res.status(400).json({
+    return res.status(statusCodes.BAD_REQUEST).json({
       success: false,
-      message: err.message || "Failed to update product",
+      message: err.message || messages.ERROR,
     });
   }
 };
@@ -130,15 +132,15 @@ export const listUnlistProduct = async (req, res) => {
       req.params.productId,
     );
 
-    return res.status(200).json({
+    return res.status(statusCodes.OK).json({
       success: true,
       message: "Product status updated",
       product: result,
     });
   } catch (err) {
-    res.status(400).json({
+    res.status(statusCodes.BAD_REQUEST).json({
       success: false,
-      message: err.message || "Failed to toggle product status",
+      message: err.message || messages.ERROR,
     });
   }
 };

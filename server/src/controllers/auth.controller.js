@@ -14,6 +14,8 @@ import {
 } from "../services/OTP.services.js";
 
 import User from "../models/user.model.js";
+import * as statusCodes from "../constants/statusCodes.js";
+import * as messages from "../constants/messages.js";
 
 //Public Pages
 
@@ -294,14 +296,14 @@ export const referralForGoogleUser = async (req, res) => {
 
     await referralService(req.body.referralCode, user);
 
-    return res.status(200).json({
+    return res.status(statusCodes.OK).json({
       success: true,
       message: "Referral applied",
     });
   } catch (err) {
     console.log(err);
 
-    return res.status(400).json({
+    return res.status(statusCodes.BAD_REQUEST).json({
       success: false,
       message: err.message,
     });

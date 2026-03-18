@@ -1,4 +1,6 @@
 import User from "../models/user.model.js";
+import * as statusCodes from "../constants/statusCodes.js";
+import * as messages from "../constants/messages.js";
 
 export const referralPage = async (req, res) => {
   try {
@@ -15,6 +17,6 @@ export const referralPage = async (req, res) => {
     });
   } catch (err) {
     console.error("Referral page error:", err);
-    res.status(500).send("Something went wrong");
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).send(messages.ERROR);
   }
 };

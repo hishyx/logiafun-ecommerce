@@ -1,5 +1,7 @@
 import * as categoryServices from "../../services/admin/admin.category.services.js";
 import uploadImageToCloudinary from "../../utils/cloudinary.upload.js";
+import * as statusCodes from "../../constants/statusCodes.js";
+import * as messages from "../../constants/messages.js";
 
 export const adminCategoryListPage = async (req, res) => {
   try {
@@ -48,15 +50,15 @@ export const addCategory = async (req, res) => {
 
     const newCategory = await categoryServices.addCategory(categoryInfo);
 
-    res.status(201).json({
-      message: "Category added successfully",
+    res.status(statusCodes.CREATED).json({
+      message: messages.CATEGORY_ADDED,
       category: newCategory,
     });
   } catch (error) {
     console.error("Error adding category:", error);
-    res.status(400).json({
+    res.status(statusCodes.BAD_REQUEST).json({
       success: false,
-      message: error.message || "Failed to add category"
+      message: error.message || messages.ERROR
     });
   }
 };
@@ -67,11 +69,11 @@ export const listUnlistCategory = async (req, res) => {
       req.params.categoryId,
     );
 
-    return res.status(200).json({
+    return res.status(statusCodes.OK).json({
       category: result,
     });
   } catch (err) {
-    res.status(400).json({
+    res.status(statusCodes.BAD_REQUEST).json({
       message: err.message,
     });
   }
@@ -93,6 +95,6 @@ export const editCategory = async (req, res) => {
     });
   } catch (err) {
     console.log(err);
-    return res.status(400).json({ message: err.message });
+    return res.status(statusCodes.BAD_REQUEST).json({ message: err.message });
   }
 };

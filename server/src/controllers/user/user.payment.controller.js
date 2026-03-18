@@ -5,6 +5,7 @@ import {
   retryOrderPayment,
 } from "../../services/user.order.services.js";
 import { deleteAllItems } from "../../services/user.cart.services.js";
+import * as statusCodes from "../../constants/statusCodes.js";
 
 export const verifyRazorPayPayment = async (req, res) => {
   try {
@@ -28,7 +29,7 @@ export const verifyRazorPayPayment = async (req, res) => {
     console.log("Reached verify ctroler");
 
     if (expectedSignature !== razorpay_signature) {
-      return res.status(400).json({ success: false });
+      return res.status(statusCodes.BAD_REQUEST).json({ success: false });
     }
 
     await updatePaymentStatus(orderId, "paid", razorpay_payment_id);
@@ -38,7 +39,7 @@ export const verifyRazorPayPayment = async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ success: false });
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ success: false });
   }
 };
 
@@ -53,7 +54,7 @@ export const paymentFailed = async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ success: false });
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ success: false });
   }
 };
 
@@ -63,9 +64,9 @@ export const retryPayment = async (req, res) => {
 
     const order = await retryOrderPayment(orderId, req.user._id);
 
-    if (order.razorpay) return res.status(200).json(order);
+    if (order.razorpay) return res.status(statusCodes.OK).json(order);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ success: false });
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ success: false });
   }
 };

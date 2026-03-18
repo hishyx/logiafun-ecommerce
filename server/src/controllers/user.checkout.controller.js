@@ -7,6 +7,8 @@ import {
 } from "../services/admin/admin.coupon.service.js";
 import { getWalletByUserId } from "../services/user.wallet.services.js";
 import { getProductVariantDetails } from "../services/user.product.services.js";
+import * as statusCodes from "../constants/statusCodes.js";
+import * as messages from "../constants/messages.js";
 
 export const checkoutPage = async (req, res) => {
   try {
@@ -51,10 +53,10 @@ export const placeOrder = async (req, res) => {
 
     console.log("order is : ", order);
     if (order.razorpay) {
-      return res.status(200).json(order);
+      return res.status(statusCodes.OK).json(order);
     }
 
-    return res.status(200).json({
+    return res.status(statusCodes.OK).json({
       success: true,
       orderId: order.orderNumber,
       redirectUrl: `/order/success/${order.orderNumber}`,
@@ -65,7 +67,7 @@ export const placeOrder = async (req, res) => {
     const message =
       err.message || "Something went wrong while placing your order.";
 
-    return res.status(400).json({
+    return res.status(statusCodes.BAD_REQUEST).json({
       success: false,
       message,
       redirectUrl: `/order/failed?message=${encodeURIComponent(message)}`,
@@ -84,9 +86,9 @@ export const applyCouponInCheckout = async (req, res) => {
       req.user._id,
     );
 
-    res.status(200).json({ newCalculations: appliedCalculations });
+    res.status(statusCodes.OK).json({ newCalculations: appliedCalculations });
   } catch (err) {
     console.log(err);
-    res.status(400).json({ message: err.message });
+    res.status(statusCodes.BAD_REQUEST).json({ message: err.message });
   }
 };

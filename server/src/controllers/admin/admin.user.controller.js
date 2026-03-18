@@ -2,6 +2,8 @@ import {
   getAdminUsersService,
   blockOrUnblockUserToggle,
 } from "../../services/admin/admin.user.services.js";
+import * as statusCodes from "../../constants/statusCodes.js";
+import * as messages from "../../constants/messages.js";
 
 export const adminUserListPage = async (req, res) => {
   try {
@@ -39,7 +41,7 @@ export const adminUserListPage = async (req, res) => {
   } catch (err) {
     console.error("adminUserListPage error:", err);
 
-    res.status(500).send("error/500"); // or simple res.send
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).send(messages.ERROR); // or simple res.send
   }
 };
 
@@ -48,13 +50,13 @@ export const blockUnblockUser = async (req, res) => {
     const user = await blockOrUnblockUserToggle(req.params.userId);
 
     if (!user) {
-      return res.status(404).json({
+      return res.status(statusCodes.NOT_FOUND).json({
         success: false,
-        message: "User not found",
+        message: messages.USER_NOT_FOUND,
       });
     }
 
-    return res.status(200).json({
+    return res.status(statusCodes.OK).json({
       success: true,
       message: user.isBlocked
         ? "User blocked successfully"
@@ -67,7 +69,7 @@ export const blockUnblockUser = async (req, res) => {
   } catch (err) {
     console.error(err);
 
-    return res.status(500).json({
+    return res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Something went wrong while updating user status",
     });

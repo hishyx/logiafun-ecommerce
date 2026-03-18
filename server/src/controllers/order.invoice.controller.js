@@ -1,4 +1,6 @@
 import { generateInvoice } from "../services/order.invoice.services.js";
+import * as statusCodes from "../constants/statusCodes.js";
+import * as messages from "../constants/messages.js";
 
 export const downloadInvoice = async (req, res) => {
   console.log("Unversal prevent controller reached");
@@ -14,6 +16,6 @@ export const downloadInvoice = async (req, res) => {
     return res.send(pdfBuffer);
   } catch (err) {
     console.error(err);
-    return res.status(500).send("Invoice generation failed");
+    return res.status(statusCodes.INTERNAL_SERVER_ERROR).send(messages.INVOICE_GEN_FAIL);
   }
 };
