@@ -1,9 +1,3 @@
-// Fetches all dashboard data in parallel and renders with pre-serialised chart JSON.
-// Analytics/reporting and download handlers are unchanged below.
-
-import Order from "../../models/order.model.js";
-import User from "../../models/user.model.js";
-import Product from "../../models/products.model.js";
 import * as adminAnalyticsServices from "../../services/admin/admin.analytics.services.js";
 import * as dashboardService from "../../services/admin/admin.dashboard.service.js";
 import ExcelJS from "exceljs";
@@ -50,7 +44,9 @@ export const getDashboardChartData = async (req, res) => {
     if (!validFrequencies.includes(frequency)) {
       return res
         .status(statusCodes.BAD_REQUEST)
-        .json({ message: "Invalid frequency. Use: daily, weekly, monthly, yearly." });
+        .json({
+          message: "Invalid frequency. Use: daily, weekly, monthly, yearly.",
+        });
     }
 
     const data = await dashboardService.getRevenueSeries(frequency);
@@ -91,12 +87,7 @@ export const getDashboardTopProductsAPI = async (req, res) => {
 
 export const adminAnalyticsPage = async (req, res) => {
   try {
-    const {
-      period = "daily",
-      startDate,
-      endDate,
-      page = 1,
-    } = req.query;
+    const { period = "daily", startDate, endDate, page = 1 } = req.query;
 
     const analyticsData = await adminAnalyticsServices.getReportData({
       period,
