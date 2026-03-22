@@ -36,7 +36,11 @@ export const adminCategoryListPage = async (req, res) => {
       totalPages: Math.ceil(categoriesList.total / limit),
     });
   } catch (err) {
-    console.log(err);
+    console.error(err);
+
+    req.flash("error", err.message || "Failed to load categories");
+
+    return res.redirect("/admin/dashboard");
   }
 };
 

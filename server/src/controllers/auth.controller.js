@@ -218,10 +218,14 @@ export const newPasswordSubmit = async (req, res) => {
 
   try {
     await setNewPassword(req.body.password, req.session.tempUserId);
-    res.redirect("/auth/reset-password/success");
+
+    return res.redirect("/auth/reset-password/success");
   } catch (err) {
-    req.flash("error", err.message);
-    console.log(err);
+    console.error(err);
+
+    req.flash("error", err.message || "Failed to reset password")
+
+    return res.redirect("/auth/reset-password");
   }
 };
 

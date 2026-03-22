@@ -32,6 +32,9 @@ export const wishlistPage = async (req, res) => {
 
 export const addToWishList = async (req, res) => {
   try {
+    console.log("reached wishlist");
+
+    console.log(req.body);
     if (!req.user || !req.user._id)
       throw new Error("Please login to add items to wishlist");
 
@@ -60,6 +63,8 @@ export const removeWishlistItem = async (req, res) => {
     });
   } catch (err) {
     console.log(err);
-    res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ message: messages.WISHLIST_REMOVE_FAIL });
+    res
+      .status(statusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: messages.WISHLIST_REMOVE_FAIL });
   }
 };

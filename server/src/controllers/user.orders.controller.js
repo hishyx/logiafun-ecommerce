@@ -13,7 +13,9 @@ export const orderPage = async (req, res) => {
       orders,
     });
   } catch (err) {
-    console.log(err);
+    console.error(err);
+    req.flash("error", err.message || "Failed to load orders");
+    return res.redirect("/");
   }
 };
 
@@ -24,7 +26,9 @@ export const ordersListPage = async (req, res) => {
       orders,
     });
   } catch (err) {
-    console.log(err);
+    console.error(err);
+    req.flash("error", err.message || "Failed to load orders");
+    return res.redirect("/");
   }
 };
 
@@ -42,7 +46,9 @@ export const orderSuccessPage = async (req, res) => {
       orderId: order._id,
     });
   } catch (err) {
-    console.log(err);
+    console.error(err);
+    req.flash("error", err.message || "Failed to load order success page");
+    return res.redirect("/orders");
   }
 };
 
@@ -74,7 +80,12 @@ export const cancelOrderEntirely = async (req, res) => {
 
     res.sendStatus(statusCodes.OK);
   } catch (err) {
-    console.log(err);
+    console.error(err);
+
+    return res.status(statusCodes.BAD_REQUEST).json({
+      success: false,
+      message: err.message || "Failed to cancel order",
+    });
   }
 };
 

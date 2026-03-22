@@ -24,7 +24,10 @@ export const checkoutPage = async (req, res) => {
       item.product.variantName = variantName;
     }
 
-    const coupons = await getAvailableCoupons(calculations.total, req.user._id);
+    const coupons = await getAvailableCoupons(
+      calculations.subtotal,
+      req.user._id,
+    );
 
     const wallet = await getWalletByUserId(req.user._id);
     const walletBalance = wallet ? wallet.balance : 0;

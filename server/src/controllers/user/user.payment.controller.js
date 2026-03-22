@@ -67,6 +67,9 @@ export const retryPayment = async (req, res) => {
     if (order.razorpay) return res.status(statusCodes.OK).json(order);
   } catch (err) {
     console.log(err);
-    res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ success: false });
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: err.message || "Unable to retry payment right now",
+    });
   }
 };

@@ -66,7 +66,11 @@ export const editProfile = async (req, res) => {
         phone: updatedUser.phone,
       },
     });
-  } catch (err) {}
+  } catch (err) {
+    res
+      .status(statusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: err.message });
+  }
 };
 
 export const changeEmail = async (req, res) => {
@@ -145,11 +149,17 @@ export const addAddress = async (req, res) => {
   try {
     const newAddress = await createNewAddress(req.user._id, req.body);
 
-    res.status(statusCodes.OK).json({
+    return res.status(statusCodes.OK).json({
+      success: true,
       address: newAddress,
     });
   } catch (err) {
-    console.log(err);
+    console.error(err);
+
+    return res.status(statusCodes.BAD_REQUEST).json({
+      success: false,
+      message: err.message || "Failed to add address",
+    });
   }
 };
 
@@ -161,7 +171,12 @@ export const deleteAddress = async (req, res) => {
       success: true,
     });
   } catch (err) {
-    console.log(err);
+    console.error(err);
+
+    return res.status(statusCodes.BAD_REQUEST).json({
+      success: false,
+      message: err.message || "Failed to delete address",
+    });
   }
 };
 
@@ -177,7 +192,12 @@ export const editAddress = async (req, res) => {
       address: editedAddress,
     });
   } catch (err) {
-    console.log(err);
+    console.error(err);
+
+    return res.status(statusCodes.BAD_REQUEST).json({
+      success: false,
+      message: err.message || "Failed to update address",
+    });
   }
 };
 
@@ -190,7 +210,12 @@ export const setDefault = async (req, res) => {
 
     res.sendStatus(statusCodes.NO_CONTENT);
   } catch (err) {
-    console.log(err);
+    console.error(err);
+
+    return res.status(statusCodes.BAD_REQUEST).json({
+      success: false,
+      message: err.message || "Failed to set default address",
+    });
   }
 };
 
@@ -204,7 +229,9 @@ export const changeProfilePicture = async (req, res) => {
     });
   } catch (err) {
     console.error("Cloudinary upload error:", err);
-    res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ message: err.message });
+    res
+      .status(statusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: err.message });
   }
 };
 
