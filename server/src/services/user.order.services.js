@@ -14,7 +14,10 @@ import { getAddressDetails } from "./user.services.js";
 import {
   changeProductStock,
   getProductVariantDetails,
+  checkProductStockForOrderRetry,
 } from "./user.product.services.js";
+
+import { calculateProportionalRefund } from "../utils/order.helper.js";
 
 import Coupon from "../models/coupon.model.js";
 
@@ -43,26 +46,19 @@ export const createOrder = async (userId, orderData) => {
     });
 
     if (coupon) {
-      let discount = 0;
-
-      // FIXED COUPON
       if (coupon.discountType === "fixed") {
-        discount = coupon.discountValue;
+        couponDiscountAmount = coupon.discountValue;
       }
 
-      // PERCENTAGE COUPON
       if (coupon.discountType === "percentage") {
-        discount = (amounts.total * coupon.discountValue) / 100;
+        couponDiscountAmount = (amounts.subtotal * coupon.discountValue) / 100;
       }
 
-      // prevent discount more than total
-      if (discount > amounts.total) {
-        discount = amounts.total;
+      if (couponDiscountAmount > amounts.subtotal) {
+        couponDiscountAmount = amounts.subtotal;
       }
 
-      // apply discount
-      amounts.total = amounts.total - discount;
-      couponDiscountAmount = discount;
+      couponDiscountAmount = Math.round(couponDiscountAmount);
 
       const usedCoupon = await couponUsage.findOne({
         userId,
@@ -75,11 +71,19 @@ export const createOrder = async (userId, orderData) => {
           userId,
         });
 
-        // increase used count
-        await Coupon.findByIdAndUpdate(coupon._id, { $inc: { usedCount: 1 } });
+        await Coupon.findByIdAndUpdate(coupon._id, {
+          $inc: { usedCount: 1 },
+        });
       }
     }
   }
+
+  const netSubtotal = amounts.subtotal - couponDiscountAmount;
+
+  amounts.gst = Math.round(netSubtotal * 0.18);
+
+  amounts.total = netSubtotal + amounts.gst + amounts.shipping;
+
   console.log("orderData.selectedAddress is : ", orderData.selectedAddress);
 
   const orderAddress = await getAddressDetails(
@@ -94,34 +98,53 @@ export const createOrder = async (userId, orderData) => {
   const items = [];
 
   console.log("ORDER PRODUCTS LENGTH:", orderProducts.length);
+  let distributedDiscount = 0;
 
-  for (const orderProduct of orderProducts) {
-    if (!orderProduct.product || !orderProduct.product.variants) {
-      console.log("BROKEN ITEM:", orderProduct);
-      continue;
+  const GST_RATE = 0.18;
+
+  const orderGrossBeforeCoupon =
+    amounts.subtotal + Math.round(amounts.subtotal * GST_RATE);
+
+  for (let i = 0; i < orderProducts.length; i++) {
+    const op = orderProducts[i];
+
+    const productId = op.product._id;
+    const variant = op.product.variants;
+
+    const originalPrice = Number(variant.price);
+    const offerPrice = Number(op.discountedPrice);
+    const quantity = Number(op.items.quantity);
+
+    const itemBaseTotal = offerPrice * quantity;
+
+    // gross weight BEFORE coupon
+    const itemGSTWeight = Math.round(itemBaseTotal * GST_RATE);
+    const itemGrossWeight = itemBaseTotal + itemGSTWeight;
+
+    let itemCouponDiscount;
+
+    // LAST ITEM → rounding adjustment
+    if (i === orderProducts.length - 1) {
+      itemCouponDiscount = couponDiscountAmount - distributedDiscount;
+    } else {
+      const itemShare = itemGrossWeight / orderGrossBeforeCoupon;
+
+      itemCouponDiscount = Math.round(itemShare * couponDiscountAmount);
+
+      distributedDiscount += itemCouponDiscount;
     }
-    const productId = orderProduct.product._id;
-    const variantId = orderProduct.product.variants._id;
-    const quantity = Number(orderProduct?.items?.quantity);
-    const unitPrice = Number(orderProduct.discountedPrice);
 
-    const itemTotal = unitPrice * quantity;
+    const finalItemBaseTotal = Math.max(0, itemBaseTotal - itemCouponDiscount);
 
-    const itemShare = itemTotal / amounts.subtotal;
-
-    const itemCouponDiscount = itemShare * couponDiscountAmount;
-
-    const finalItemTotal = Math.round(itemTotal - itemCouponDiscount);
-
-    const finalUnitPrice = Math.round(finalItemTotal / quantity);
+    const finalUnitPrice = Math.round(finalItemBaseTotal / quantity);
 
     items.push({
       product: {
         productId,
-        variantId,
-        name: orderProduct?.product?.name,
-        image: orderProduct?.product?.variants?.images[0],
-        originalPrice: unitPrice,
+        variantId: variant._id,
+        name: op.product.name,
+        image: variant.images[0],
+        originalPrice,
         discountedPrice: finalUnitPrice,
       },
       quantity,
@@ -134,7 +157,7 @@ export const createOrder = async (userId, orderData) => {
       },
     });
 
-    await changeProductStock(productId, variantId, quantity, "decrease");
+    await changeProductStock(productId, variant._id, quantity, "decrease");
   }
 
   console.log("Order pushing done");
@@ -202,7 +225,7 @@ export const createOrder = async (userId, orderData) => {
   //Update payment status
 
   newOrder.payment.status = "paid";
-  newOrder.save();
+  await newOrder.save();
 
   await deleteAllItems(userId);
 
@@ -278,8 +301,10 @@ export const cancelEntireOrder = async (orderId, reason) => {
   order.refundSummary.totalRefundedAmount =
     order.refundSummary.totalRefundedAmount || 0;
 
-  const remainingRefund =
+  let remainingRefund =
     order.payment.amount - order.refundSummary.totalRefundedAmount;
+
+  if (remainingRefund < 0) remainingRefund = 0;
 
   const transactionData = {
     userId: order.userId,
@@ -293,6 +318,7 @@ export const cancelEntireOrder = async (orderId, reason) => {
   await userWalletServices.addRefundToWallet(transactionData);
 
   order.refundSummary.totalRefundedAmount = order.payment.amount;
+  await order.save();
 };
 
 export const cancelSpecificOrderItem = async (
@@ -338,9 +364,15 @@ export const cancelSpecificOrderItem = async (
   );
 
   if (!isEntireCancel) {
+    //refund amount calculate
+
+    const itemBase = item.product.discountedPrice * item.quantity;
+
+    const refundAmount = calculateProportionalRefund(order, itemBase);
+
     const transactionData = {
       userId: order.userId,
-      amount: item.product.discountedPrice * item.quantity,
+      amount: refundAmount,
       orderNumber: order.orderNumber,
       status: "cancelled",
       itemName: item.product.name,
@@ -349,8 +381,7 @@ export const cancelSpecificOrderItem = async (
     console.log("Refunded");
     await userWalletServices.addRefundToWallet(transactionData);
 
-    order.refundSummary.totalRefundedAmount +=
-      item.product.discountedPrice * item.quantity;
+    order.refundSummary.totalRefundedAmount += refundAmount;
   }
 
   await order.save();
@@ -449,14 +480,17 @@ export const updateStockOnPaymentFailure = async (orderId) => {
 export const retryOrderPayment = async (orderId, userId) => {
   const order = await Order.findById(orderId);
 
-  // if (order.userId != userId) throw new Error("This order is not this users");
+  const retryOrderStockCheck = await checkProductStockForOrderRetry(
+    order.items,
+  );
 
   if (order.payment.status == "paid")
     throw new Error("Order amount is already paid");
 
   const paymentMethod = order.payment.method;
 
-  const amount = order.totalAmount;
+  const amount = order.payment.amount;
+  console.log(amount);
 
   if (paymentMethod == "razorpay") {
     const razorpayOrder = await razorpay.orders.create({

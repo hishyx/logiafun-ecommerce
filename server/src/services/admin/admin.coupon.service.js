@@ -234,6 +234,10 @@ export const applyCouponService = async (couponId, userId) => {
     $expr: { $lt: ["$usedCount", "$usageLimit"] },
   });
 
+  if (!coupon) {
+    throw new Error("Coupon not found or not eligible");
+  }
+
   const usedCoupon = await couponUsage.findOne({
     userId,
     couponId: coupon._id,
@@ -257,12 +261,25 @@ export const applyCouponService = async (couponId, userId) => {
     }
   }
 
-  discount = Math.min(discount, cartCalaculations.total);
+  discount = Math.round(Math.min(discount, orderPrice));
 
-  cartCalaculations.discount += discount;
-  cartCalaculations.total = Number(
-    (cartCalaculations.total - discount).toFixed(2),
-  );
+  // store coupon amount
+  cartCalaculations.discount = discount;
+
+  // do NOT touch subtotal
+  cartCalaculations.netSubtotal = cartCalaculations.subtotal - discount;
+
+  // GST always on net subtotal
+  cartCalaculations.gst = Math.round(cartCalaculations.netSubtotal * 0.18);
+
+  // Shipping ALWAYS on original subtotal
+  cartCalaculations.shipping = cartCalaculations.subtotal >= 1000 ? 0 : 80;
+
+  // Final total
+  cartCalaculations.total =
+    cartCalaculations.netSubtotal +
+    cartCalaculations.gst +
+    cartCalaculations.shipping;
 
   return cartCalaculations;
 };

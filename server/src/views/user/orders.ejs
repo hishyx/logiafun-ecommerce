@@ -376,76 +376,12 @@
   <%- include('../partials/header.ejs')%>
 
     <main>
-      <div class="profile-container">
-        <!-- Sidebar -->
-        <aside class="profile-sidebar">
-          <div class="profile-user-info">
-            <div class="profile-avatar-large"><img src="<%=user.profileImage%>"></div>
-            <div>
-              <div class="profile-user-name">
-                <%=user.name%>
-              </div>
-              <div class="profile-user-email">
-                <%=user.email%>
-              </div>
-            </div>
-          </div>
-          <nav class="sidebar-menu">
-            <a href="/user/profile" class="sidebar-link">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-              </svg>
-              Profile
-            </a>
-            <a href="/user/addresses" class="sidebar-link">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                <circle cx="12" cy="10" r="3"></circle>
-              </svg>
-              Addresses
-            </a>
-            <a href="/user/orders" class="sidebar-link active">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="1" y="3" width="15" height="13" />
-                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
-                <circle cx="5.5" cy="18.5" r="2.5" />
-                <circle cx="18.5" cy="18.5" r="2.5" />
-              </svg>
-              My Orders
-            </a>
-
-            <a href="/user/wallet" class="sidebar-link">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="2" y="5" width="20" height="14" rx="2" />
-                <line x1="2" y1="10" x2="22" y2="10" />
-              </svg>
-              Wallet
-            </a>
-            <a href="/user/referral" class="sidebar-link">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-              </svg>
-              Refer & Earn
-            </a>
-            <form action="/user/logout" method="POST" style="display: inline">
-              <button type="submit" class="sidebar-link logout-link">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                  <polyline points="16 17 21 12 16 7"></polyline>
-                  <line x1="21" y1="12" x2="9" y2="12"></line>
-                </svg>
-                Log Out
-              </button>
-            </form>
-          </nav>
-        </aside>
+      <div class="account-layout profile-container orders-page">
+        <%- include('../partials/account-sidebar.ejs', { user, activePage: 'orders', allowProfileImageEdit: false }) %>
 
         <!-- Main Content -->
-        <section class="profile-content">
+        <section class="account-content profile-content">
+          <div class="account-card">
           <div class="orders-header">
             <h1 class="orders-title">My Orders</h1>
             <a href="/user/orders/list" class="order-btn btn-outline" style="text-decoration: none;">View All Orders</a>
@@ -466,7 +402,7 @@
                       </div>
                       <div class="meta-item">
                         <span class="meta-label">Total Amount</span>
-                        <span class="meta-value">₹<%= order.totalAmount %></span>
+                        <span class="meta-value">₹<%= order.payment.amount %></span>
                       </div>
                       <div class="meta-item">
                         <span class="meta-label">Order #</span>
@@ -478,6 +414,14 @@
                         <span class="meta-label">Items</span>
                         <span class="meta-value">
                           <%= order.items.length %>
+                        </span>
+                      </div>
+                      <div class="meta-item">
+                        <span class="meta-label">Payment Status</span>
+                        <span class="meta-value">
+                          <span class="status-badge <%= order.payment && order.payment.status === 'paid' ? 'status-delivered' : 'status-cancelled' %>" style="padding: 0.2rem 0.75rem; border-radius: 50px; font-size: 0.75rem; display: inline-flex;">
+                            <%= order.payment && order.payment.status === 'paid' ? 'Paid' : 'Non-Paid' %>
+                          </span>
                         </span>
                       </div>
                     </div>
@@ -506,7 +450,6 @@
 
                     <div class="order-card-footer"
                       style="padding: 1rem 0 0 0; margin-top: 1rem; border-top: 1px solid #f1f5f9;">
-                      <button class="order-btn btn-outline">Track Package</button>
                       <a href="/user/orders/<%= order._id %>" class="order-btn btn-fill"
                         style="text-decoration: none;">View Details</a>
                     </div>
@@ -535,7 +478,9 @@
                   </svg>
                 </a>
               </div>
+
               <% } %>
+          </div>
         </section>
       </div>
     </main>

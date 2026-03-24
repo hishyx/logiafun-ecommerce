@@ -7,6 +7,7 @@ import nocache from "nocache";
 import methodOverride from "method-override";
 import preventHTMLCache from "./middlewares/prevent.cache.js";
 import errorHandler from "./middlewares/error.handling.middleware.js";
+import * as statusCodes from "./constants/statusCodes.js";
 
 //importing routers
 
@@ -41,7 +42,7 @@ app.use("/", adminRoute);
 app.use("/", userRoute);
 
 app.use((req, res) => {
-  res.status(404).render("404-not-found");
+  res.status(statusCodes.NOT_FOUND).render("404-not-found");
 });
 
 app.use(errorHandler);

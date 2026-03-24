@@ -198,7 +198,7 @@ router
   .delete(userControllers.deleteAddress)
   .patch(userControllers.editAddress);
 
-router.patch("/addresses/:addressId/default", userControllers.setDefault);
+router.patch("/user/addresses/:addressId/default", userControllers.setDefault);
 
 router.post(
   "/user/profile-image",

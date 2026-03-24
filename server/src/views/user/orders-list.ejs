@@ -352,6 +352,14 @@
                       <%= order.items.length %>
                     </span>
                   </div>
+                  <div class="meta-item">
+                    <span class="meta-label">Payment Status</span>
+                    <span class="meta-value">
+                      <span class="status-badge <%= order.payment && order.payment.status === 'paid' ? 'status-delivered' : 'status-cancelled' %>" style="padding: 0.2rem 0.75rem; border-radius: 50px; font-size: 0.75rem; display: inline-flex;">
+                        <%= order.payment && order.payment.status === 'paid' ? 'Paid' : 'Non-Paid' %>
+                      </span>
+                    </span>
+                  </div>
                 </div>
                 <div class="status-badge status-<%= order.orderStatus %>">
                   <span class="status-dot"></span>
@@ -378,7 +386,6 @@
 
                 <div class="order-card-footer"
                   style="padding: 1rem 0 0 0; margin-top: 1rem; border-top: 1px solid #f1f5f9;">
-                  <button class="order-btn btn-outline">Track Package</button>
                   <a href="/user/orders/<%= order._id %>" class="order-btn btn-fill"
                     style="text-decoration: none;">View Details</a>
                 </div>

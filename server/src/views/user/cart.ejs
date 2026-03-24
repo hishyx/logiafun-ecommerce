@@ -350,20 +350,21 @@
 
   <script>
     async function ClearEverything() {
+      try {
+        const res = await fetch("/user/cart/clearAll", {
+          method: "DELETE"
+        });
 
-      console.log("reached delete fuction")
-
-
-      const res = await fetch("/user/cart/clearAll", {
-        method: "DELETE"
-      })
-
-      if (res.ok) {
-        location.reload()
-      } else {
-        console.log("Semthing wet")
+        if (res.ok) {
+          showToast("Cart cleared successfully", "success");
+          setTimeout(() => location.reload(), 1000);
+        } else {
+          showToast("Failed to clear cart", "error");
+        }
+      } catch (err) {
+        console.error("Clear cart error:", err);
+        showToast("Something went wrong", "error");
       }
-
     }
 
     const stockReductionBadge = document.getElementsByClassName("stock-reduction-badge")[0]

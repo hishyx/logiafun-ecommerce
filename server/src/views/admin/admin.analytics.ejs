@@ -1,183 +1,410 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Analytics - LogiaFun</title>
+  <title>Financial Analytics – LogiaFun Admin</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="stylesheet" href="/css/admin/main.css" />
+
   <style>
-    .analytics-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 2rem;
+    /* design tokens — mirrors dashboard for visual consistency */
+    :root {
+      --blue:    #3b82f6;
+      --green:   #10b981;
+      --purple:  #8b5cf6;
+      --amber:   #f59e0b;
+      --red:     #ef4444;
+      --ink:     #0f172a;
+      --muted:   #64748b;
+      --surface: #f8fafc;
+      --border:  #e2e8f0;
+      --radius-card: 20px;
+      --radius-sm:   12px;
+      --shadow-card: 0 4px 24px -8px rgba(15,23,42,0.08);
+      --shadow-hover: 0 16px 40px -12px rgba(15,23,42,0.14);
+      --transition: all 0.28s cubic-bezier(0.4,0,0.2,1);
     }
 
-    .chart-card {
+    .content-body {
+      display: flex;
+      flex-direction: column;
+      gap: 1.75rem;
+    }
+
+    /* sticky page header with controls */
+    .analytics-header {
       background: white;
-      border-radius: 20px;
-      padding: 1.5rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-      border: 1px solid #f1f5f9;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card);
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 50;
     }
 
-    .section-title {
-      font-size: 1.125rem;
+    .header-titles { flex: 1; min-width: 200px; }
+    .header-titles h1 {
+      font-size: 1.35rem;
       font-weight: 700;
-      color: #0f172a;
-      margin-bottom: 1.5rem;
+      color: var(--ink);
+      margin: 0 0 0.2rem;
+      line-height: 1.2;
+    }
+    .header-titles p {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin: 0;
     }
 
-    .top-products-card {
+    .header-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    /* period select */
+    .filter-select, .filter-input {
+      padding: 0.5rem 0.85rem;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--ink);
+      background: var(--surface);
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      appearance: auto;
+    }
+    .filter-select:focus, .filter-input:focus {
+      border-color: var(--blue);
       background: white;
-      border-radius: 20px;
-      padding: 1.5rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-      border: 1px solid #f1f5f9;
     }
 
-    .product-item {
+    /* custom date range — shown/hidden via JS */
+    .date-range {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .date-range.hidden { display: none; }
+    .date-sep { font-size: 0.8rem; color: var(--muted); }
+
+    /* action buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1.1rem;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: var(--transition);
+    }
+    .btn:active { transform: scale(0.96); }
+
+    .btn-primary {
+      background: var(--ink);
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #1e293b;
+      box-shadow: 0 8px 20px -6px rgba(15,23,42,0.3);
+    }
+
+    .btn-excel {
+      background: #f0fdf4;
+      color: #166534;
+      border: 1.5px solid #bbf7d0;
+    }
+    .btn-excel:hover { background: #dcfce7; border-color: #86efac; }
+
+    .btn-pdf {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1.5px solid #fecaca;
+    }
+    .btn-pdf:hover { background: #fee2e2; border-color: #fca5a5; }
+
+    /* kpi cards */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.25rem;
+    }
+    @media (max-width: 1100px) { .kpi-grid { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 600px)  { .kpi-grid { grid-template-columns: 1fr; } }
+
+    .kpi-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 1.4rem 1.5rem;
       display: flex;
       align-items: center;
       gap: 1rem;
-      padding: 1rem;
-      border-bottom: 1px solid #f1f5f9;
-      transition: background 0.2s;
+      box-shadow: var(--shadow-card);
+      transition: var(--transition);
+    }
+    .kpi-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-hover);
     }
 
-    .product-item:hover {
-      background: #f8fafc;
+    .kpi-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.25rem;
+      flex-shrink: 0;
     }
+    .kpi-icon.blue   { background: #eff6ff; color: var(--blue); }
+    .kpi-icon.green  { background: #f0fdf4; color: var(--green); }
+    .kpi-icon.red    { background: #fef2f2; color: var(--red); }
+    .kpi-icon.purple { background: #f5f3ff; color: var(--purple); }
 
-    .product-image {
-      width: 50px;
-      height: 50px;
-      border-radius: 8px;
-      object-fit: cover;
-    }
-
-    .product-info {
-      flex: 1;
-    }
-
-    .product-name {
-      font-weight: 600;
-      color: #1e293b;
+    .kpi-label {
       display: block;
-    }
-
-    .product-stats {
-      font-size: 0.825rem;
-      color: #64748b;
-    }
-
-    .product-revenue {
-      font-weight: 700;
-      color: #0f172a;
-    }
-
-    /* Modern Form Controls */
-    .premium-controls {
-      background: white;
-      padding: 1.5rem;
-      border-radius: 20px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-      margin-bottom: 2.5rem;
-      border: 1px solid #f1f5f9;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1.5rem;
-      align-items: flex-end;
-    }
-
-    .control-group {
-      flex: 1;
-      min-width: 220px;
-    }
-
-    .control-label {
-      display: block;
-      margin-bottom: 0.6rem;
+      font-size: 0.72rem;
       font-weight: 600;
-      font-size: 0.85rem;
-      color: #64748b;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 0.3rem;
+    }
+    .kpi-value {
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1;
     }
 
-    .premium-input, .premium-select {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border: 2px solid #f1f5f9;
-      border-radius: 12px;
-      background: #f8fafc;
-      color: #1e293b;
-      font-family: inherit;
-      font-size: 0.95rem;
-      font-weight: 500;
-      transition: all 0.2s ease;
-      outline: none;
-    }
-
-    .premium-input:focus, .premium-select:focus {
-      border-color: #3b82f6;
+    /* content panel */
+    .panel {
       background: white;
-      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-card);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-card);
     }
-
-    .btn-generate {
-      height: 48px;
-      padding: 0 2rem;
-      background: #0f172a;
-      color: white;
-      border: none;
-      border-radius: 12px;
-      font-weight: 600;
-      font-size: 0.95rem;
-      cursor: pointer;
+    .panel-header {
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 0.75rem;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.2);
+      margin-bottom: 1.25rem;
+    }
+    .panel-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--ink);
     }
 
-    .btn-generate:hover {
-      background: #1e293b;
-      transform: translateY(-2px);
-      box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.3);
-    }
+    /* chart areas */
+    .chart-area { position: relative; height: 320px; }
+    .chart-area.short { height: 240px; }
 
-    .btn-generate i {
-      font-size: 1.1rem;
-    }
-
-    .btn-download {
-      height: 48px;
-      width: 48px;
-      border: none;
-      border-radius: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
+    /* chart empty state */
+    .chart-empty {
+      display: none;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      transition: all 0.2s ease;
-      color: white;
+      height: 100%;
+      gap: 0.75rem;
+      color: var(--muted);
+    }
+    .chart-empty i { font-size: 2.5rem; opacity: 0.3; }
+    .chart-empty p { font-size: 0.85rem; margin: 0; }
+
+    /* shimmer skeleton */
+    @keyframes shimmer {
+      0%   { background-position: -400px 0; }
+      100% { background-position: 400px 0; }
+    }
+    .skeleton {
+      background: linear-gradient(90deg, #f1f5f9 25%, #e9eff5 50%, #f1f5f9 75%);
+      background-size: 800px 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 6px;
     }
 
-    .btn-excel { background: #10b981; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2); }
-    .btn-pdf { background: #ef4444; box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2); }
+    /* 2-column secondary row */
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+    @media (max-width: 900px) { .charts-row { grid-template-columns: 1fr; } }
 
-    @media (max-width: 640px) {
-      .analytics-grid {
-        grid-template-columns: 1fr;
-      }
+    /* top products progress bars */
+    .prog-item { margin-bottom: 1rem; }
+    .prog-item:last-child { margin-bottom: 0; }
+    .prog-meta {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.4rem;
+      font-size: 0.82rem;
+    }
+    .prog-meta .name { font-weight: 500; color: #334155; }
+    .prog-meta .pct  { font-weight: 700; color: var(--blue); }
+    .prog-track {
+      height: 7px;
+      background: var(--border);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .prog-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--blue), #60a5fa);
+      border-radius: 999px;
+      width: 0;
+      transition: width 1s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    /* orders table */
+    .table-scroll { overflow-x: auto; }
+
+    .orders-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    .orders-table thead th {
+      position: sticky;
+      top: 0;
+      background: var(--surface);
+      padding: 0.7rem 1rem;
+      text-align: left;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      z-index: 5;
+    }
+    .orders-table tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+    .orders-table tbody tr:last-child { border-bottom: none; }
+    .orders-table tbody tr:hover { background: var(--surface); }
+    .orders-table td {
+      padding: 0.9rem 1rem;
+      color: #334155;
+      font-weight: 500;
+      vertical-align: middle;
+    }
+    .td-order { color: var(--blue); font-weight: 700; }
+    .td-discount { color: var(--red); }
+    .td-amount  { font-weight: 700; color: var(--ink); }
+    .td-date    { color: var(--muted); font-size: 0.78rem; }
+
+    /* payment method badge */
+    .method-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 3px 9px;
+      background: #f1f5f9;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #475569;
+    }
+
+    /* status pill — matches dashboard system */
+    .pill {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: capitalize;
+    }
+    .pill-delivered  { background: #dcfce7; color: #15803d; }
+    .pill-pending    { background: #fef9c3; color: #854d0e; }
+    .pill-processing { background: #dbeafe; color: #1d4ed8; }
+    .pill-shipped    { background: #e0f2fe; color: #0369a1; }
+    .pill-in_transit { background: #f3e8ff; color: #7e22ce; }
+    .pill-cancelled  { background: #fee2e2; color: #b91c1c; }
+    .pill-returned   { background: #fef3c7; color: #b45309; }
+
+    /* empty state inside table */
+    .table-empty {
+      padding: 4rem 1rem;
+      text-align: center;
+      color: var(--muted);
+    }
+    .table-empty i {
+      font-size: 2.5rem;
+      display: block;
+      margin-bottom: 1rem;
+      opacity: 0.3;
+    }
+    .table-empty p { margin: 0; font-size: 0.9rem; }
+
+    /* pagination */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.4rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+      margin-top: 0.5rem;
+    }
+    .page-btn {
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: white;
+      color: var(--ink);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    .page-btn:hover:not(.disabled):not(.active) {
+      border-color: var(--blue);
+      color: var(--blue);
+      background: #eff6ff;
+    }
+    .page-btn.active {
+      background: var(--ink);
+      color: white;
+      border-color: var(--ink);
+    }
+    .page-btn.disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+
+    /* entry animation */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp 0.4s ease forwards; }
+
+    @media (max-width: 768px) {
+      .analytics-header { flex-direction: column; align-items: flex-start; }
+      .header-controls  { flex-direction: column; align-items: flex-start; width: 100%; }
+      .date-range       { flex-direction: column; }
     }
   </style>
 </head>
@@ -192,59 +419,50 @@
         <ul>
           <li class="nav-item">
             <a href="/admin/dashboard" class="nav-link">
-              <i class="fa-solid fa-chart-line"></i>
-              <span>Dashboard</span>
+              <i class="fa-solid fa-chart-line"></i><span>Dashboard</span>
             </a>
           </li>
           <li class="nav-item active">
             <a href="/admin/analytics" class="nav-link">
-              <i class="fa-solid fa-chart-pie"></i>
-              <span>Analytics</span>
+              <i class="fa-solid fa-chart-pie"></i><span>Analytics</span>
             </a>
           </li>
           <li class="nav-item">
             <a href="/admin/products" class="nav-link">
-              <i class="fa-solid fa-box"></i>
-              <span>Products</span>
+              <i class="fa-solid fa-box"></i><span>Products</span>
             </a>
           </li>
           <li class="nav-item">
             <a href="/admin/categories" class="nav-link">
-              <i class="fa-solid fa-layer-group"></i>
-              <span>Categories</span>
+              <i class="fa-solid fa-layer-group"></i><span>Categories</span>
             </a>
           </li>
           <li class="nav-item">
             <a href="/admin/orders" class="nav-link">
-              <i class="fa-solid fa-cart-shopping"></i>
-              <span>Orders</span>
+              <i class="fa-solid fa-cart-shopping"></i><span>Orders</span>
             </a>
           </li>
           <li class="nav-item">
             <a href="/admin/users" class="nav-link">
-              <i class="fa-solid fa-users"></i>
-              <span>Users</span>
+              <i class="fa-solid fa-users"></i><span>Users</span>
             </a>
           </li>
           <li class="nav-item">
             <a href="/admin/coupons" class="nav-link">
-              <i class="fa-solid fa-ticket"></i>
-              <span>Coupons</span>
+              <i class="fa-solid fa-ticket"></i><span>Coupons</span>
             </a>
           </li>
           <li class="nav-item">
             <a href="/admin/offers" class="nav-link">
-              <i class="fa-solid fa-tags"></i>
-              <span>Offers</span>
+              <i class="fa-solid fa-tags"></i><span>Offers</span>
             </a>
           </li>
         </ul>
       </nav>
       <div class="sidebar-footer">
-        <form action="/admin/logout" method="POST" class="logout-form">
+        <form action="/admin/logout" method="POST">
           <button type="submit" class="nav-link logout logout-btn">
-            <i class="fa-solid fa-right-from-bracket"></i>
-            <span>Logout</span>
+            <i class="fa-solid fa-right-from-bracket"></i><span>Logout</span>
           </button>
         </form>
       </div>
@@ -252,246 +470,437 @@
 
     <main class="main-content">
       <header class="top-bar">
-        <div class="mobile-toggle">
-          <i class="fa-solid fa-bars"></i>
-        </div>
-        <div class="page-title">
-          <h1>Detailed Analytics</h1>
-        </div>
+        <div class="mobile-toggle"><i class="fa-solid fa-bars"></i></div>
+        <div class="page-title"><h1>Analytics</h1></div>
         <div class="user-profile">
-          <div class="notification-icon">
-            <i class="fa-regular fa-bell"></i>
-          </div>
+          <div class="notification-icon"><i class="fa-regular fa-bell"></i></div>
           <div class="profile-info">
-            <img src="https://ui-avatars.com/api/?name=Admin+User&background=0D8ABC&color=fff" alt="Admin" />
+            <img src="https://ui-avatars.com/api/?name=Admin+User&background=3b82f6&color=fff" alt="Admin" />
             <span>Admin</span>
           </div>
         </div>
       </header>
 
       <div class="content-body">
-        <div class="premium-controls">
-          <div class="control-group">
-            <label class="control-label">Report Period</label>
-            <select id="reportPeriod" class="premium-select">
-              <option value="daily" <%= period === 'daily' ? 'selected' : '' %>>Daily</option>
-              <option value="weekly" <%= period === 'weekly' ? 'selected' : '' %>>Weekly</option>
-              <option value="yearly" <%= period === 'yearly' ? 'selected' : '' %>>Yearly</option>
-              <option value="custom" <%= period === 'custom' ? 'selected' : '' %>>Custom Range</option>
+
+        <!-- sticky filter + action header -->
+        <div class="analytics-header fade-up">
+          <div class="header-titles">
+            <h1>Financial Analytics</h1>
+            <p>Track revenue performance and order insights</p>
+          </div>
+
+          <div class="header-controls">
+            <select id="periodSelect" class="filter-select" onchange="toggleDateRange(this.value)">
+              <option value="daily"   <%= period === 'daily'   ? 'selected' : '' %>>Daily</option>
+              <option value="weekly"  <%= period === 'weekly'  ? 'selected' : '' %>>Weekly</option>
+              <option value="monthly" <%= period === 'monthly' ? 'selected' : '' %>>Monthly</option>
+              <option value="yearly"  <%= period === 'yearly'  ? 'selected' : '' %>>Yearly</option>
+              <option value="custom"  <%= period === 'custom'  ? 'selected' : '' %>>Custom Range</option>
             </select>
-          </div>
-          
-          <div id="customDates" style="display: <%= period === 'custom' ? 'flex' : 'none' %>; gap: 1rem; flex: 2; min-width: 320px;">
-            <div class="control-group">
-              <label class="control-label">Start Date</label>
-              <input type="date" id="reportStartDate" value="<%= startDate %>" class="premium-input">
-            </div>
-            <div class="control-group">
-              <label class="control-label">End Date</label>
-              <input type="date" id="reportEndDate" value="<%= endDate %>" class="premium-input">
-            </div>
-          </div>
 
-          <div style="display: flex; gap: 0.75rem;">
-            <button onclick="applyReportFilter()" class="btn-generate">
-              <i class="fa-solid fa-arrows-rotate"></i> Generate Report
+            <!-- only visible when custom is selected -->
+            <div class="date-range <%= period !== 'custom' ? 'hidden' : '' %>" id="dateRange">
+              <input type="date" id="startDate" class="filter-input" value="<%= startDate || '' %>" />
+              <span class="date-sep">→</span>
+              <input type="date" id="endDate" class="filter-input" value="<%= endDate || '' %>" />
+            </div>
+
+            <button class="btn btn-primary" onclick="generateReport()">
+              <i class="fa-solid fa-rotate"></i> Generate Report
             </button>
-            <button onclick="downloadReport('excel')" class="btn-download btn-excel" title="Download Excel">
-              <i class="fa-solid fa-file-excel"></i>
+            <button class="btn btn-excel" onclick="downloadReport('excel')" title="Download Excel">
+              <i class="fa-solid fa-file-excel"></i> Excel
             </button>
-            <button onclick="downloadReport('pdf')" class="btn-download btn-pdf" title="Download PDF">
-              <i class="fa-solid fa-file-pdf"></i>
+            <button class="btn btn-pdf" onclick="downloadReport('pdf')" title="Download PDF">
+              <i class="fa-solid fa-file-pdf"></i> PDF
             </button>
           </div>
         </div>
 
-        <!-- Sales Summary -->
-         <div class="analytics-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 2rem;">
-            <div class="chart-card" style="text-align: center; padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-              <span style="color: #64748b; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Orders</span>
-              <h2 style="font-size: 1.75rem; color: #0f172a; margin: 0.5rem 0;"><%= reportSummary.totalSalesCount %></h2>
-              <span style="color: #10b981; font-size: 0.75rem;"><i class="fa-solid fa-cart-shopping"></i> Total Sales</span>
+        <!-- kpi cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card fade-up" style="animation-delay:0.05s">
+            <div class="kpi-icon blue"><i class="fa-solid fa-cart-shopping"></i></div>
+            <div>
+              <span class="kpi-label">Total Orders</span>
+              <span class="kpi-value"><%= orderCount.toLocaleString("en-IN") %></span>
             </div>
-            <div class="chart-card" style="text-align: center; padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-              <span style="color: #64748b; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Subtotal</span>
-              <h2 style="font-size: 1.75rem; color: #0f172a; margin: 0.5rem 0;">₹<%= reportSummary.totalSubtotal.toLocaleString() %></h2>
-              <span style="color: #64748b; font-size: 0.75rem;"><i class="fa-solid fa-receipt"></i> Gross Value</span>
-            </div>
-            <div class="chart-card" style="text-align: center; padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-              <span style="color: #64748b; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Offer Disc.</span>
-              <h2 style="font-size: 1.75rem; color: #f59e0b; margin: 0.5rem 0;">₹<%= reportSummary.totalOfferDiscount.toLocaleString() %></h2>
-              <span style="color: #f59e0b; font-size: 0.75rem;"><i class="fa-solid fa-tag"></i> Market Offers</span>
-            </div>
-            <div class="chart-card" style="text-align: center; padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-              <span style="color: #64748b; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Coupon Disc.</span>
-              <h2 style="font-size: 1.75rem; color: #ef4444; margin: 0.5rem 0;">₹<%= reportSummary.totalCouponDiscount.toLocaleString() %></h2>
-              <span style="color: #ef4444; font-size: 0.75rem;"><i class="fa-solid fa-ticket"></i> Promo Savings</span>
-            </div>
-            <div class="chart-card" style="background: #0f172a; text-align: center; padding: 1.5rem; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-              <span style="color: #94a3b8; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">Final Revenue</span>
-              <h2 style="font-size: 1.75rem; color: #ffffff; margin: 0.5rem 0;">₹<%= reportSummary.totalRevenue.toLocaleString() %></h2>
-              <span style="color: #10b981; font-size: 0.75rem;"><i class="fa-solid fa-money-bill-trend-up"></i> Net Collection</span>
-            </div>
-         </div>
-
-        <div class="analytics-grid">
-          <!-- Category Distribution -->
-          <div class="chart-card">
-            <h2 class="section-title">Sales by Category</h2>
-            <canvas id="categoryChart"></canvas>
           </div>
-
-          <!-- Payment Methods -->
-          <div class="chart-card">
-            <h2 class="section-title">Payment Methods</h2>
-            <canvas id="paymentChart"></canvas>
+          <div class="kpi-card fade-up" style="animation-delay:0.1s">
+            <div class="kpi-icon green"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+            <div>
+              <span class="kpi-label">Gross Revenue</span>
+              <span class="kpi-value">₹<%= grossSale.toLocaleString("en-IN") %></span>
+            </div>
+          </div>
+          <div class="kpi-card fade-up" style="animation-delay:0.15s">
+            <div class="kpi-icon red"><i class="fa-solid fa-tag"></i></div>
+            <div>
+              <span class="kpi-label">Coupon Discount</span>
+              <span class="kpi-value">₹<%= couponDiscount.toLocaleString("en-IN") %></span>
+            </div>
+          </div>
+          <div class="kpi-card fade-up" style="animation-delay:0.2s">
+            <div class="kpi-icon purple"><i class="fa-solid fa-circle-check"></i></div>
+            <div>
+              <span class="kpi-label">Net Revenue</span>
+              <span class="kpi-value">₹<%= (grossSale - couponDiscount).toLocaleString("en-IN") %></span>
+            </div>
           </div>
         </div>
 
-        <!-- Top Products -->
-        <div class="top-products-card">
-          <h2 class="section-title">Top Selling Products</h2>
-          <div class="products-list">
-            <% topProducts.forEach(product => { %>
-              <div class="product-item">
-                <img src="<%= product.image %>" alt="<%= product.name %>" class="product-image">
-                <div class="product-info">
-                  <span class="product-name"><%= product.name %></span>
-                  <span class="product-stats">Sold: <%= product.totalSold %> units</span>
-                </div>
-                <div class="product-revenue">
-                  ₹<%= product.revenue.toLocaleString() %>
-                </div>
+        <!--
+        revenue trend chart — commented out, not needed for now
+        <div class="panel fade-up" style="animation-delay:0.25s">
+          <div class="panel-header">
+            <h2 class="panel-title">Revenue Trend</h2>
+            <span style="font-size:0.8rem; color:var(--muted);">
+              <% if (period === 'custom' && startDate && endDate) { %>
+                <%= new Date(startDate).toLocaleDateString("en-IN", {day:"2-digit",month:"short"}) %> &ndash;
+                <%= new Date(endDate).toLocaleDateString("en-IN", {day:"2-digit",month:"short",year:"numeric"}) %>
+              <% } else { %>
+                <%= period.charAt(0).toUpperCase() + period.slice(1) %> Period
+              <% } %>
+            </span>
+          </div>
+          <div class="chart-area" id="trendChartWrap">
+            <% if (orders.length === 0) { %>
+              <div class="chart-empty" style="display:flex;">
+                <i class="fa-solid fa-chart-line"></i>
+                <p>No revenue data for the selected period</p>
               </div>
-            <% }) %>
-            <% if (topProducts.length === 0) { %>
-              <div style="text-align: center; padding: 2rem;">No data available</div>
+            <% } else { %>
+              <canvas id="trendChart"></canvas>
             <% } %>
           </div>
         </div>
-        <!-- Sales Report Table -->
-        <div class="top-products-card" style="margin-top: 2rem;">
-          <h2 class="section-title">In-Depth Sales Report</h2>
-          <div style="overflow-x: auto;">
-            <table style="width: 100%; border-collapse: collapse;">
-              <thead style="background: #f8fafc;">
-                <tr>
-                  <th style="padding: 1rem; text-align: left; color: #64748b; font-weight: 600; font-size: 0.875rem;">Order Number</th>
-                  <th style="padding: 1rem; text-align: left; color: #64748b; font-weight: 600; font-size: 0.875rem;">Date</th>
-                  <th style="padding: 1rem; text-align: left; color: #64748b; font-weight: 600; font-size: 0.875rem;">Subtotal</th>
-                  <th style="padding: 1rem; text-align: left; color: #64748b; font-weight: 600; font-size: 0.875rem;">Offer Disc.</th>
-                  <th style="padding: 1rem; text-align: left; color: #64748b; font-weight: 600; font-size: 0.875rem;">Coupon</th>
-                  <th style="padding: 1rem; text-align: left; color: #64748b; font-weight: 600; font-size: 0.875rem;">Paid Amount</th>
-                  <th style="padding: 1rem; text-align: left; color: #64748b; font-weight: 600; font-size: 0.875rem;">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <% if (orders && orders.length > 0) { %>
-                  <% orders.forEach(order => { %>
-                    <% const offerDiscount = order.items.reduce((acc, item) => acc + (item.product.originalPrice - item.product.discountedPrice) * item.quantity, 0); %>
-                    <tr style="border-bottom: 1px solid #f1f5f9;">
-                      <td style="padding: 1.25rem 1rem; font-weight: 500; font-size: 0.9rem;"><%= order.orderNumber %></td>
-                      <td style="padding: 1.25rem 1rem; color: #64748b; font-size: 0.9rem;"><%= new Date(order.createdAt).toLocaleDateString() %></td>
-                      <td style="padding: 1.25rem 1rem; color: #64748b; font-size: 0.9rem;">₹<%= (order.payment.subtotal || order.payment.amount).toLocaleString() %></td>
-                      <td style="padding: 1.25rem 1rem; color: #f59e0b; font-weight: 500; font-size: 0.9rem;">₹<%= offerDiscount.toLocaleString() %></td>
-                      <td style="padding: 1.25rem 1rem; color: #ef4444; font-weight: 500; font-size: 0.9rem;">₹<%= (order.payment.discount || 0).toLocaleString() %></td>
-                      <td style="padding: 1.25rem 1rem; font-weight: 700; color: #0f172a; font-size: 0.9rem;">₹<%= order.payment.amount.toLocaleString() %></td>
-                      <td style="padding: 1.25rem 1rem;">
-                        <span style="background: #eff6ff; color: #3b82f6; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; text-transform: capitalize;">
-                          <%= order.orderStatus %>
+        -->
+        <!-- top products + order type breakdown -->
+        <div class="charts-row">
+
+          <!-- top products by revenue (backend-computed aggregation) -->
+          <div class="panel fade-up" style="animation-delay:0.3s">
+            <div class="panel-header">
+              <h2 class="panel-title">Top Products</h2>
+              <span style="font-size:0.78rem;color:var(--muted);">by revenue</span>
+            </div>
+            <%
+              const maxProdRev = topProducts[0]?.revenue || 1;
+            %>
+            <% if (topProducts.length === 0) { %>
+              <div class="chart-empty" style="display:flex; height:200px;">
+                <i class="fa-solid fa-box-open"></i>
+                <p>No product data available</p>
+              </div>
+            <% } else { %>
+              <div id="topProdsContainer">
+                <% topProducts.forEach((prod, i) => { %>
+                  <div class="prog-item fade-up" style="animation-delay:<%= 0.32 + i * 0.06 %>s">
+                    <div class="prog-meta">
+                      <span class="name"><%= prod.name %></span>
+                      <span class="pct">₹<%= prod.revenue.toLocaleString("en-IN") %></span>
+                    </div>
+                    <div class="prog-track">
+                      <div class="prog-fill" data-width="<%= ((prod.revenue / maxProdRev) * 100).toFixed(1) %>"></div>
+                    </div>
+                  </div>
+                <% }); %>
+              </div>
+            <% } %>
+          </div>
+
+          <!-- order status doughnut (backend aggregation) -->
+          <div class="panel fade-up" style="animation-delay:0.3s">
+            <div class="panel-header">
+              <h2 class="panel-title">Order Breakdown</h2>
+              <span style="font-size:0.78rem;color:var(--muted);">by status</span>
+            </div>
+            <% if (!statusData || statusData.length === 0) { %>
+              <div class="chart-empty" style="display:flex; height:200px;">
+                <i class="fa-solid fa-chart-pie"></i>
+                <p>No order data available</p>
+              </div>
+            <% } else { %>
+              <div class="chart-area short">
+                <canvas id="statusChart"></canvas>
+              </div>
+            <% } %>
+          </div>
+
+        </div>
+
+        <!-- orders table -->
+        <div class="panel fade-up" style="animation-delay:0.35s">
+          <div class="panel-header">
+            <h2 class="panel-title">Order Report</h2>
+            <span style="font-size:0.82rem;color:var(--muted);"><%= orderCount %> total orders</span>
+          </div>
+
+          <% if (orders.length === 0) { %>
+            <div class="table-empty">
+              <i class="fa-solid fa-folder-open"></i>
+              <p>No orders found for the selected period.<br>Try adjusting the report filters.</p>
+            </div>
+          <% } else { %>
+            <div class="table-scroll">
+              <table class="orders-table">
+                <thead>
+                  <tr>
+                    <th>Order</th>
+                    <th>Customer</th>
+                    <th>Payment</th>
+                    <th>Subtotal</th>
+                    <th>Discount</th>
+                    <th>Net Amount</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% orders.forEach(order => {
+                    const statusDate = new Date(order.createdAt).toLocaleDateString("en-IN", {
+                      day: "2-digit", month: "short", year: "numeric"
+                    });
+                  %>
+                    <tr>
+                      <td class="td-order">#<%= order.orderNumber %></td>
+                      <td><%= order.userId?.name || "Guest" %></td>
+                      <td>
+                        <span class="method-badge">
+                          <i class="fa-solid fa-credit-card"></i>
+                          <%= order.payment.method %>
                         </span>
                       </td>
+                      <td>₹<%= (order.payment.subtotal || order.payment.amount).toLocaleString("en-IN") %></td>
+                      <td class="td-discount">₹<%= (order.payment.discount || 0).toLocaleString("en-IN") %></td>
+                      <td class="td-amount">₹<%= order.payment.amount.toLocaleString("en-IN") %></td>
+                      <td><span class="pill pill-<%= order.orderStatus %>"><%= order.orderStatus %></span></td>
+                      <td class="td-date"><%= statusDate %></td>
                     </tr>
-                  <% }) %>
-                <% } else { %>
-                  <tr>
-                    <td colspan="6" style="padding: 3rem; text-align: center; color: #64748b;">No orders found for this period</td>
-                  </tr>
+                  <% }); %>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- pagination -->
+            <% if (totalPages > 1) {
+              const pageUrl = (p) => {
+                let u = `?page=${p}&period=${period}`;
+                if (startDate) u += `&startDate=${startDate}`;
+                if (endDate)   u += `&endDate=${endDate}`;
+                return u;
+              };
+            %>
+              <nav class="pagination">
+                <a href="<%= pageUrl(currentPage - 1) %>"
+                   class="page-btn <%= currentPage === 1 ? 'disabled' : '' %>">
+                  <i class="fa-solid fa-chevron-left" style="font-size:0.7rem;"></i>
+                </a>
+
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                  <a href="<%= pageUrl(i) %>"
+                     class="page-btn <%= currentPage === i ? 'active' : '' %>">
+                    <%= i %>
+                  </a>
                 <% } %>
-              </tbody>
-            </table>
-          </div>
+
+                <a href="<%= pageUrl(currentPage + 1) %>"
+                   class="page-btn <%= currentPage === totalPages ? 'disabled' : '' %>">
+                  <i class="fa-solid fa-chevron-right" style="font-size:0.7rem;"></i>
+                </a>
+              </nav>
+            <% } %>
+          <% } %>
         </div>
-      </div>
+
+      </div><!-- .content-body -->
     </main>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
   <script>
-    document.getElementById('reportPeriod').addEventListener('change', function() {
-      const customDates = document.getElementById('customDates');
-      customDates.style.display = this.value === 'custom' ? 'flex' : 'none';
-    });
+    // order data from SSR — used to render client charts
+    const ORDER_DATA = <%- JSON.stringify(orders) %>;
+    const STATUS_MAP = <%- JSON.stringify(statusData || []) %>;
 
-    function applyReportFilter() {
-      const period = document.getElementById('reportPeriod').value;
-      const startDate = document.getElementById('reportStartDate').value;
-      const endDate = document.getElementById('reportEndDate').value;
-      
-      const params = new URLSearchParams(window.location.search);
-      params.set('period', period);
-      if (period === 'custom') {
-        params.set('startDate', startDate);
-        params.set('endDate', endDate);
-      } else {
-        params.delete('startDate');
-        params.delete('endDate');
-      }
-      window.location.search = params.toString();
+    // show/hide custom date inputs based on period selection
+    function toggleDateRange(val) {
+      const el = document.getElementById("dateRange");
+      el.classList.toggle("hidden", val !== "custom");
     }
 
-    function downloadReport(type) {
-      const period = document.getElementById('reportPeriod').value;
-      const startDate = document.getElementById('reportStartDate').value;
-      const endDate = document.getElementById('reportEndDate').value;
-      
-      let url = `/admin/analytics/${type}?period=${period}`;
-      if (period === 'custom') {
-        url += `&startDate=${startDate}&endDate=${endDate}`;
+    function generateReport() {
+      const period = document.getElementById("periodSelect").value;
+      const start  = document.getElementById("startDate")?.value;
+      const end    = document.getElementById("endDate")?.value;
+
+      if (period === "custom" && (!start || !end)) {
+        alert("Please select both start and end dates.");
+        return;
+      }
+
+      let url = `?period=${period}`;
+      if (period === "custom") url += `&startDate=${start}&endDate=${end}`;
+      window.location.href = url;
+    }
+
+    function downloadReport(format) {
+      const period = document.getElementById("periodSelect").value;
+      const start  = document.getElementById("startDate")?.value;
+      const end    = document.getElementById("endDate")?.value;
+
+      let url = `/admin/analytics/${format}?period=${period}`;
+      if (period === "custom" && start && end) {
+        url += `&startDate=${start}&endDate=${end}`;
       }
       window.location.href = url;
     }
 
-    // Category Chart
-    const catCtx = document.getElementById('categoryChart').getContext('2d');
-    new Chart(catCtx, {
-      type: 'doughnut',
-      data: {
-        labels: <%- categoryLabels %>,
-        datasets: [{
-          data: <%- categoryValues %>,
-          backgroundColor: ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#ec4899', '#06b6d4'],
-          borderWidth: 0
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { position: 'bottom' }
-        }
-      }
-    });
+    /*
+    revenue trend line chart — commented out, not needed for now
+    function buildTrendChart() {
+      const canvas = document.getElementById("trendChart");
+      if (!canvas || ORDER_DATA.length === 0) return;
 
-    // Payment Chart
-    const payCtx = document.getElementById('paymentChart').getContext('2d');
-    new Chart(payCtx, {
-      type: 'pie',
-      data: {
-        labels: <%- paymentLabels %>,
-        datasets: [{
-          data: <%- paymentValues %>,
-          backgroundColor: ['#3b82f6', '#f59e0b', '#10b981'],
-          borderWidth: 0
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { position: 'bottom' }
-        }
-      }
+      const buckets = {};
+      ORDER_DATA.forEach(o => {
+        const day = new Date(o.createdAt).toLocaleDateString("en-IN", {
+          day: "2-digit", month: "short"
+        });
+        buckets[day] = (buckets[day] || 0) + (o.payment.amount || 0);
+      });
+
+      const labels = Object.keys(buckets);
+      const values = Object.values(buckets);
+      const ctx    = canvas.getContext("2d");
+
+      const grad = ctx.createLinearGradient(0, 0, 0, 320);
+      grad.addColorStop(0, "rgba(59,130,246,0.22)");
+      grad.addColorStop(1, "rgba(59,130,246,0)");
+
+      new Chart(ctx, {
+        type: "line",
+        data: {
+          labels,
+          datasets: [{
+            label: "Revenue",
+            data: values,
+            borderColor: "#3b82f6",
+            backgroundColor: grad,
+            borderWidth: 2.5,
+            fill: true,
+            tension: 0.42,
+            pointRadius: labels.length > 20 ? 2 : 4,
+            pointHoverRadius: 6,
+            pointBackgroundColor: "#3b82f6",
+            pointBorderColor: "#fff",
+            pointBorderWidth: 2,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: { duration: 700, easing: "easeOutQuart" },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: "rgba(15,23,42,0.92)",
+              padding: 12,
+              callbacks: {
+                label: (ctx) => ` ₹${ctx.parsed.y.toLocaleString("en-IN")}`,
+              },
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: "#f1f5f9" },
+              ticks: {
+                color: "#94a3b8",
+                font: { size: 11 },
+                callback: v => "₹" + (v >= 1000 ? (v/1000).toFixed(0)+"k" : v),
+              },
+            },
+            x: {
+              grid: { display: false },
+              ticks: { color: "#94a3b8", font: { size: 11 }, maxTicksLimit: 10, maxRotation: 0 },
+            },
+          },
+        },
+      });
+    }
+    */
+
+    // order status doughnut chart
+    function buildStatusChart() {
+      const canvas = document.getElementById("statusChart");
+      if (!canvas) return;
+
+      // STATUS_MAP comes from SSR (statusEntries array)
+      const labels = STATUS_MAP.map(e => e[0]);
+      const values = STATUS_MAP.map(e => e[1]);
+      const palette = ["#3b82f6","#10b981","#f59e0b","#8b5cf6","#ef4444","#06b6d4","#ec4899"];
+
+      new Chart(canvas.getContext("2d"), {
+        type: "doughnut",
+        data: {
+          labels,
+          datasets: [{
+            data: values,
+            backgroundColor: palette.slice(0, labels.length),
+            borderWidth: 2,
+            borderColor: "#fff",
+            hoverOffset: 6,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: "65%",
+          animation: { duration: 700 },
+          plugins: {
+            legend: {
+              position: "right",
+              labels: {
+                font: { size: 12, weight: "600" },
+                color: "#334155",
+                padding: 14,
+                usePointStyle: true,
+                pointStyleWidth: 10,
+              },
+            },
+            tooltip: {
+              backgroundColor: "rgba(15,23,42,0.92)",
+              callbacks: {
+                label: ctx => ` ${ctx.label}: ${ctx.parsed} orders`,
+              },
+            },
+          },
+        },
+      });
+    }
+
+    // animate top-product progress bars (same rAF trick as dashboard)
+    function animateBars() {
+      document.querySelectorAll(".prog-fill[data-width]").forEach(el => {
+        requestAnimationFrame(() => { el.style.width = el.dataset.width + "%"; });
+      });
+    }
+
+    // mobile sidebar toggle
+    const mobileToggle = document.querySelector(".mobile-toggle");
+    if (mobileToggle) {
+      mobileToggle.addEventListener("click", () => {
+        document.querySelector(".sidebar").classList.toggle("active");
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // buildTrendChart(); — commented out
+      buildStatusChart();
+      animateBars();
     });
   </script>
 </body>
-
 </html>

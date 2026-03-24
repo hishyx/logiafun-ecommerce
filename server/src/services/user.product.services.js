@@ -398,3 +398,44 @@ export const getProductVariantDetails = async (productId, variantId) => {
 
   return { variantName };
 };
+
+export const checkProductStockForOrderRetry = async (orderItems) => {
+  const productMap = {};
+
+  // STEP 1 → Validate
+  for (let item of orderItems) {
+    let product = productMap[item.product.productId];
+
+    if (!product) {
+      product = await Product.findById(item.product.productId);
+      if (!product) throw new Error("Product not available");
+
+      productMap[item.product.productId] = product;
+    }
+
+    const variant = product.variants.id(item.product.variantId);
+
+    if (!variant)
+      throw new Error(
+        "One of the product in your order is variant not available",
+      );
+
+    if (item.quantity > variant.stock)
+      throw new Error("One of the product in your order is out of stock");
+  }
+
+  // STEP 2 → Decrease
+  for (let item of orderItems) {
+    const product = productMap[item.product.productId];
+    const variant = product.variants.id(item.product.variantId);
+
+    variant.stock -= item.quantity;
+  }
+
+  // STEP 3 → Save
+  for (let productId in productMap) {
+    await productMap[productId].save();
+  }
+
+  return true;
+};

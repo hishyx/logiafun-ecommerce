@@ -22,3 +22,31 @@ export const generateCheckoutId = () => {
 
   return `CHK-${timestamp}-${randomPart}`;
 };
+
+export const calculateProportionalRefund = (order, itemBaseTotal) => {
+  const totalPaid = order.payment.amount;
+
+  const subtotalAfterDiscount = order.payment.subtotal - order.payment.discount;
+
+  const alreadyRefunded = order.refundSummary?.totalRefundedAmount || 0;
+
+  const remainingRefundable = totalPaid - alreadyRefunded;
+
+  // full remaining refund protection
+  if (subtotalAfterDiscount <= 0) {
+    return remainingRefundable > 0 ? remainingRefundable : 0;
+  }
+
+  let refundAmount = Math.round(
+    (itemBaseTotal / subtotalAfterDiscount) * totalPaid,
+  );
+
+  // drift protection
+  if (refundAmount > remainingRefundable) {
+    refundAmount = remainingRefundable;
+  }
+
+  if (refundAmount < 0) refundAmount = 0;
+
+  return refundAmount;
+};

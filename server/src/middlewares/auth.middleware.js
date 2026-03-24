@@ -1,5 +1,7 @@
 import User from "../models/user.model.js";
 import Order from "../models/order.model.js";
+import * as statusCodes from "../constants/statusCodes.js";
+import * as messages from "../constants/messages.js";
 
 export const isAuth = (req, res, next) => {
   console.log("isAuth hit:", req.originalUrl);
@@ -104,7 +106,7 @@ export const checkAuthUniversaly = async (req, res, next) => {
     console.log("order.userId:", order.userId.toString());
 
     if (!order) {
-      return res.status(404).send("Order not found");
+      return res.status(statusCodes.NOT_FOUND).send(messages.ORDER_NOT_FOUND);
     }
 
     // Allow admin
@@ -119,9 +121,9 @@ export const checkAuthUniversaly = async (req, res, next) => {
       return next();
     }
 
-    return res.status(403).send("Unauthorized");
+    return res.status(statusCodes.FORBIDDEN).send(messages.UNAUTHORIZED_ACCESS);
   } catch (err) {
     console.error(err);
-    res.status(500).send("Authorization failed");
+    res.status(statusCodes.INTERNAL_SERVER_ERROR).send(messages.INTERNAL_SERVER_ERROR);
   }
 };

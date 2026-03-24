@@ -1,0 +1,119 @@
+
+<span id="newResultsCount" style="display:none">
+  Showing <strong><%=skip+1%>-<%=skip+products.length%></strong> of <strong><%=totalProducts%></strong> premium toys
+</span>
+
+            <div class="products-grid" id="productsGrid">
+
+              <% if (products && products.length> 0) { %>
+
+                <% products.forEach(product=> { %>
+
+                  <% const firstVariant=product.variants?.[0]; const variantPrice=firstVariant?.price || 0; const
+                    image=firstVariant?.images?.[0] || '/images/placeholder-toy.jpg' ; const
+                    discount=product.finalDiscount || 0; const hasDiscount=discount> 0;
+                    const finalPrice = product.discountedPrice || variantPrice;
+                    %>
+
+                    <div class="product-card">
+                      <a href="/products/<%= product._id %>"
+                        style="display: block; height: 100%; text-decoration: none; color: inherit;">
+                        <div class="product-image-wrapper">
+                          <img src="<%= image %>" alt="<%= product.name %>">
+                          <% if (hasDiscount) { %>
+                            <div class="discount-badge">
+                              <%= discount %>% OFF
+                            </div>
+                            <% } %>
+                        </div>
+
+                        <div class="product-content">
+
+                          <div class="product-category-tag">
+                            <%= product.category.name || "General" %>
+                          </div>
+
+                          <h3 class="product-title">
+                            <%= product.name %>
+                          </h3>
+
+                          <div class="rating-wrapper">
+                            <div class="stars">
+                              <% const rating=product.rating || 0; for (let i=1; i <=5; i++) { if (rating>= i) {
+                                %>
+                                <i class="fa-solid fa-star"></i>
+                                <% } else if (rating>= i - 0.5) {
+                                  %>
+                                  <i class="fa-solid fa-star-half-stroke"></i>
+                                  <% } else { %>
+                                    <i class="fa-regular fa-star"></i>
+                                    <% } } %>
+                            </div>
+
+                            <span class="review-count">
+                              (<%= product.reviewCount || 0 %> reviews)
+                            </span>
+                          </div>
+
+                          <div class="price-row">
+                            <div class="price-wrapper">
+                              <span class="current-price">
+                                ₹<%= Math.round(finalPrice).toLocaleString() %>
+                              </span>
+
+                              <% if (hasDiscount) { %>
+                                <span class="old-price">
+                                  ₹<%= variantPrice.toLocaleString() %>
+                                </span>
+                                <% } %>
+                            </div>
+
+                            <div class="add-cart-action">
+                              <button class="add-cart-btn" title="View Details">
+                                <i class="fa-solid fa-arrow-right"></i>
+                              </button>
+                            </div>
+                          </div>
+
+
+                        </div>
+                      </a>
+
+                      <div class="card-actions" style="z-index: 10;">
+                        <button class="action-btn" title="Wishlist"
+                          onclick="addToWishlist(event, '<%= product._id %>')">
+                          <i class="fa-regular fa-heart"></i>
+                        </button>
+                      </div>
+                    </div>
+
+
+                    <% }) %>
+
+                      <% } else { %>
+
+                        <p>No products found.</p>
+
+                        <% } %>
+
+            </div>
+
+            <!--Pagination stuffs-->
+
+            <div class="pagination" id="paginationWrapper">
+              <button class="page-link" id="page-back-btn" onclick="goToPage(<%= currentPage - 1 %>)" <%=currentPage <=1
+                ? 'disabled' : '' %>>
+                <i class="fa-solid fa-chevron-left"></i>
+              </button>
+
+              <% for (let i=1; i <=totalPages; i++) { %>
+                <button class="page-link <%= i === currentPage ? 'active' : '' %>" onclick="goToPage(<%= i %>)">
+                  <%= i %>
+                </button>
+                <% } %>
+
+                  <button class="page-link" id="page-front-btn" onclick="goToPage(<%= currentPage + 1 %>)"
+                    <%=currentPage>= totalPages ? 'disabled' : '' %>>
+                    <i class="fa-solid fa-chevron-right"></i>
+                  </button>
+            </div>

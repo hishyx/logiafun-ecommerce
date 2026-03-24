@@ -2,6 +2,8 @@ import Order from "../../models/order.model.js";
 import statusTransitions from "../../components/order.status.transitions.js";
 import { changeProductStock } from "../user.product.services.js";
 import { addRefundToWallet } from "../user.wallet.services.js";
+import { calculateProportionalRefund } from "../../utils/order.helper.js";
+import * as userWalletServices from "../user.wallet.services.js";
 
 export const getAllOrders = async ({
   page,
@@ -129,9 +131,10 @@ export const acceptOrderReturn = async (orderId, stockIncreaseItems) => {
   order.refundSummary.totalRefundedAmount =
     order.refundSummary.totalRefundedAmount || 0;
 
-  const remainingRefund =
+  let remainingRefund =
     order.payment.amount - order.refundSummary.totalRefundedAmount;
 
+  if (remainingRefund < 0) remainingRefund = 0;
   const transactionData = {
     userId: order.userId,
     amount: remainingRefund,
@@ -143,7 +146,7 @@ export const acceptOrderReturn = async (orderId, stockIncreaseItems) => {
 
   order.refundSummary.totalRefundedAmount = order.payment.amount;
 
-  order.save();
+  await order.save();
   return order;
 };
 
@@ -193,20 +196,22 @@ export const acceptItemReturn = async (
   }
 
   if (!isEntireReturn) {
+    const itemBase = item.product.discountedPrice * item.quantity;
+
+    const refundAmount = calculateProportionalRefund(order, itemBase);
+
     const transactionData = {
       userId: order.userId,
-      amount: item.product.discountedPrice * item.quantity,
+      amount: refundAmount,
       orderNumber: order.orderNumber,
       status: "returned",
       itemName: item.product.name,
     };
-    await addRefundToWallet(transactionData);
 
-    order.refundSummary.totalRefundedAmount =
-      order.refundSummary.totalRefundedAmount || 0;
+    await userWalletServices.addRefundToWallet(transactionData);
 
-    order.refundSummary.totalRefundedAmount +=
-      item.product.discountedPrice * item.quantity;
+    //  FIX HERE
+    order.refundSummary.totalRefundedAmount += refundAmount;
   }
 
   await order.save();
@@ -234,12 +239,6 @@ export const changeAdminOrderItemStatusService = async (
 
   item.status = newStatus;
 
-  // Sync overall order status if necessary.
-  // If all non-cancelled items are successfully delivered, the order might be considered delivered.
-  // Or handle differently based on your store's logic. Simplest is to let item statuses be independent
-  // until we need to evaluate the whole order.
-
-  // Optionally update overall order status logic here:
   const activeItems = order.items.filter(
     (i) => i.status !== "cancelled" && i.status !== "returned",
   );

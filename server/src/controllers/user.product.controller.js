@@ -18,8 +18,6 @@ export const productListPage = async (req, res) => {
 
   const limit = 6;
 
-  //Filtering works
-
   let categoryIds = [];
 
   if (category) {
@@ -43,12 +41,7 @@ export const productListPage = async (req, res) => {
 
   const skip = (page - 1) * limit >= 0 ? (page - 1) * limit : 0;
 
-  console.log(totalPages);
-
-  console.log("SortBy : ", sortBy);
-  console.log("Products : ", productList.products);
-
-  res.render("user/product.list.page.ejs", {
+  const viewData = {
     products: productList.products,
     searchValue: search,
     currentPage: page,
@@ -60,7 +53,15 @@ export const productListPage = async (req, res) => {
     skip,
     sortBy,
     selectedCategoryIds: category || [],
-  });
+  };
+
+  // if api request
+  if (req.headers["x-requested-with"] === "XMLHttpRequest") {
+    return res.render("partials/product-listing.ejs", viewData);
+  }
+
+  //  normal page render
+  res.render("user/product.list.page.ejs", viewData);
 };
 
 export const productDetailsPage = async (req, res) => {

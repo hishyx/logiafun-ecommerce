@@ -203,6 +203,8 @@ export const editAddress = async (req, res) => {
 
 export const setDefault = async (req, res) => {
   try {
+    console.log("Reached default set controller");
+
     const editedAddress = await changeDefaultAddress(
       req.user._id,
       req.params.addressId,

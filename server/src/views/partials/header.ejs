@@ -26,12 +26,88 @@
   .login-header-btn:hover svg {
     transform: translateX(2px);
   }
+
+  .toastify.app-toast {
+    position: fixed;
+    top: 18px;
+    right: 16px;
+    left: auto !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: auto;
+    max-width: min(380px, calc(100vw - 32px));
+    min-height: 58px;
+    padding: 14px 16px !important;
+    border-radius: 18px !important;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.2) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 9999;
+  }
+
+  .toastify.app-toast.on {
+    opacity: 1;
+  }
+
+  .toastify.app-toast .toast-close {
+    margin-left: auto;
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    color: rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    font-size: 18px;
+    line-height: 1;
+    opacity: 1;
+    cursor: pointer;
+    pointer-events: auto;
+    user-select: none;
+    flex-shrink: 0;
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+
+  .toastify.app-toast .toast-close:hover {
+    background: rgba(255, 255, 255, 0.24);
+    transform: scale(1.05);
+  }
+
+  .toastify.app-toast-success {
+    background: linear-gradient(135deg, #059669 0%, #22c55e 100%) !important;
+  }
+
+  .toastify.app-toast-error {
+    background: linear-gradient(135deg, #dc2626 0%, #f97316 100%) !important;
+  }
+
+  .toastify.app-toast-info {
+    background: linear-gradient(135deg, #2563eb 0%, #06b6d4 100%) !important;
+  }
+
+  @media (max-width: 576px) {
+    .toastify.app-toast {
+      right: 12px;
+      max-width: calc(100vw - 24px);
+      min-height: 52px;
+      padding: 12px 14px !important;
+      border-radius: 14px !important;
+    }
+  }
 </style>
 
 <header class="header">
   <div class="container">
     <div class="header-content">
-      <a href="/home" class="logo">logia<span>Fun</span></a>
+      <a href="/home" class="logo">
+        <span class="full-logo">logia<span>Fun</span></span>
+        <span class="mobile-logo"><span class="l">l</span><span class="f">F</span></span>
+      </a>
 
       <nav class="nav">
         <a href="/home">Home</a>
@@ -63,7 +139,7 @@
 
 
           <% if (locals.user) { %>
-            <a href="/user/profile" class="profile-btn">
+            <a href="/user/profile" class="profile-btn" title="Go to Profile">
               <div class="profile-icon">
                 <img src="<%=user.profileImage%>" style="border-radius: 30px;border-color: black;border-width: 1px;">
               </div>
@@ -73,13 +149,16 @@
               </span>
             </a>
             <% } else { %>
-              <a href="/auth/login" class="login-header-btn">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  style="margin-right: 8px;">
-                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3" />
-                </svg>
-                Login
-              </a>
+              <div class="guest-signin-wrap">
+                <span class="guest-signin-hint">click here to sign in !<span class="guest-signin-arrow">→</span></span>
+                <a href="/auth/login" class="login-header-btn guest-profile-link" title="Click here to sign in">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21a8 8 0 0 0-16 0"></path>
+                    <circle cx="12" cy="8" r="5"></circle>
+                  </svg>
+                  <span class="login-header-text">Sign in</span>
+                </a>
+              </div>
               <% } %>
 
                 <a href="/user/wishlist" class="cart-icon" style="margin-right: 15px;">
@@ -118,28 +197,33 @@
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 <script>
   window.showToast = function (message, type = 'success') {
-    let bgColor = 'linear-gradient(to right, #00b09b, #96c93d)'; // success green
+    let toastClass = 'app-toast app-toast-success';
     if (type === 'error') {
-      bgColor = 'linear-gradient(to right, #ff5f6d, #ffc371)'; // error red/orange
+      toastClass = 'app-toast app-toast-error';
     } else if (type === 'info') {
-      bgColor = 'linear-gradient(to right, #2193b0, #6dd5ed)'; // info blue
+      toastClass = 'app-toast app-toast-info';
     }
 
     Toastify({
       text: message,
+      className: toastClass,
       duration: 3000,
-      newWindow: true,
       close: true,
       gravity: "top",
       position: "right",
+      offset: {
+        x: 16,
+        y: 18
+      },
       stopOnFocus: true,
       style: {
-        background: bgColor,
         borderRadius: "8px",
         boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-        padding: "12px 24px",
+        padding: "12px 16px",
         fontSize: "14px",
-        fontWeight: "500"
+        fontWeight: "500",
+        width: "fit-content",
+        maxWidth: "min(380px, calc(100vw - 32px))"
       }
     }).showToast();
   };

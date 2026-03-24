@@ -7,6 +7,7 @@ import {
 } from "../middlewares/auth.middleware.js";
 import upload from "../config/multer.js";
 
+import * as statusCodes from "../constants/statusCodes.js";
 import * as authControllers from "../controllers/auth.controller.js";
 import * as adminUserControllers from "../controllers/admin/admin.user.controller.js";
 import * as adminProductControllers from "../controllers/admin/admin.product.controller.js";
@@ -15,7 +16,6 @@ import * as adminOrderControllers from "../controllers/admin/admin.order.control
 import * as adminCouponControllers from "../controllers/admin/admin.coupon.controller.js";
 import * as adminOffersControllers from "../controllers/admin/admin.offers.controller.js";
 import * as adminDashboardControllers from "../controllers/admin/admin.dashboard.controller.js";
-
 
 const router = express.Router();
 
@@ -32,9 +32,20 @@ router.use("/admin", checkAdminStatus);
 router.get("/admin", adminDashboardControllers.adminDashboardPage);
 router.get("/admin/dashboard", adminDashboardControllers.adminDashboardPage);
 router.get("/admin/analytics", adminDashboardControllers.adminAnalyticsPage);
+router.get(
+  "/admin/dashboard-stats",
+  adminDashboardControllers.getDashboardSummaryStats,
+);
+router.get(
+  "/admin/dashboard/chart",
+  adminDashboardControllers.getDashboardChartData,
+);
+router.get(
+  "/admin/dashboard/top-products",
+  adminDashboardControllers.getDashboardTopProductsAPI,
+);
 router.get("/admin/analytics/excel", adminDashboardControllers.downloadExcel);
 router.get("/admin/analytics/pdf", adminDashboardControllers.downloadPDF);
-
 
 router.get("/admin/users", adminUserControllers.adminUserListPage);
 
@@ -105,7 +116,10 @@ router
   .post(adminOffersControllers.addOffer);
 
 router.patch("/admin/offers/:offerId", adminOffersControllers.editOffer);
-router.patch("/admin/offers/:offerId/toggle", adminOffersControllers.toggleOffer);
+router.patch(
+  "/admin/offers/:offerId/toggle",
+  adminOffersControllers.toggleOffer,
+);
 
 router.patch(
   "/admin/products/:productId/toggle",
@@ -113,7 +127,7 @@ router.patch(
 );
 
 router.all("/admin/{*any}", (req, res) => {
-  res.status(404).render("404-not-found");
+  res.status(statusCodes.NOT_FOUND).render("404-not-found");
 });
 
 export default router;

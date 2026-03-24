@@ -1,16 +1,22 @@
 const orderTemplate = (order) => {
-  // calculate subtotal from ORIGINAL prices
-  const subtotal = order.items.reduce(
-    (sum, item) => sum + item.product.originalPrice * item.quantity,
-    0,
-  );
-
-  const gst = Math.round(order.gst || 0);
-  const discount = Math.round(subtotal + gst - order.totalAmount);
+  // Merchandise Subtotal (Before Coupon)
+  const merchandiseSubtotal = order.payment.subtotal;
+  const couponDiscount = order.payment.discount;
+  const netMerchandiseValue = merchandiseSubtotal - couponDiscount;
+  const gst = order.payment.gst;
+  const shippingCharge = order.payment.shipping;
+  const totalPaid = order.payment.amount;
+  const totalRefunded = order.refundSummary ? (order.refundSummary.totalRefundedAmount || 0) : 0;
 
   const itemsHtml = order.items
     .map(
-      (item) => `
+      (item) => {
+        let statusClass = 'pending';
+        if (item.status === 'delivered') statusClass = 'delivered';
+        if (item.status === 'cancelled') statusClass = 'cancelled';
+        if (item.status === 'returned') statusClass = 'returned';
+
+        return `
       <tr>
         <td>
           <div class="product-cell">
@@ -29,11 +35,12 @@ const orderTemplate = (order) => {
           </div>
         </td>
         <td class="text-center">
-          <span class="status-text status-${item.status.toLowerCase()}">${item.status}</span>
+          <span class="status-text status-${statusClass}">${item.status}</span>
         </td>
         <td class="text-right font-bold">₹${item.product.discountedPrice * item.quantity}</td>
       </tr>
-    `,
+    `;
+      }
     )
     .join("");
 
@@ -229,6 +236,32 @@ const orderTemplate = (order) => {
       .status-delivered { background: #f0fdf4; color: #16a34a; }
       .status-pending { background: #fffbeb; color: #d97706; }
       .status-cancelled { background: #fef2f2; color: #dc2626; }
+      .status-returned { background: #f8fafc; color: #64748b; }
+      .refund-notice {
+        margin-top: 20px;
+        padding: 12px;
+        background: #fdf2f2;
+        border: 1px dashed #fecaca;
+        border-radius: 6px;
+      }
+      .refund-title {
+        color: #dc2626;
+        font-weight: 700;
+        font-size: 11px;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+      }
+      .refund-amount {
+        font-size: 16px;
+        font-weight: 800;
+        color: #dc2626;
+      }
+      .refund-note {
+        font-size: 10px;
+        color: #b91c1c;
+        margin-top: 4px;
+        font-style: italic;
+      }
 
       /* Totals */
       .totals-container {
@@ -299,7 +332,7 @@ const orderTemplate = (order) => {
           <div class="section-title">Order Information</div>
           <div class="info-row">
             <span class="info-label">Order Date</span>
-            <span class="info-value">${new Date(order.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+            <span class="info-value">${new Date(order.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })}</span>
           </div>
           <div class="info-row">
             <span class="info-label">Order Status</span>
@@ -358,31 +391,43 @@ const orderTemplate = (order) => {
       </div>
 
       <!-- TOTALS -->
-      <div class="totals-container">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 10px;">
+        <div style="flex: 1;">
+          ${totalRefunded > 0 ? `
+            <div class="refund-notice">
+              <div class="refund-title">Refund Summary</div>
+              <div class="refund-amount">Total Refunded: ₹${totalRefunded}</div>
+              <div style="font-weight: 600; color: #dc2626; margin-top: 2px;">Refund Method: Wallet</div>
+              <div class="refund-note">* Includes proportional tax & shipping share.</div>
+            </div>
+          ` : ''}
+        </div>
         <div class="totals-table">
           <div class="total-row">
-            <span>Subtotal</span>
-            <span>₹${subtotal}</span>
+            <span>Merchandise Value</span>
+            <span>₹${merchandiseSubtotal}</span>
           </div>
-          ${gst > 0 ? `
-          <div class="total-row">
-            <span>Estimated GST</span>
+          ${couponDiscount > 0 ? `
+            <div class="total-row discount">
+              <span>Coupon Discount</span>
+              <span>-₹${couponDiscount}</span>
+            </div>
+            <div class="total-row" style="font-weight: 600; color: #1e293b; padding: 4px 0; border-top: 1px solid #f1f5f9;">
+              <span>Net Merchandise Value</span>
+              <span>₹${netMerchandiseValue}</span>
+            </div>
+          ` : ''}
+          <div class="total-row" style="margin-top: 5px;">
+            <span>GST Charged</span>
             <span>₹${gst}</span>
           </div>
-          ` : ""}
-          ${discount > 0 ? `
-          <div class="total-row discount">
-            <span>Discount Applied</span>
-            <span>-₹${discount}</span>
-          </div>
-          ` : ""}
           <div class="total-row">
-            <span>Shipping</span>
-            <span style="color: #16a34a; font-weight: 600;">FREE</span>
+            <span>Shipping Fee</span>
+            <span style="color: #16a34a; font-weight: 600;">${shippingCharge > 0 ? '₹' + shippingCharge : 'FREE'}</span>
           </div>
           <div class="grand-total-row">
-            <span>Grand Total</span>
-            <span>₹${order.totalAmount}</span>
+            <span>Final Amount Paid</span>
+            <span>₹${totalPaid}</span>
           </div>
         </div>
       </div>
@@ -400,4 +445,3 @@ const orderTemplate = (order) => {
 };
 
 export default orderTemplate;
-

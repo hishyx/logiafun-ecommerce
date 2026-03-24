@@ -6,6 +6,11 @@ export const addProductToWishListService = async (productData, userId) => {
 
   if (!validProduct) throw new Error("product out of stock or got blocked");
 
+  if (!productData.variantId)
+    productData.variantId = validProduct.variants[0]._id;
+
+  console.log("productData is : ", productData);
+
   let wishlist = await Wishlist.findOne({ userId });
 
   if (!wishlist) {

@@ -79,7 +79,7 @@ export const getCartItems = async (userId, isOrder) => {
 
   //Prevnt if discount is null
 
-  if (!cart) return [];
+  if (!cart.length) return [];
 
   const calculations = {
     subtotal: 0,
@@ -88,13 +88,6 @@ export const getCartItems = async (userId, isOrder) => {
   };
 
   for (let item of cart) {
-    if (
-      item.product.variants.stock == 0 ||
-      !item.product.isActive ||
-      !item.category.isActive
-    )
-      continue;
-
     console.log("The real item of cart is : ", item);
 
     item.discount = await getHighestOffer(
@@ -107,9 +100,7 @@ export const getCartItems = async (userId, isOrder) => {
 
     const originalPrice = item.product.variants.price;
 
-    const discountedPrice = Math.round(
-      originalPrice * (1 - item.discount / 100),
-    );
+    const discountedPrice = originalPrice * (1 - item.discount / 100);
 
     item.discountedPrice = discountedPrice;
 
@@ -146,24 +137,19 @@ export const getCartItems = async (userId, isOrder) => {
 
     //Calculations
 
-    calculations.subtotal += Math.round(finalPrice * quantity);
+    calculations.subtotal += finalPrice * quantity;
 
     calculations.discount = 0;
   }
 
-  const gst = calculations.subtotal >= 1000 ? 18 : 5;
+  calculations.subtotal = Math.round(calculations.subtotal);
 
-  calculations.gst = (calculations.subtotal * gst) / 100;
+  calculations.gst = Math.round(calculations.subtotal * 0.18);
 
-  calculations.total = Number(
-    (calculations.subtotal + calculations.gst).toFixed(2),
-  );
+  calculations.shipping = calculations.subtotal >= 1000 ? 0 : 80;
 
-  calculations.shipping = calculations.total >= 1000 ? 0 : 80;
-
-  calculations.total = Number(
-    (calculations.total + calculations.shipping).toFixed(2),
-  );
+  calculations.total =
+    calculations.subtotal + calculations.gst + calculations.shipping;
 
   const cartItems = cart;
 
@@ -238,9 +224,11 @@ export const deleteAllItems = async (userId) => {
 };
 
 export const getAvailableCartItems = async (userId, isOrder) => {
+  console.log("Iam gonna log isorder her");
+  console.log("isOrder is ,", isOrder);
   const [cartItems, calculations] = await getCartItems(userId, isOrder);
 
-  console.log(cartItems);
+  console.log("An erro occured broiiii");
 
   const availableCartItems = cartItems.filter(
     (item) =>

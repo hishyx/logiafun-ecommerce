@@ -625,10 +625,10 @@
 
     <div class="order-header">
       <div class="order-id-section">
-        <h1>Order #<%= order.orderNumber %>
-        </h1>
-        <div class="order-date">Placed on <%= new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric' ,
-              month: 'long' , year: 'numeric' }) %>
+        <h1>Order #<%= order.orderNumber %></h1>
+        <div class="order-date">Placed on <%= new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) %></div>
+        <div style="margin-top: 1rem; font-size: 1.25rem; font-weight: 800; color: var(--success);">
+            Total Paid: ₹<%= order.payment.amount %>
         </div>
       </div>
       <% const currentStatus=order.orderStatus %>
@@ -769,6 +769,24 @@
                   %>"></i>
                   <%= item.status.charAt(0).toUpperCase() + item.status.slice(1) %>
                 </div>
+
+                <% if (item.status === 'cancelled' || item.status === 'returned') { %>
+                  <% 
+                    const subtotalAfterDiscountPerItem = order.payment.subtotal - order.payment.discount;
+                    const itemBasePerItem = item.product.discountedPrice * item.quantity;
+                    const itemRefund = subtotalAfterDiscountPerItem > 0 ? Math.round((itemBasePerItem / subtotalAfterDiscountPerItem) * order.payment.amount) : 0;
+                  %>
+                  <div style="margin-top: 0.75rem; padding: 0.75rem; background: #fef2f2; border: 1px dashed #fecaca; border-radius: 8px; font-size: 0.85rem;">
+                    <div style="font-weight: 700; color: #dc2626; margin-bottom: 2px;">Refund Breakdown:</div>
+                    <div style="color: #64748b;">
+                        Item Price Paid: ₹<%= item.product.discountedPrice * item.quantity %> <br>
+                        (Incl. Share of Tax & Shipping)
+                    </div>
+                    <div style="margin-top: 4px; font-weight: 600; color: var(--primary);">
+                        Total Refunded: ₹<%= itemRefund %>
+                    </div>
+                  </div>
+                <% } %>
                 <% if ((item.status==='cancelled' || item.status==='returned' ) && item.statusChangeReason)
                               { %>
                 <div class="reason-container <%= item.status %>" style="padding: 0.75rem; margin-top: 0.5rem;">
@@ -818,6 +836,22 @@
             </p>
           </div>
         </div>
+
+        <% if (order.refundSummary.totalRefundedAmount > 0) { %>
+        <div class="card" style="border: 1px solid #7c3aed; background: #fbfaff;">
+          <div class="card-title" style="color: #7c3aed;">
+            <i class="fa-solid fa-wallet"></i>
+            Refund Summary
+          </div>
+          <div class="summary-row" style="color: #7c3aed; font-weight: 700; font-size: 1.1rem;">
+            <span>Total Refunded to Wallet</span>
+            <span>₹<%= order.refundSummary.totalRefundedAmount %></span>
+          </div>
+          <p style="font-size: 0.85rem; color: #6d28d9; margin-top: 0.5rem; font-weight: 500;">
+            Includes proportional tax and delivery fee share where applicable.
+          </p>
+        </div>
+        <% } %>
       </div>
 
       <div class="order-sidebar">
@@ -829,32 +863,35 @@
           </div>
           <div class="payment-summary">
 
-          <div class="summary-row">
-          <span>Subtotal</span>
+        <div class="summary-row">
+          <span>Merchandise Value</span>
           <span>₹<%= order.payment.subtotal %></span>
         </div>
 
         <div class="summary-row">
-          <span>GST</span>
+          <span>Estimated GST (18%)</span>
           <span>₹<%= order.payment.gst %></span>
         </div>
 
         <% if (order.payment.discount > 0) { %>
-        <div class="summary-row" style="color: #16a34a;">
-          <span>Discount</span>
+        <div class="summary-row" style="color: #16a34a; font-weight: 600; background: #f0fdf4; padding: 4px 8px; border-radius: 4px; margin: 8px 0;">
+          <span>Coupon Savings</span>
           <span>-₹<%= order.payment.discount %></span>
         </div>
         <% } %>
 
         <div class="summary-row">
-          <span>Shipping</span>
+          <span>Delivery Charges</span>
           <span style="color: var(--success); font-weight: 500;">
-            <%= order.payment.shipping > 0 ? '₹' + order.payment.shipping : 'Free' %>
+            <%= order.payment.shipping > 0 ? '₹' + order.payment.shipping : 'FREE Delivery' %>
           </span>
+          <% if (order.payment.shipping === 0) { %>
+            <div style="font-size: 0.75rem; color: var(--text-secondary); width: 100%; margin-top: -8px;">(Eligibility based on cart value)</div>
+          <% } %>
         </div>
 
         <div class="summary-row total">
-          <span>Order Total</span>
+          <span>Order Total Paid</span>
           <span>₹<%= order.payment.amount %></span>
         </div>
 
@@ -1038,25 +1075,32 @@
 
 
 
-    const tryToPayBtn = document.getElementById("tryToPayBtn")
+    const tryToPayBtn = document.getElementById("tryToPayBtn");
 
-    tryToPayBtn.addEventListener("click", async (e) => {
+    if (tryToPayBtn) {
+      tryToPayBtn.addEventListener("click", async (e) => {
+        const orderId = e.currentTarget.dataset.orderId;
 
-      const orderId = e.target.dataset.orderId
-      const res = await fetch("/retry-payment", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          orderId
-        }),
+        const res = await fetch("/retry-payment", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            orderId
+          }),
+        });
+
+        const result = await res.json();
+
+        if (!res.ok || !result.razorpay) {
+          showToast(result.message || "Unable to retry payment right now.", "error");
+          return;
+        }
+
+        await placePaymentWithPopup(result);
       });
-
-      const result = await res.json();
-
-      await placePaymentWithPopup(result)
-    })
+    }
   </script>
 </body>
 

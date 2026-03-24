@@ -456,30 +456,35 @@
 
         <div class="order-header">
           <div class="order-meta">
-            <h2>Order #<%= order.orderNumber %>
-            </h2>
-            <p>Placed on <%= new Date(order.createdAt).toLocaleString(undefined, { dateStyle: 'medium' ,
-                timeStyle: 'short' }) %>
-            </p>
+            <h2>Order #<%= order.orderNumber %></h2>
+            <p>Placed on <%= new Date(order.createdAt).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) %></p>
           </div>
-          <% const statusTransitions={ pending: ["processing", "cancelled" ], processing: ["shipped", "cancelled" ],
-            shipped: ["in_transit"], in_transit: ["delivered"], delivered: ["returned"], cancelled: [], returned: [], };
-            const currentStatus=order.orderStatus; const availableOptions=[currentStatus,
-            ...(statusTransitions[currentStatus] || [])]; const statusClass=currentStatus.toLowerCase(); %>
-            <select class="status-select status-<%= statusClass %>"
-              style="margin-right: 12px; padding: 0.5rem 2rem 0.5rem 1rem; border-radius: 20px; text-transform: uppercase; font-weight: 700;"
-              data-previous-status="<%= currentStatus %>" onchange="updateOrderStatus(this, '<%= order._id %>')">
-              <% availableOptions.forEach(option=> { %>
-                <option value="<%= option %>" <%=option===currentStatus ? 'selected' : '' %>>
-                  <%= option.charAt(0).toUpperCase() + option.slice(1) %>
-                </option>
-                <% }) %>
-            </select>
-            <!-- Added Download Invoice Button UI -->
-            <button class="download-invoice-btn" id="download-invoice-btn" onclick="downloadInvoice('<%=order._id%>')">
-              <i class="fa-solid fa-file-pdf"></i>
-              Download Invoice
-            </button>
+          <div style="display: flex; gap: 1rem; align-items: center;">
+            <div class="card" style="margin-bottom: 0; padding: 0.75rem 1.25rem; border-left: 4px solid #16a34a; background: #f0fdf4;">
+              <span class="info-label" style="margin-bottom: 2px;">Total Paid</span>
+              <span class="info-value" style="font-size: 1.25rem; color: #16a34a; font-weight: 800;">₹<%= order.payment.amount %></span>
+              <div style="font-size: 0.75rem; color: #16a34a; font-weight: 600; text-transform: uppercase; margin-top: 2px;">
+                <%= order.payment.method %> • <%= order.payment.status %>
+              </div>
+            </div>
+            <% const statusTransitions={ pending: ["processing", "cancelled" ], processing: ["shipped", "cancelled" ],
+              shipped: ["in_transit"], in_transit: ["delivered"], delivered: ["returned"], cancelled: [], returned: [], };
+              const currentStatus=order.orderStatus; const availableOptions=[currentStatus,
+              ...(statusTransitions[currentStatus] || [])]; const statusClass=currentStatus.toLowerCase(); %>
+              <select class="status-select status-<%= statusClass %>"
+                style="padding: 0.5rem 2rem 0.5rem 1rem; border-radius: 20px; text-transform: uppercase; font-weight: 700;"
+                data-previous-status="<%= currentStatus %>" onchange="updateOrderStatus(this, '<%= order._id %>')">
+                <% availableOptions.forEach(option=> { %>
+                  <option value="<%= option %>" <%=option===currentStatus ? 'selected' : '' %>>
+                    <%= option.charAt(0).toUpperCase() + option.slice(1) %>
+                  </option>
+                  <% }) %>
+              </select>
+              <button class="download-invoice-btn" onclick="downloadInvoice('<%=order._id%>')">
+                <i class="fa-solid fa-file-pdf"></i>
+                Invoice
+              </button>
+          </div>
         </div>
 
         <div class="details-container">
@@ -583,32 +588,61 @@
                                       style="font-size: 0.75rem; color: #16a34a; font-weight: 600; display: block; margin-bottom: 2px;">
                                       <%= Math.round(discountPercent) %>% OFF
                                     </span>
-                                    <% } %>
                                       <% } %>
                                         <span class="price">₹<%= item.product.discountedPrice %></span>
                                         <span class="qty">x <%= item.quantity %></span>
                                         <div style="font-size: 0.8rem; color: #64748b; margin-top: 4px;">
-                                          Total: ₹<%= item.product.discountedPrice * item.quantity %>
+                                          Line Total: ₹<%= item.product.discountedPrice * item.quantity %>
                                         </div>
 
-                                        <% if (item.statusOptions && item.statusOptions.length> 1) { %>
-                                          <div style="margin-top: 8px;">
-                                            <select class="status-select"
+                                        <% if (item.status === 'cancelled' || item.status === 'returned') { %>
+                                          <% 
+                                              const subtotalAfterDiscountPerItem = order.payment.subtotal - order.payment.discount;
+                                              const itemBasePerItem = item.product.discountedPrice * item.quantity;
+                                              const itemRefund = subtotalAfterDiscountPerItem > 0 ? Math.round((itemBasePerItem / subtotalAfterDiscountPerItem) * order.payment.amount) : 0;
+                                          %>
+                                          <div style="margin-top: 8px; padding: 8px; background: #fff1f2; border: 1px dashed #fecaca; border-radius: 6px; text-align: left;">
+                                            <div style="font-size: 0.7rem; font-weight: 700; color: #be123c; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">
+                                              Refund Breakdown
+                                            </div>
+                                            <div style="font-size: 0.8rem; color: #475569; display: flex; justify-content: space-between;">
+                                              <span>Item Net Paid:</span>
+                                              <span>₹<%= itemBasePerItem %></span>
+                                            </div>
+                                            <div style="font-size: 0.8rem; font-weight: 700; color: #be123c; display: flex; justify-content: space-between; margin-top: 2px;">
+                                              <span>Proportional Refund:</span>
+                                              <span>₹<%= itemRefund %></span>
+                                            </div>
+                                            <div style="font-size: 0.65rem; color: #94a3b8; font-style: italic; margin-top: 4px;">
+                                              *Includes share of tax & delivery.
+                                            </div>
+                                          </div>
+                                        <% } %>
+
+                                        <div style="margin-top: 8px;">
+                                          <% if (item.statusOptions && item.statusOptions.length > 1) { %>
+                                            <select class="status-select" style="padding: 4px 1.5rem 4px 0.5rem; font-size: 0.7rem;"
                                               onchange="handleItemStatusChange('<%= order._id %>', '<%= item._id %>', this.value, '<%= item.status %>')">
-                                              <% item.statusOptions.forEach(statusOption=> { %>
-                                                <option value="<%= statusOption %>" <%=statusOption===item.status
-                                                  ? 'selected' : '' %>>
+                                              <% item.statusOptions.forEach(statusOption => { %>
+                                                <option value="<%= statusOption %>" <%= statusOption === item.status ? 'selected' : '' %>>
                                                   <%= statusOption.charAt(0).toUpperCase() + statusOption.slice(1) %>
                                                 </option>
-                                                <% }) %>
+                                              <% }) %>
                                             </select>
-                                          </div>
                                           <% } else { %>
-                                            <div class="status-capsule status-<%= item.status.toLowerCase() %>"
-                                              style="margin-top: 8px; font-size: 0.75rem; padding: 2px 10px;">
+                                            <% 
+                                              let badgeClass = 'status-pending';
+                                              if (item.status === 'delivered') badgeClass = 'status-delivered';
+                                              if (item.status === 'cancelled') badgeClass = 'status-cancelled';
+                                              if (item.status === 'returned') badgeClass = 'status-returned';
+                                              if (item.status === 'shipped' || item.status === 'in_transit') badgeClass = 'status-shipped';
+                                            %>
+                                            <div class="status-capsule <%= badgeClass %>" style="font-size: 0.7rem; padding: 2px 10px; width: fit-content; margin-left: auto;">
                                               <%= item.status.charAt(0).toUpperCase() + item.status.slice(1) %>
                                             </div>
-                                            <% } %>
+                                          <% } %>
+                                        </div>
+                                        <% } %>
                               </div>
                               <% if (item.returnStatus==='requested' ) { %>
                                 <div style="margin-left: 1rem; padding-left: 1rem; border-left: 1px solid #f1f5f9; display: flex; flex-direction: column; gap: 8px;">
@@ -678,52 +712,107 @@
                       Phone: <%= order.address.phone %>
               </p>
             </div>
-
             <div class="card">
               <div class="card-title">
                 <i class="fa-solid fa-receipt"></i>
-                Order Summary
+                Financial Summary
               </div>
               <div class="summary-row">
-                <span>Subtotal</span>
+                <span>Merchandise Value</span>
                 <span>₹<%= order.payment.subtotal %></span>
               </div>
-
-              <div class="summary-row">
-                <span>GST</span>
-                <span>₹<%= order.payment.gst %></span>
-              </div>
-
-              <div class="summary-row" style="color: #16a34a;">
-                <span>Discount</span>
+              <% if (order.payment.discount > 0) { %>
+              <div class="summary-row" style="color: #be123c;">
+                <span>Coupon Discount</span>
                 <span>-₹<%= order.payment.discount %></span>
               </div>
-
+              <% } %>
+              <div class="summary-row" style="font-weight: 600; color: #1e293b; padding: 4px 0; border-top: 1px solid #f1f5f9;">
+                <span>Net Merchandise Value</span>
+                <span>₹<%= order.payment.subtotal - order.payment.discount %></span>
+              </div>
+              <div class="summary-row" style="margin-top: 8px;">
+                <span>GST Charged (18%)</span>
+                <span>₹<%= order.payment.gst %></span>
+              </div>
               <div class="summary-row">
-                <span>Shipping</span>
-                <span>
-                  <%= order.payment.shipping> 0 ? '₹' + order.payment.shipping : 'Free' %>
+                <span>Shipping Fee</span>
+                <span style="color: #16a34a; font-weight: 600;">
+                  <%= order.payment.shipping > 0 ? '₹' + order.payment.shipping : 'FREE' %>
                 </span>
               </div>
-
-              <div class="summary-row">
-                <span>Payment Method</span>
-                <span style="text-transform: uppercase;">
-                  <%= order.payment.method %>
-                </span>
-              </div>
-
-              <div class="summary-row total">
-                <span>Total Amount</span>
+              <div class="summary-row total" style="background: #f8fafc; margin: 1rem -1.5rem -1.5rem; padding: 1.25rem 1.5rem; border-radius: 0 0 12px 12px;">
+                <span>Final Amount Paid</span>
                 <span>₹<%= order.payment.amount %></span>
               </div>
+            </div>
 
-              <% if (order.returnStatus==='returned' ) { %>
-                <div class="full-return-notice">
-                  <i class="fa-solid fa-circle-info"></i>
-                  <span>Entire order has been returned.</span>
+            <% if (order.refundSummary.totalRefundedAmount > 0) { %>
+            <div class="card" style="border-left: 4px solid #7c3aed; background: #fbfaff;">
+              <div class="card-title" style="color: #7c3aed; border-bottom-color: #f5f3ff;">
+                <i class="fa-solid fa-wallet"></i>
+                Refund Summary
+              </div>
+              <div class="summary-row" style="color: #7c3aed; font-weight: 700; font-size: 1.1rem;">
+                <span>Total Refunded</span>
+                <span>₹<%= order.refundSummary.totalRefundedAmount %></span>
+              </div>
+              <div class="info-group" style="margin-top: 1rem;">
+                <span class="info-label">Refund Method</span>
+                <span class="info-value">Wallet</span>
+              </div>
+              <div class="info-group">
+                <span class="info-label">Refund Type</span>
+                <span class="info-value">Proportional Refund</span>
+              </div>
+              <p style="font-size: 0.75rem; color: #7c3aed; font-style: italic; margin-top: 0.5rem;">
+                Includes proportional GST and delivery fee share.
+              </p>
+              <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #f5f3ff;">
+                <a href="/admin/users/<%= order.userId._id %>/wallet" style="font-size: 0.85rem; font-weight: 600; color: #7c3aed; text-decoration: none; display: flex; align-items: center; gap: 6px;">
+                  <i class="fa-solid fa-list-check"></i> View Wallet Transactions
+                </a>
+              </div>
+            </div>
+            <% } %>
+
+            <div class="card">
+              <div class="card-title">
+                <i class="fa-solid fa-timeline"></i>
+                Financial Timeline
+              </div>
+              <div style="position: relative; padding-left: 24px;">
+                <div style="position: absolute; left: 7px; top: 0; bottom: 0; width: 2px; background: #e2e8f0;"></div>
+                
+                <div style="position: relative; margin-bottom: 1.25rem;">
+                  <div style="position: absolute; left: -21px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: #16a34a; border: 2px solid white; box-shadow: 0 0 0 2px #16a34a;"></div>
+                  <div style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">Order Paid</div>
+                  <div style="font-size: 0.8rem; color: #64748b;">Amount: ₹<%= order.payment.amount %></div>
                 </div>
-                <% } %>
+
+                <% 
+                  let currentBalance = order.payment.amount;
+                  order.items.forEach(item => { 
+                    if (item.status === 'cancelled' || item.status === 'returned') {
+                      const itemBase = item.product.discountedPrice * item.quantity;
+                      const subtotalAfterDiscount = order.payment.subtotal - order.payment.discount;
+                      const itemRefund = subtotalAfterDiscount > 0 ? Math.round((itemBase / subtotalAfterDiscount) * order.payment.amount) : 0;
+                      currentBalance -= itemRefund;
+                %>
+                <div style="position: relative; margin-bottom: 1.25rem;">
+                  <div style="position: absolute; left: -21px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: <%= item.status === 'cancelled' ? '#ef4444' : '#f97316' %>; border: 2px solid white; box-shadow: 0 0 0 2px <%= item.status === 'cancelled' ? '#ef4444' : '#f97316' %>;"></div>
+                  <div style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">Item <%= item.status.charAt(0).toUpperCase() + item.status.slice(1) %></div>
+                  <div style="font-size: 0.8rem; color: #64748b;"><%= item.product.name %>: -₹<%= itemRefund %></div>
+                </div>
+                <% } }) %>
+
+                <div style="position: relative;">
+                  <div style="position: absolute; left: -21px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: #2563eb; border: 2px solid white; box-shadow: 0 0 0 2px #2563eb;"></div>
+                  <div style="font-size: 0.85rem; font-weight: 700; color: #2563eb;">Final Refund Balance</div>
+                  <div style="font-size: 0.8rem; color: #2563eb; font-weight: 800;">₹<%= order.payment.amount - order.refundSummary.totalRefundedAmount %></div>
+                </div>
+              </div>
+            </div>
             </div>
           </div>
         </div>
