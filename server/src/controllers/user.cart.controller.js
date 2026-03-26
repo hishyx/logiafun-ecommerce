@@ -14,7 +14,9 @@ export const addToCart = async (req, res) => {
 
     const cartCount = await userCartServices.getCartCount(req.user._id);
 
-    res.status(statusCodes.OK).json({ message: "Added to cart successfully", cartCount });
+    res
+      .status(statusCodes.OK)
+      .json({ message: "Added to cart successfully", cartCount });
   } catch (err) {
     console.log(err);
     res.status(statusCodes.BAD_REQUEST).json({ message: err.message });
@@ -23,7 +25,7 @@ export const addToCart = async (req, res) => {
 
 export const cartPage = async (req, res) => {
   try {
-    let cartItems;
+    let cartItems = [];
     let calculations;
 
     if (req.user && req.user._id) {
@@ -63,7 +65,9 @@ export const deleteCartItem = async (req, res) => {
       .json({ message: "Item removed", cartCount, calculations });
   } catch (err) {
     console.log(err);
-    res.status(statusCodes.INTERNAL_SERVER_ERROR).json({ message: messages.WISHLIST_REMOVE_FAIL });
+    res
+      .status(statusCodes.INTERNAL_SERVER_ERROR)
+      .json({ message: messages.WISHLIST_REMOVE_FAIL });
   }
 };
 
