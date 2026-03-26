@@ -376,6 +376,8 @@
   <%- include('../partials/header.ejs')%>
 
     <main>
+      <%- include('../partials/account-topbar.ejs') %>
+
       <div class="account-layout profile-container orders-page">
         <%- include('../partials/account-sidebar.ejs', { user, activePage: 'orders', allowProfileImageEdit: false }) %>
 

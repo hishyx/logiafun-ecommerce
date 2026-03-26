@@ -12,7 +12,7 @@
   </div>
 
   <div class="mobile-header-logout">
-    <form action="/user/logout" method="POST">
+    <form action="/user/logout" method="POST" data-account-logout-form>
       <button type="submit" class="mobile-header-logout-btn" aria-label="Log out">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -70,8 +70,8 @@
         </svg>
         Refer & Earn
       </a>
-      <form action="/user/logout" method="POST" style="display: inline">
-        <button type="submit" class="sidebar-link logout-link">
+    <form action="/user/logout" method="POST" style="display: inline" data-account-logout-form>
+      <button type="submit" class="sidebar-link logout-link">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
             <polyline points="16 17 21 12 16 7"></polyline>
@@ -93,6 +93,35 @@
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     const carousels = document.querySelectorAll("[data-account-nav]");
+    const logoutForms = document.querySelectorAll("[data-account-logout-form]");
+
+    logoutForms.forEach((logoutForm) => {
+      logoutForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        if (typeof Swal !== "undefined") {
+          const result = await Swal.fire({
+            title: "Log out?",
+            text: "You'll need to sign in again to access your account.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Logout",
+            cancelButtonText: "Stay here",
+            confirmButtonColor: "#dc2626",
+            cancelButtonColor: "#94a3b8",
+          });
+
+          if (result.isConfirmed) {
+            logoutForm.submit();
+          }
+          return;
+        }
+
+        if (window.confirm("Log out of your account?")) {
+          logoutForm.submit();
+        }
+      });
+    });
 
     carousels.forEach((carousel) => {
       const track = carousel.querySelector(".account-nav-track");
@@ -103,64 +132,32 @@
       if (!track || !prevBtn || !nextBtn) return;
 
       const getActiveIndex = () => sectionLinks.findIndex((link) => link.classList.contains("active"));
-      const getActiveLink = () => sectionLinks[getActiveIndex()] || null;
-
-      const focusActiveSection = (smooth = false) => {
-        const activeLink = getActiveLink();
-        if (!activeLink) return;
-        activeLink.scrollIntoView({
-          behavior: smooth ? "smooth" : "auto",
-          inline: "center",
-          block: "nearest",
-        });
-      };
 
       const updateArrowState = () => {
-        const maxScroll = track.scrollWidth - track.clientWidth;
-        const canScroll = maxScroll > 1;
-        const isAtStart = track.scrollLeft <= 1;
-        const isAtEnd = track.scrollLeft >= maxScroll - 1;
         const activeIndex = getActiveIndex();
         const hasPrevPage = activeIndex > 0;
         const hasNextPage = activeIndex >= 0 && activeIndex < sectionLinks.length - 1;
 
         prevBtn.disabled = !hasPrevPage;
         nextBtn.disabled = !hasNextPage;
-
-        carousel.classList.toggle("can-scroll-left", canScroll && !isAtStart);
-        carousel.classList.toggle("can-scroll-right", canScroll && !isAtEnd);
       };
-
-      const scrollByAmount = () => Math.max(140, Math.round(track.clientWidth * 0.65));
 
       prevBtn.addEventListener("click", () => {
         const activeIndex = getActiveIndex();
         if (activeIndex > 0) {
           window.location.href = sectionLinks[activeIndex - 1].href;
-          return;
         }
-        track.scrollBy({ left: -scrollByAmount(), behavior: "smooth" });
       });
 
       nextBtn.addEventListener("click", () => {
         const activeIndex = getActiveIndex();
         if (activeIndex >= 0 && activeIndex < sectionLinks.length - 1) {
           window.location.href = sectionLinks[activeIndex + 1].href;
-          return;
         }
-        track.scrollBy({ left: scrollByAmount(), behavior: "smooth" });
       });
 
-      track.addEventListener("scroll", updateArrowState, { passive: true });
-      window.addEventListener("resize", () => {
-        focusActiveSection(false);
-        updateArrowState();
-      });
-
-      requestAnimationFrame(() => {
-        focusActiveSection(false);
-        updateArrowState();
-      });
+      window.addEventListener("resize", updateArrowState);
+      requestAnimationFrame(updateArrowState);
     });
   });
 </script>

@@ -14,6 +14,8 @@
   <%- include('../partials/header.ejs')%>
 
     <main>
+      <%- include('../partials/account-topbar.ejs') %>
+
       <div class="account-layout profile-container addresses-page">
         <%- include('../partials/account-sidebar.ejs', { user, activePage: 'addresses', allowProfileImageEdit: false }) %>
 

@@ -111,6 +111,82 @@
   color: #dc2626;
 }
 
+.mobile-header-logout {
+  display: none;
+}
+
+.mobile-header-logout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.8rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid #fecaca;
+  background: #fff5f5;
+  color: #dc2626;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.mobile-header-logout-btn:hover {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.mobile-header-logout-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.account-nav-carousel {
+  display: block;
+}
+
+.account-nav-track {
+  display: block;
+}
+
+.account-nav-arrow {
+  display: none;
+}
+
+.profile-page-topbar {
+  max-width: 1200px;
+  width: 100%;
+  margin: 1.1rem auto 0;
+  padding: 0 1.5rem;
+  display: none;
+  justify-content: flex-end;
+}
+
+.profile-page-logout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 40px;
+  padding: 0.45rem 0.8rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid #fecaca;
+  background: #fff5f5;
+  color: #dc2626;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.profile-page-logout-btn:hover {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.profile-page-logout-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
 /* Content Area */
 .profile-content {
   flex: 1;
@@ -230,6 +306,12 @@
 
 /* Responsive */
 @media (max-width: 900px) {
+  .profile-page-topbar {
+    display: flex;
+    margin-top: 1rem;
+    padding: 0 1rem;
+  }
+
   .profile-container {
     flex-direction: column;
     padding: 2rem 1rem;
@@ -256,27 +338,78 @@
     font-size: 1.5rem;
   }
 
-  .sidebar-menu {
+  .account-nav-carousel {
     display: flex;
-    overflow-x: auto;
-    padding: 0;
-    border-top: 1px solid #f0f0f0;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.8rem 1rem 1rem;
   }
 
-  .sidebar-link {
-    padding: 1rem;
+  .account-nav-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
     flex-shrink: 0;
-    border-left: none;
-    border-bottom: 3px solid transparent;
-    flex-direction: column;
-    gap: 0.5rem;
-    font-size: 0.8rem;
-    text-align: center;
+    border: 1px solid #e2e8f0;
+    border-radius: 999px;
+    background: var(--white);
+    color: var(--primary);
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: var(--shadow-sm);
   }
 
-  .sidebar-link.active {
-    border-left: none;
-    border-bottom-color: var(--primary);
+  .account-nav-arrow:hover {
+    background: var(--primary);
+    color: var(--white);
+  }
+
+  .account-nav-arrow:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .account-nav-arrow svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .account-nav-track,
+  .sidebar-menu {
+    flex: 1;
+    min-width: 0;
+    display: block;
+    padding: 0;
+    border-top: none;
+    overflow: hidden;
+  }
+
+  .account-nav-track .sidebar-link {
+    display: none;
+  }
+
+  .account-nav-track .sidebar-link.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.7rem;
+    width: 100%;
+    max-width: 260px;
+    margin: 0 auto;
+    padding: 0.95rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    color: var(--primary);
+    border-left: 1px solid #e2e8f0;
+    box-shadow: var(--shadow-sm);
+    flex-direction: row;
+    font-size: 0.92rem;
+    font-weight: 600;
+    text-align: center;
   }
 
   .logout-link {
@@ -285,9 +418,45 @@
     margin-left: auto; /* Push to right if space allows, or just part of flow */
     border-left: 1px solid #f0f0f0;
   }
+
+  .sidebar-menu .logout-link {
+    display: none;
+  }
+
 }
 
 @media (max-width: 600px) {
+  .profile-page-topbar {
+    margin-top: 0.9rem;
+  }
+
+  .profile-page-logout-btn {
+    min-height: 38px;
+    padding: 0.4rem 0.72rem;
+    font-size: 0.74rem;
+  }
+
+  .mobile-header-logout-btn {
+    padding: 0.42rem 0.72rem;
+    font-size: 0.74rem;
+  }
+
+  .account-nav-carousel {
+    gap: 0.65rem;
+    padding: 0.75rem 0.75rem 0.9rem;
+  }
+
+  .account-nav-arrow {
+    width: 36px;
+    height: 36px;
+  }
+
+  .account-nav-track .sidebar-link.active {
+    max-width: none;
+    padding: 0.85rem 0.9rem;
+    font-size: 0.86rem;
+  }
+
   .form-row {
     grid-template-columns: 1fr;
     gap: 0;

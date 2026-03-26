@@ -55,12 +55,13 @@ export const productListPage = async (req, res) => {
     selectedCategoryIds: category || [],
   };
 
-  // if api request
-  if (req.headers["x-requested-with"] === "XMLHttpRequest") {
+  const isAjaxRequest =
+    req.xhr || req.get("X-Requested-With") === "XMLHttpRequest";
+
+  if (isAjaxRequest) {
     return res.render("partials/product-listing.ejs", viewData);
   }
 
-  //  normal page render
   res.render("user/product.list.page.ejs", viewData);
 };
 
