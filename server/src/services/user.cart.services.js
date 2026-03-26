@@ -79,7 +79,7 @@ export const getCartItems = async (userId, isOrder) => {
 
   //Prevnt if discount is null
 
-  if (!cart.length) return [];
+  if (!cart.length) return [[], {}];
 
   const calculations = {
     subtotal: 0,
