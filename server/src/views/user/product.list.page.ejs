@@ -814,7 +814,8 @@
                     image=firstVariant?.images?.[0] || '/images/placeholder-toy.jpg' ; const
                     discount=product.finalDiscount || 0; const hasDiscount=discount> 0;
                     const finalPrice = product.discountedPrice || variantPrice; const isWishlisted =
-                    Array.isArray(product.wishlistData) && product.wishlistData.length > 0;
+                    !!firstVariant && Array.isArray(product.wishlistData) &&
+                    product.wishlistData.some(item => String(item.variantId) === String(firstVariant._id));
                     %>
 
                     <div class="product-card">
@@ -884,7 +885,7 @@
                       <div class="card-actions" style="z-index: 10;">
                         <button class="action-btn <%= isWishlisted ? 'wishlisted' : '' %>" title="Wishlist"
                           aria-pressed="<%= isWishlisted ? 'true' : 'false' %>"
-                          onclick="addToWishlist(event, '<%= product._id %>')">
+                          onclick="addToWishlist(event, '<%= product._id %>', '<%= firstVariant?._id || '' %>')">
                           <i class="fa-<%= isWishlisted ? 'solid' : 'regular' %> fa-heart"></i>
                         </button>
                       </div>
@@ -994,7 +995,7 @@
       <script src="/js/helpers/sorting.js"></script>
 
       <script>
-        async function addToWishlist(event, productId) {
+        async function addToWishlist(event, productId, variantId) {
           event.preventDefault();
           event.stopPropagation();
 
@@ -1005,7 +1006,8 @@
                 'Content-Type': 'application/json'
               },
               body: JSON.stringify({
-                productId
+                productId,
+                variantId
               })
             });
 
