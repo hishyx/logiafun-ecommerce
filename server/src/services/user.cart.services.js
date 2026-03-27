@@ -217,13 +217,13 @@ export const getCartItems = async (userId, isOrder) => {
 
   //Prevnt if discount is null
 
-  if (!cart.length) return [[], {}];
-
   const calculations = {
     subtotal: 0,
     discount: 0,
     total: 0,
   };
+
+  if (!cart.length) return [[], calculations];
 
   for (let item of cart) {
     console.log("The real item of cart is : ", item);

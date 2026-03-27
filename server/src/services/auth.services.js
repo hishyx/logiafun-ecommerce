@@ -45,12 +45,14 @@ export const authenticateUser = async (body) => {
       "This account was created using Google. Please sign in with Google instead.",
     );
 
+  console.log(user);
+
   if (user.role !== "user") {
     throw new Error("This account is not a user");
   }
 
   if (user.isBlocked) {
-    throw new Error(`This account is ${user.status} please contact your admin`);
+    throw new Error(`This account is Blocked please contact your admin`);
   }
 
   console.log(`body.password is ${body.password}`);
