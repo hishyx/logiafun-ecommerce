@@ -258,6 +258,39 @@
       box-shadow: 0 4px 12px rgba(30, 58, 95, 0.2);
     }
 
+    .view-order-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.65rem;
+      min-width: 170px;
+      padding: 0.85rem 1.25rem;
+      border-radius: 14px;
+      text-decoration: none;
+      background: linear-gradient(135deg, #1e3a5f 0%, #294a76 100%);
+      color: #fff;
+      box-shadow: 0 12px 24px rgba(30, 58, 95, 0.18);
+      border: 1px solid rgba(30, 58, 95, 0.15);
+    }
+
+    .view-order-btn svg {
+      width: 17px;
+      height: 17px;
+      transition: transform 0.2s ease;
+    }
+
+    .view-order-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 28px rgba(30, 58, 95, 0.24);
+      background: #ffffff;
+      color: #1e3a5f;
+      border-color: rgba(30, 58, 95, 0.25);
+    }
+
+    .view-order-btn:hover svg {
+      transform: translateX(3px);
+    }
+
     @media (max-width: 600px) {
       .orders-header {
         flex-direction: column;
@@ -282,6 +315,11 @@
       .order-item-img {
         width: 100%;
         height: 200px;
+      }
+
+      .view-order-btn {
+        width: 100%;
+        min-width: 0;
       }
     }
 
@@ -452,8 +490,13 @@
 
                     <div class="order-card-footer"
                       style="padding: 1rem 0 0 0; margin-top: 1rem; border-top: 1px solid #f1f5f9;">
-                      <a href="/user/orders/<%= order._id %>" class="order-btn btn-fill"
-                        style="text-decoration: none;">View Details</a>
+                      <a href="/user/orders/<%= order._id %>" class="order-btn btn-fill view-order-btn">
+                        View Details
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <line x1="5" y1="12" x2="19" y2="12"></line>
+                          <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                      </a>
                     </div>
                   </div>
                 </div>

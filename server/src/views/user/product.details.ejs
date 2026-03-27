@@ -377,6 +377,17 @@
       background: #fef2f2;
     }
 
+    .btn-secondary.wishlisted {
+      border-color: #ef4444;
+      color: #ef4444;
+      background: #fef2f2;
+    }
+
+    .btn-secondary.wishlisted:hover {
+      background: #ef4444;
+      color: white;
+    }
+
     /* Additional Info Details */
     .details-tabs {
       margin-top: 3rem;
@@ -500,7 +511,7 @@
       height: 36px;
       border-radius: 50%;
       background: white;
-      border: none;
+      border: 1px solid transparent;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -514,6 +525,18 @@
       background: var(--primary);
       color: white;
       transform: scale(1.1);
+    }
+
+    .action-btn.wishlisted {
+      background: #fef2f2;
+      border-color: rgba(239, 68, 68, 0.22);
+      color: #ef4444;
+    }
+
+    .action-btn.wishlisted:hover {
+      background: #ef4444;
+      border-color: #ef4444;
+      color: white;
     }
 
     .product-content {
@@ -650,6 +673,9 @@
         </div>
 
         <div class="product-container">
+          <% const selectedVariantId = product.defaultVariant?._id || product.variants?.[0]?._id;
+          const isWishlisted = Array.isArray(product.wishlistData) &&
+          product.wishlistData.some(item => item.variantId?.toString() === selectedVariantId?.toString()); %>
           <!-- Gallery -->
           <div class="product-gallery">
             <div class="main-image-wrapper" id="zoom-container">
@@ -779,9 +805,10 @@
                   </button>
                   <% } %>
 
-                    <button class="btn-secondary" id="addToWishListBtn" title="Add to Wishlist"
-                      data-product-id="<%=product._id%>">
-                      <i class="fa-regular fa-heart"></i>
+                    <button class="btn-secondary <%= isWishlisted ? 'wishlisted' : '' %>" id="addToWishListBtn"
+                      title="Add to Wishlist" data-product-id="<%=product._id%>"
+                      aria-pressed="<%= isWishlisted ? 'true' : 'false' %>">
+                      <i class="fa-<%= isWishlisted ? 'solid' : 'regular' %> fa-heart"></i>
                     </button>
             </div>
 
@@ -828,6 +855,8 @@
             <div class="products-grid" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));">
               <!-- Product Card 1 -->
               <%relatedProducts.forEach(relatedProd=>{%>
+                <% const relatedIsWishlisted = Array.isArray(relatedProd.wishlistData) &&
+                relatedProd.wishlistData.length > 0; %>
                 <div class="product-card">
                   <a href="/products/<%= relatedProd._id %>"
                     style="display: block; height: 100%; text-decoration: none; color: inherit;">
@@ -864,7 +893,11 @@
                     </div>
                   </a>
                   <div class="card-actions">
-                    <button class="action-btn"><i class="fa-regular fa-heart"></i></button>
+                    <button class="action-btn <%= relatedIsWishlisted ? 'wishlisted' : '' %>"
+                      title="Wishlist" aria-pressed="<%= relatedIsWishlisted ? 'true' : 'false' %>"
+                      onclick="addRelatedToWishlist(event, '<%= relatedProd._id %>')">
+                      <i class="fa-<%= relatedIsWishlisted ? 'solid' : 'regular' %> fa-heart"></i>
+                    </button>
                   </div>
                 </div>
                 <%})%>
@@ -886,6 +919,45 @@
 
 
       <script>
+        async function addRelatedToWishlist(event, productId) {
+          event.preventDefault();
+          event.stopPropagation();
+
+          try {
+            const response = await fetch('/user/wishlist', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                productId
+              })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+              const button = event.target.closest('button');
+              const icon = button?.querySelector('i');
+              const wishlistBadges = document.querySelectorAll('a[href="/user/wishlist"] .cart-badge');
+              button?.classList.add('wishlisted');
+              button?.setAttribute('aria-pressed', 'true');
+              if (icon) {
+                icon.classList.remove('fa-regular');
+                icon.classList.add('fa-solid');
+              }
+              wishlistBadges.forEach((badge) => {
+                badge.textContent = data.wishlistCount;
+              });
+              if (typeof showToast === 'function') showToast(data.message || 'Added to wishlist!');
+            } else {
+              if (typeof showToast === 'function') showToast(data.message || 'Could not add to wishlist');
+            }
+          } catch (err) {
+            console.error('Wishlist Request failed', err);
+          }
+        }
+
         const img = document.getElementById("main-image");
         const lens = document.getElementById("zoom-lens");
         const container = document.getElementById("zoom-container");

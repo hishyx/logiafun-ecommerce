@@ -65,6 +65,11 @@ router.patch(
   adminOrderControllers.updateAdminOrderItemStatus,
 );
 
+router.patch(
+  "/admin/orders/:orderId/payment-status",
+  adminOrderControllers.updateAdminPaymentStatus,
+);
+
 router
   .route("/admin/categories")
   .get(adminCategoryControllers.adminCategoryListPage)

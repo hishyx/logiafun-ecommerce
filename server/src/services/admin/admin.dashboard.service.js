@@ -2,9 +2,12 @@ import Order from "../../models/order.model.js";
 import User from "../../models/user.model.js";
 import Product from "../../models/products.model.js";
 
-// excludes cancelled and returned orders regardless of payment status
+// includes paid orders and COD orders, while excluding cancelled / returned
 const REVENUE_MATCH = {
-  "payment.status": "paid",
+  $or: [
+    { "payment.status": "paid" },
+    { "payment.method": { $in: ["cod", "COD"] } },
+  ],
   orderStatus: { $nin: ["cancelled", "returned"] },
 };
 
@@ -287,7 +290,7 @@ export async function getTopCategories() {
   }));
 }
 
-// last 5 paid non-cancelled orders for the dashboard table
+// last 5 qualifying non-cancelled orders for the dashboard table
 export async function getRecentOrders() {
   const orders = await Order.find(REVENUE_MATCH)
     .sort({ createdAt: -1 })

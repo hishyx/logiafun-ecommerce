@@ -224,7 +224,9 @@ export const createOrder = async (userId, orderData) => {
 
   //Update payment status
 
-  newOrder.payment.status = "paid";
+  const paymentStatus = paymentMethod == "cod" ? "pending" : "paid";
+
+  newOrder.payment.status = paymentStatus;
   await newOrder.save();
 
   await deleteAllItems(userId);
@@ -279,7 +281,7 @@ export const cancelEntireOrder = async (orderId, reason) => {
 
   if (!order) throw new Error("Order not found");
 
-  if (order.payment.status != "paid")
+  if (order.payment.status != "paid" && order.payment.method != "cod")
     throw new Error("The payment isn't done for the order");
 
   const availableTransitions = statusTransitions[order.orderStatus];
@@ -315,7 +317,8 @@ export const cancelEntireOrder = async (orderId, reason) => {
 
   console.log("The transction data for cencellation is : ", transactionData);
 
-  await userWalletServices.addRefundToWallet(transactionData);
+  if (order.payment.status === "paid")
+    await userWalletServices.addRefundToWallet(transactionData);
 
   order.refundSummary.totalRefundedAmount = order.payment.amount;
   await order.save();
@@ -331,7 +334,7 @@ export const cancelSpecificOrderItem = async (
 
   const order = await Order.findById(orderId);
 
-  if (order.payment.status != "paid")
+  if (order.payment.status != "paid" && order.payment.method != "cod")
     throw new Error("The payment isn't done for the order");
 
   console.log("order from service is : ", order);
@@ -378,8 +381,8 @@ export const cancelSpecificOrderItem = async (
       itemName: item.product.name,
     };
 
-    console.log("Refunded");
-    await userWalletServices.addRefundToWallet(transactionData);
+    if (order.payment.status === "paid")
+      await userWalletServices.addRefundToWallet(transactionData);
 
     order.refundSummary.totalRefundedAmount += refundAmount;
   }

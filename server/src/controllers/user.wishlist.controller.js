@@ -43,7 +43,14 @@ export const addToWishList = async (req, res) => {
       req.user._id,
     );
 
-    res.status(statusCodes.OK).json({ message: messages.WISHLIST_ADD_SUCCESS });
+    const wishlistCount = await userWishListServices.getWishlistCount(
+      req.user._id,
+    );
+
+    res.status(statusCodes.OK).json({
+      message: messages.WISHLIST_ADD_SUCCESS,
+      wishlistCount,
+    });
   } catch (err) {
     console.log(err);
     res.status(statusCodes.BAD_REQUEST).json({ message: err.message });

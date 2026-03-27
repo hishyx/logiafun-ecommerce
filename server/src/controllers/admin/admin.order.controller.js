@@ -167,3 +167,23 @@ export const updateAdminOrderItemStatus = async (req, res) => {
     });
   }
 };
+
+export const updateAdminPaymentStatus = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    const order = await adminOrderServices.markOrderPaymentAsPaidService(orderId);
+
+    res.status(statusCodes.OK).json({
+      success: true,
+      message: "Payment status updated successfully",
+      payment: order.payment,
+    });
+  } catch (err) {
+    console.error("Error in updateAdminPaymentStatus:", err);
+    res.status(statusCodes.BAD_REQUEST).json({
+      success: false,
+      message: err.message || "Failed to update payment status",
+    });
+  }
+};

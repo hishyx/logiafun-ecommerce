@@ -24,8 +24,30 @@ document.addEventListener("DOMContentLoaded", function () {
   const stockIndicator = document.getElementById("stock-indicator");
   const addBtn = document.getElementById("addToCartBtn");
   const wishBtn = document.getElementById("addToWishListBtn");
+  const wishlistItems = Array.isArray(product.wishlistData)
+    ? [...product.wishlistData]
+    : [];
 
   let activeVariant = null;
+
+  function syncWishlistButton() {
+    if (!wishBtn) return;
+
+    const isWishlisted = activeVariant
+      ? wishlistItems.some(
+          (item) => String(item.variantId) === String(activeVariant._id),
+        )
+      : false;
+
+    wishBtn.classList.toggle("wishlisted", isWishlisted);
+    wishBtn.setAttribute("aria-pressed", isWishlisted ? "true" : "false");
+
+    const icon = wishBtn.querySelector("i");
+    if (icon) {
+      icon.classList.toggle("fa-solid", isWishlisted);
+      icon.classList.toggle("fa-regular", !isWishlisted);
+    }
+  }
 
   /**
    * Main UI Sync Logic
@@ -41,7 +63,8 @@ document.addEventListener("DOMContentLoaded", function () {
       triggerConfig.innerText = Object.values(activeVariant.attributes).join(
         " • ",
       );
-    if (triggerPrice) triggerPrice.innerText = "₹" + activeVariant.price.toLocaleString();
+    if (triggerPrice)
+      triggerPrice.innerText = "₹" + activeVariant.price.toLocaleString();
 
     // 2. Sync Price Section
     const base = activeVariant.price;
@@ -72,6 +95,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // 5. Sync Images
     syncImages();
+
+    // 6. Sync wishlist state for the selected variant
+    syncWishlistButton();
   }
 
   function syncImages() {
@@ -188,6 +214,16 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         const data = await res.json();
+
+        if (res.ok) {
+          const cartBadges = document.querySelectorAll(
+            'a[href="/user/cart"] .cart-badge',
+          );
+
+          cartBadges.forEach((badge) => {
+            badge.textContent = data.cartCount;
+          });
+        }
         if (typeof showToast === "function") showToast(data.message);
       } catch (err) {
         console.error("Cart Request failed", err);
@@ -213,6 +249,28 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         const data = await res.json();
+        if (res.ok && activeVariant) {
+          const alreadyExists = wishlistItems.some(
+            (item) => String(item.variantId) === String(activeVariant._id),
+          );
+
+          if (!alreadyExists) {
+            wishlistItems.push({
+              productId: product._id,
+              variantId: activeVariant._id,
+            });
+          }
+
+          syncWishlistButton();
+
+          const wishlistBadges = document.querySelectorAll(
+            'a[href="/user/wishlist"] .cart-badge',
+          );
+          wishlistBadges.forEach((badge) => {
+            badge.textContent = data.wishlistCount;
+          });
+        }
+
         if (typeof showToast === "function") showToast(data.message);
       } catch (err) {
         console.error("Wishlist Request failed", err);
@@ -231,7 +289,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Auto select default variant
     const defaultVid = product.defaultVariant?._id || product.defaultVariantId;
-    activeVariant = variants.find(v => String(v._id) === String(defaultVid)) || variants[0];
+    activeVariant =
+      variants.find((v) => String(v._id) === String(defaultVid)) || variants[0];
     updateUI();
   }
 

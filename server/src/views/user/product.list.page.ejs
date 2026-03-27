@@ -301,7 +301,7 @@
       height: 36px;
       border-radius: 50%;
       background: white;
-      border: none;
+      border: 1px solid transparent;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -315,6 +315,18 @@
       background: var(--primary);
       color: white;
       transform: scale(1.1);
+    }
+
+    .action-btn.wishlisted {
+      background: #fef2f2;
+      border-color: rgba(239, 68, 68, 0.22);
+      color: #ef4444;
+    }
+
+    .action-btn.wishlisted:hover {
+      background: #ef4444;
+      border-color: #ef4444;
+      color: white;
     }
 
     .product-content {
@@ -801,7 +813,8 @@
                   <% const firstVariant=product.variants?.[0]; const variantPrice=firstVariant?.price || 0; const
                     image=firstVariant?.images?.[0] || '/images/placeholder-toy.jpg' ; const
                     discount=product.finalDiscount || 0; const hasDiscount=discount> 0;
-                    const finalPrice = product.discountedPrice || variantPrice;
+                    const finalPrice = product.discountedPrice || variantPrice; const isWishlisted =
+                    Array.isArray(product.wishlistData) && product.wishlistData.length > 0;
                     %>
 
                     <div class="product-card">
@@ -869,9 +882,10 @@
                       </a>
 
                       <div class="card-actions" style="z-index: 10;">
-                        <button class="action-btn" title="Wishlist"
+                        <button class="action-btn <%= isWishlisted ? 'wishlisted' : '' %>" title="Wishlist"
+                          aria-pressed="<%= isWishlisted ? 'true' : 'false' %>"
                           onclick="addToWishlist(event, '<%= product._id %>')">
-                          <i class="fa-regular fa-heart"></i>
+                          <i class="fa-<%= isWishlisted ? 'solid' : 'regular' %> fa-heart"></i>
                         </button>
                       </div>
                     </div>
@@ -1000,11 +1014,16 @@
             if (response.ok) {
               const button = event.target.closest('button');
               const icon = button.querySelector('i');
+              button.classList.add('wishlisted');
+              button.setAttribute('aria-pressed', 'true');
+              const wishlistBadges = document.querySelectorAll('a[href="/user/wishlist"] .cart-badge');
               if (icon) {
                 icon.classList.remove('fa-regular');
                 icon.classList.add('fa-solid');
-                icon.style.color = '#ef4444';
               }
+              wishlistBadges.forEach((badge) => {
+                badge.textContent = data.wishlistCount;
+              });
               showToast(data.message || 'Added to wishlist!', 'success');
             } else {
               showToast(data.message || 'Could not add to wishlist', 'error');

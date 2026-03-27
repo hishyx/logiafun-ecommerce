@@ -45,9 +45,12 @@ export const getReportData = async ({
   console.log("End is ", end);
   console.log("Start is ", start);
 
-  // Only consider paid orders and ignore cancelled / returned ones
+  // Include paid orders and COD orders, but ignore cancelled / returned ones
   const query = {
-    "payment.status": "paid",
+    $or: [
+      { "payment.status": "paid" },
+      { "payment.method": { $in: ["cod", "COD"] } },
+    ],
     orderStatus: { $nin: ["cancelled", "returned"] },
     createdAt: { $gte: start, $lte: end },
   };

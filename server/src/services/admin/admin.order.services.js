@@ -51,7 +51,14 @@ export const getAllOrders = async ({
 
   const result = await Order.aggregate([
     { $match: query },
-    { $match: { "payment.status": "paid" } },
+    {
+      $match: {
+        $or: [
+          { "payment.status": "paid" },
+          { "payment.method": { $in: ["cod", "COD"] } },
+        ],
+      },
+    },
     {
       $facet: {
         orders: [
@@ -109,7 +116,7 @@ export const acceptOrderReturn = async (orderId, stockIncreaseItems) => {
   const order = await Order.findById(orderId);
   if (!order) throw new Error("Order not found");
 
-  if (order.payment.status != "paid")
+  if (order.payment.status != "paid" && order.payment.method != "cod")
     throw new Error("The payment isn't done for the order");
 
   if (order.returnStatus !== "requested") {
@@ -142,7 +149,7 @@ export const acceptOrderReturn = async (orderId, stockIncreaseItems) => {
     status: "returned",
   };
 
-  await addRefundToWallet(transactionData);
+  if (order.payment.status === "paid") await addRefundToWallet(transactionData);
 
   order.refundSummary.totalRefundedAmount = order.payment.amount;
 
@@ -159,7 +166,7 @@ export const acceptItemReturn = async (
   const order = await Order.findById(orderId);
   if (!order) throw new Error("Order not found");
 
-  if (order.payment.status != "paid")
+  if (order.payment.status != "paid" && order.payment.method != "cod")
     throw new Error("The payment isn't done for the order");
 
   const item = order.items.id(itemId);
@@ -208,7 +215,8 @@ export const acceptItemReturn = async (
       itemName: item.product.name,
     };
 
-    await userWalletServices.addRefundToWallet(transactionData);
+    if (order.payment.status === "paid")
+      await userWalletServices.addRefundToWallet(transactionData);
 
     //  FIX HERE
     order.refundSummary.totalRefundedAmount += refundAmount;
@@ -260,5 +268,19 @@ export const changeAdminOrderItemStatusService = async (
   }
 
   await order.save();
+  return order;
+};
+
+export const markOrderPaymentAsPaidService = async (orderId) => {
+  const order = await Order.findById(orderId);
+  if (!order) throw new Error("Order not found");
+
+  if (order.payment.status === "paid") {
+    throw new Error("Order is already marked as paid");
+  }
+
+  order.payment.status = "paid";
+  await order.save();
+
   return order;
 };

@@ -20,6 +20,8 @@ const cartSchema = mongoose.Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
+      unique: true,
+      index: true,
     },
     items: [cartItemsSchema],
   },

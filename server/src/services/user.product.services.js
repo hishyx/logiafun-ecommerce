@@ -1,7 +1,32 @@
 import Category from "../models/categories.model.js";
 import Product from "../models/products.model.js";
+import Wishlist from "../models/wishlist.model.js";
 import mongoose from "mongoose";
 import { getHighestOffer } from "./admin/admin.offer.services.js";
+
+const getWishlistItemsMap = async (productIds, userId) => {
+  if (!userId || productIds.length === 0) return new Map();
+
+  const wishlist = await Wishlist.findOne(
+    {
+      userId,
+      "items.productId": { $in: productIds },
+    },
+    { items: 1 },
+  ).lean();
+
+  const wishlistMap = new Map();
+
+  for (const item of wishlist?.items || []) {
+    const key = item.productId?.toString();
+    if (!key) continue;
+
+    if (!wishlistMap.has(key)) wishlistMap.set(key, []);
+    wishlistMap.get(key).push(item);
+  }
+
+  return wishlistMap;
+};
 
 //Helper function for valid Product checking
 export const checkProductAvailability = async (productId) => {
@@ -52,6 +77,7 @@ export const checkProductAvailability = async (productId) => {
         "variants.0": { $exists: true },
       },
     },
+
   ]);
 
   return result[0] || null;
@@ -65,6 +91,7 @@ export const getAllProducts = async ({
   minPrice,
   maxPrice,
   sortBy,
+  userId,
 }) => {
   //Sorting works
 
@@ -237,6 +264,43 @@ export const getAllProducts = async ({
       },
     },
     {
+      $lookup: {
+        from: "wishlists",
+        let: {
+          productId: "$_id",
+          userId,
+        },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $eq: ["$userId", "$$userId"],
+              },
+            },
+          },
+          {
+            $project: {
+              items: {
+                $filter: {
+                  input: "$items",
+                  as: "item",
+                  cond: {
+                    $eq: ["$$item.productId", "$$productId"],
+                  },
+                },
+              },
+            },
+          },
+          {
+            $match: {
+              "items.0": { $exists: true },
+            },
+          },
+        ],
+        as: "wishlistData",
+      },
+    },
+    {
       $facet: {
         products: [{ $skip: skip }, { $limit: limit }],
         count: [{ $count: "total" }],
@@ -257,7 +321,7 @@ export const getAllProducts = async ({
   };
 };
 
-export const getProductDetails = async (productId) => {
+export const getProductDetails = async (productId, userId = null) => {
   const product = await checkProductAvailability(productId);
 
   console.log("product is ", product);
@@ -293,6 +357,9 @@ export const getProductDetails = async (productId) => {
 
   console.log("Reached end");
 
+  const wishlistMap = await getWishlistItemsMap([product._id], userId);
+  const wishlistData = wishlistMap.get(product._id.toString()) || [];
+
   return {
     ...product,
     defaultVariant,
@@ -302,10 +369,11 @@ export const getProductDetails = async (productId) => {
     finalPrice,
     variantMap,
     inStock: (product.variants || []).some((v) => v.stock > 0),
+    wishlistData,
   };
 };
 
-export const getRelatedProducts = async (categoryId, productId) => {
+export const getRelatedProducts = async (categoryId, productId, userId = null) => {
   const limit = 4;
   const relatedProducts = await Product.aggregate([
     {
@@ -352,7 +420,15 @@ export const getRelatedProducts = async (categoryId, productId) => {
     },
   ]);
 
-  return relatedProducts;
+  const wishlistMap = await getWishlistItemsMap(
+    relatedProducts.map((product) => product._id),
+    userId,
+  );
+
+  return relatedProducts.map((product) => ({
+    ...product,
+    wishlistData: wishlistMap.get(product._id.toString()) || [],
+  }));
 };
 
 export const changeProductStock = async (

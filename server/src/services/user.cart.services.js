@@ -5,38 +5,176 @@ import { StringIdToObjectId } from "../utils/convert.to.objectId.js";
 import AppError from "../utils/app.error.js";
 import { getHighestOffer } from "./admin/admin.offer.services.js";
 
+const buildCartItemKey = (item) =>
+  `${item.productId.toString()}:${item.variantId.toString()}`;
+
+const mergeCartItems = (items = []) => {
+  const mergedItems = new Map();
+
+  for (const item of items) {
+    const key = buildCartItemKey(item);
+    const existingItem = mergedItems.get(key);
+
+    if (existingItem) {
+      existingItem.quantity += Number(item.quantity) || 0;
+      continue;
+    }
+
+    mergedItems.set(key, {
+      productId: item.productId,
+      variantId: item.variantId,
+      quantity: Number(item.quantity) || 0,
+    });
+  }
+
+  return Array.from(mergedItems.values());
+};
+
+const normalizeUserCart = async (userId) => {
+  const carts = await Cart.find({ userId }).sort({ createdAt: 1 });
+
+  if (carts.length === 0) return null;
+
+  const [primaryCart, ...extraCarts] = carts;
+  const mergedItems = mergeCartItems(carts.flatMap((cart) => cart.items));
+
+  const needsPrimaryUpdate =
+    extraCarts.length > 0 ||
+    primaryCart.items.length !== mergedItems.length ||
+    primaryCart.items.some((item, index) => {
+      const mergedItem = mergedItems[index];
+
+      if (!mergedItem) return true;
+
+      return (
+        item.productId.toString() !== mergedItem.productId.toString() ||
+        item.variantId.toString() !== mergedItem.variantId.toString() ||
+        Number(item.quantity) !== Number(mergedItem.quantity)
+      );
+    });
+
+  if (needsPrimaryUpdate) {
+    primaryCart.items = mergedItems;
+    await primaryCart.save();
+  }
+
+  if (extraCarts.length > 0) {
+    await Cart.deleteMany({
+      _id: { $in: extraCarts.map((cart) => cart._id) },
+    });
+  }
+
+  return primaryCart;
+};
+
 export const addProductToCartService = async (productData, userId) => {
   console.log(productData);
   const validProduct = await checkProductAvailability(productData.productId);
 
   if (!validProduct) throw new Error("product not found or blocked");
 
-  let cart = await Cart.findOne({ userId });
+  const normalizedProduct = {
+    productId: StringIdToObjectId(productData.productId),
+    variantId: StringIdToObjectId(productData.variantId),
+    quantity: Number(productData.quantity) || 1,
+  };
 
-  if (!cart) {
-    cart = await Cart.create({
+  if (normalizedProduct.quantity < 1)
+    throw new Error("Quantity must be at least 1");
+
+  await normalizeUserCart(userId);
+
+  const incrementExistingItemResult = await Cart.updateOne(
+    {
       userId,
-      items: [],
+      "items.productId": normalizedProduct.productId,
+      "items.variantId": normalizedProduct.variantId,
+    },
+    {
+      $inc: {
+        "items.$.quantity": normalizedProduct.quantity,
+      },
+    },
+  );
+
+  if (incrementExistingItemResult.modifiedCount > 0) {
+    await normalizeUserCart(userId);
+    return;
+  }
+
+  const pushNewItemResult = await Cart.updateOne(
+    {
+      userId,
+      items: {
+        $not: {
+          $elemMatch: {
+            productId: normalizedProduct.productId,
+            variantId: normalizedProduct.variantId,
+          },
+        },
+      },
+    },
+    {
+      $push: {
+        items: normalizedProduct,
+      },
+    },
+  );
+
+  if (pushNewItemResult.modifiedCount > 0) {
+    await normalizeUserCart(userId);
+    return;
+  }
+
+  try {
+    await Cart.create({
+      userId,
+      items: [normalizedProduct],
     });
-  }
+  } catch (error) {
+    if (error?.code !== 11000) throw error;
 
-  const existingItem = cart.items.find((item) => {
-    return (
-      item.variantId.toString() === productData.variantId.toString() &&
-      item.productId.toString() === productData.productId.toString()
+    const retryIncrementResult = await Cart.updateOne(
+      {
+        userId,
+        "items.productId": normalizedProduct.productId,
+        "items.variantId": normalizedProduct.variantId,
+      },
+      {
+        $inc: {
+          "items.$.quantity": normalizedProduct.quantity,
+        },
+      },
     );
-  });
 
-  if (existingItem) {
-    existingItem.quantity += productData.quantity;
-  } else {
-    cart.items.push(productData);
+    if (retryIncrementResult.modifiedCount === 0) {
+      await Cart.updateOne(
+        {
+          userId,
+          items: {
+            $not: {
+              $elemMatch: {
+                productId: normalizedProduct.productId,
+                variantId: normalizedProduct.variantId,
+              },
+            },
+          },
+        },
+        {
+          $push: {
+            items: normalizedProduct,
+          },
+        },
+      );
+    }
   }
 
-  await cart.save();
+  await normalizeUserCart(userId);
 };
 
 export const getCartItems = async (userId, isOrder) => {
+  await normalizeUserCart(userId);
+
   console.log("user id is : ", userId);
   const cart = await Cart.aggregate([
     {
@@ -159,11 +297,14 @@ export const getCartItems = async (userId, isOrder) => {
 };
 
 export const getCartCount = async (userId) => {
+  await normalizeUserCart(userId);
   const cart = await Cart.findOne({ userId });
   if (cart) return cart.items.length;
 };
 
 export const removeItemFromCart = async (userId, itemId) => {
+  await normalizeUserCart(userId);
+
   userId = StringIdToObjectId(userId);
   itemId = StringIdToObjectId(itemId);
 
@@ -181,6 +322,8 @@ export const removeItemFromCart = async (userId, itemId) => {
 };
 
 export const updateCartItemService = async (userId, itemId, newQuantity) => {
+  await normalizeUserCart(userId);
+
   userId = StringIdToObjectId(userId);
   itemId = StringIdToObjectId(itemId);
 

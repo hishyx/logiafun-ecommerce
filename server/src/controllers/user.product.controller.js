@@ -33,6 +33,7 @@ export const productListPage = async (req, res) => {
     minPrice,
     maxPrice,
     sortBy,
+    userId: req.user?._id || null,
   });
 
   const totalPages = Math.ceil(productList.total / limit);
@@ -55,13 +56,6 @@ export const productListPage = async (req, res) => {
     selectedCategoryIds: category || [],
   };
 
-  const isAjaxRequest =
-    req.xhr || req.get("X-Requested-With") === "XMLHttpRequest";
-
-  if (isAjaxRequest) {
-    return res.render("partials/product-listing.ejs", viewData);
-  }
-
   res.render("user/product.list.page.ejs", viewData);
 };
 
@@ -69,11 +63,15 @@ export const productDetailsPage = async (req, res) => {
   const productId = req.params.productId || "";
 
   try {
-    const product = await userProductServices.getProductDetails(productId);
+    const product = await userProductServices.getProductDetails(
+      productId,
+      req.user?._id || null,
+    );
 
     const relatedProducts = await userProductServices.getRelatedProducts(
       product.categoryId,
       product._id,
+      req.user?._id || null,
     );
 
     res.render("user/product.details.ejs", { product, relatedProducts });

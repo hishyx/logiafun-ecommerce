@@ -574,6 +574,152 @@
       color: var(--primary);
     }
 
+    .terminal-progress-card {
+      margin-bottom: 2rem;
+      padding: 2rem 1.5rem;
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .terminal-progress-card.cancelled {
+      border-color: #fecaca;
+      background: linear-gradient(180deg, #fffafa 0%, #ffffff 100%);
+    }
+
+    .terminal-progress-card.returned {
+      border-color: #ddd6fe;
+      background: linear-gradient(180deg, #faf7ff 0%, #ffffff 100%);
+    }
+
+    .terminal-progress-header {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .terminal-progress-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .terminal-progress-card.cancelled .terminal-progress-icon {
+      background: #fef2f2;
+      color: #dc2626;
+    }
+
+    .terminal-progress-card.returned .terminal-progress-icon {
+      background: #f5f3ff;
+      color: #7c3aed;
+    }
+
+    .terminal-progress-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 0.3rem;
+    }
+
+    .terminal-progress-copy {
+      color: var(--text-secondary);
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+
+    .terminal-timeline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      position: relative;
+      margin-top: 1.75rem;
+    }
+
+    .terminal-timeline::before {
+      content: '';
+      position: absolute;
+      left: 8%;
+      right: 8%;
+      top: 20px;
+      height: 4px;
+      background: #e2e8f0;
+      z-index: 1;
+    }
+
+    .terminal-timeline-fill {
+      position: absolute;
+      left: 8%;
+      top: 20px;
+      height: 4px;
+      z-index: 2;
+    }
+
+    .terminal-progress-card.cancelled .terminal-timeline-fill {
+      width: 84%;
+      background: linear-gradient(90deg, #f97316 0%, #ef4444 100%);
+    }
+
+    .terminal-progress-card.returned .terminal-timeline-fill {
+      width: 84%;
+      background: linear-gradient(90deg, #22c55e 0%, #7c3aed 100%);
+    }
+
+    .terminal-step {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 33.33%;
+      text-align: center;
+    }
+
+    .terminal-step-dot {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 4px solid #e2e8f0;
+      background: #ffffff;
+      color: #94a3b8;
+      margin-bottom: 0.7rem;
+      font-size: 0.9rem;
+    }
+
+    .terminal-step.is-complete .terminal-step-dot {
+      color: #ffffff;
+      border-color: transparent;
+    }
+
+    .terminal-progress-card.cancelled .terminal-step.is-complete .terminal-step-dot {
+      background: #ef4444;
+    }
+
+    .terminal-progress-card.returned .terminal-step.is-complete .terminal-step-dot {
+      background: #7c3aed;
+    }
+
+    .terminal-step-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    .terminal-step.is-complete .terminal-step-label {
+      color: var(--primary);
+    }
+
     @media (max-width: 640px) {
       .tracking-timeline {
         flex-direction: column;
@@ -606,6 +752,43 @@
       .step-icon {
         margin-bottom: 0;
       }
+
+      .terminal-progress-header {
+        align-items: flex-start;
+      }
+
+      .terminal-timeline {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.25rem;
+        margin-left: 20px;
+      }
+
+      .terminal-timeline::before {
+        left: 20px;
+        right: auto;
+        top: 0;
+        width: 4px;
+        height: 100%;
+      }
+
+      .terminal-timeline-fill {
+        left: 20px;
+        top: 0;
+        width: 4px !important;
+        height: 100%;
+      }
+
+      .terminal-step {
+        width: 100%;
+        flex-direction: row;
+        gap: 1rem;
+        text-align: left;
+      }
+
+      .terminal-step-dot {
+        margin-bottom: 0;
+      }
     }
   </style>
 </head>
@@ -625,10 +808,15 @@
 
     <div class="order-header">
       <div class="order-id-section">
+        <% const isCod = order.payment.method === 'cod' || order.payment.method === 'COD';
+        const isPaid = order.payment.status === 'paid';
+        const isPaidOrCod = isPaid || isCod;
+        const paymentHeadingColor = isPaid ? 'var(--success)' : '#dc2626';
+        const paymentHeadingLabel = isPaid ? 'Total Paid' : 'Total To Be Paid'; %>
         <h1>Order #<%= order.orderNumber %></h1>
         <div class="order-date">Placed on <%= new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' }) %></div>
-        <div style="margin-top: 1rem; font-size: 1.25rem; font-weight: 800; color: var(--success);">
-            Total Paid: ₹<%= order.payment.amount %>
+        <div style="margin-top: 1rem; font-size: 1.25rem; font-weight: 800; color: <%= paymentHeadingColor %>;">
+            <%= paymentHeadingLabel %>: ₹<%= order.payment.amount %>
         </div>
       </div>
       <% const currentStatus=order.orderStatus %>
@@ -640,10 +828,9 @@
         <%= currentStatus %>
       </div>
 
-      <% const isPaid=order.payment.status==='paid'; %>
-      <div class="order-status-badge" style="background: <%= isPaid ? '#ecfdf5' : '#fef2f2' %>; color: <%= isPaid ? '#059669' : '#dc2626' %>;">
-        <i class="fa-solid <%= isPaid ? 'fa-check' : 'fa-xmark' %>"></i>
-        <%= isPaid ? 'Paid' : 'Not Paid' %>
+      <div class="order-status-badge" style="background: <%= isPaidOrCod ? '#ecfdf5' : '#fef2f2' %>; color: <%= isPaidOrCod ? '#059669' : '#dc2626' %>;">
+        <i class="fa-solid <%= isPaidOrCod ? 'fa-check' : 'fa-xmark' %>"></i>
+        <%= isPaid ? 'Paid' : (isCod ? 'COD' : 'Not Paid') %>
       </div>
 
       <!-- Added Download Invoice Button UI -->
@@ -652,7 +839,7 @@
         Download Invoice
       </button>
 
-      <% if (order.payment.status !=='paid') { %>
+      <% if (!isPaidOrCod) { %>
       <button class="download-invoice-btn" id="tryToPayBtn" data-order-id="<%= order._id%>" style="background-color: var(--accent); margin-left: auto;">
         <i class="fa-solid fa-credit-card"></i>
         Try to Pay
@@ -712,6 +899,60 @@
               <div class="step-icon"><i class="fa-solid <%= isCompleted('delivered') ? 'fa-check' : 'fa-house-chimney' %>"></i></div>
               <div class="step-label">Delivered</div>
             </div>
+          </div>
+        </div>
+        <% } else { %>
+        <div class="terminal-progress-card <%= status %>">
+          <div class="terminal-progress-header">
+            <div class="terminal-progress-icon">
+              <i class="fa-solid <%= status === 'cancelled' ? 'fa-ban' : 'fa-rotate-left' %>"></i>
+            </div>
+            <div>
+              <div class="terminal-progress-title">
+                <%= status === 'cancelled' ? 'Order Cancelled' : 'Order Returned' %>
+              </div>
+              <div class="terminal-progress-copy">
+                <%= status === 'cancelled'
+                  ? 'This order is no longer being processed. Any completed refund will appear in your wallet summary below.'
+                  : 'This order completed delivery and has now moved into the return flow. Any refund updates will appear in your wallet summary below.' %>
+              </div>
+            </div>
+          </div>
+
+          <div class="terminal-timeline">
+            <div class="terminal-timeline-fill"></div>
+
+            <% if (status === 'cancelled') { %>
+            <div class="terminal-step is-complete">
+              <div class="terminal-step-dot"><i class="fa-solid fa-receipt"></i></div>
+              <div class="terminal-step-label">Order Placed</div>
+            </div>
+
+            <div class="terminal-step is-complete">
+              <div class="terminal-step-dot"><i class="fa-solid fa-hourglass-half"></i></div>
+              <div class="terminal-step-label">Review Stopped</div>
+            </div>
+
+            <div class="terminal-step is-complete">
+              <div class="terminal-step-dot"><i class="fa-solid fa-circle-xmark"></i></div>
+              <div class="terminal-step-label">Cancelled</div>
+            </div>
+            <% } else { %>
+            <div class="terminal-step is-complete">
+              <div class="terminal-step-dot"><i class="fa-solid fa-receipt"></i></div>
+              <div class="terminal-step-label">Order Placed</div>
+            </div>
+
+            <div class="terminal-step is-complete">
+              <div class="terminal-step-dot"><i class="fa-solid fa-house-chimney"></i></div>
+              <div class="terminal-step-label">Delivered</div>
+            </div>
+
+            <div class="terminal-step is-complete">
+              <div class="terminal-step-dot"><i class="fa-solid fa-rotate-left"></i></div>
+              <div class="terminal-step-label">Returned</div>
+            </div>
+            <% } %>
           </div>
         </div>
         <% } %>
@@ -798,7 +1039,7 @@
                   </span>
                 </div>
                 <% } %>
-                <% if (isPaid && transitions[item.status]) { %>
+                <% if (isPaidOrCod && transitions[item.status]) { %>
                 <% if (transitions[item.status].includes("cancelled")) { %>
                 <button class="btn-cancel" onclick="openCancelItem('<%= item._id %>', '<%= item.product.name %>')">
                   <i class="fa-solid fa-xmark"></i> Cancel Item
@@ -914,7 +1155,7 @@
               );
               %>
 
-          <% if (isPaid) { %>
+          <% if (isPaidOrCod) { %>
             <% if (canCancelEntireOrder && currentStatus !=='cancelled' && currentStatus !=='delivered' &&
                   currentStatus !=='returned' ) { %>
             <button class="btn-cancel btn-cancel-order" onclick="openCancelOrder()">
