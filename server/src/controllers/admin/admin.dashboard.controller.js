@@ -317,7 +317,15 @@ export const downloadPDF = async (req, res) => {
       totalSalesCount: orderCount,
     };
 
-    const browser = await puppeteer.launch({ headless: "new" });
+    const browser = await puppeteer.launch({
+      headless: "new",
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu',
+      ],
+    });
     const page = await browser.newPage();
 
     const rangeText = startDate && endDate 
