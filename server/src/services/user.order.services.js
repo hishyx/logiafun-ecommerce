@@ -324,15 +324,30 @@ export const cancelEntireOrder = async (orderId, reason) => {
   await order.save();
 };
 
+//Code test
+
+const isMaxCancellationReached=async (userId)=>{
+
+  const cancelled=await Order.find({userId,status:"cancelled"})
+
+  if(cancelled.length>=1)return false
+  else true
+}
+
 export const cancelSpecificOrderItem = async (
   orderId,
   itemId,
   reason,
   isEntireCancel,
 ) => {
+
   console.log("Order id is : ", orderId);
 
   const order = await Order.findById(orderId);
+  const isMaxTest = await isMaxCancellationReached(order.userId)
+
+  if(!isMaxTest)throw new Error("Max cancallation limit reached already")
+
 
   if (order.payment.status != "paid" && order.payment.method != "cod")
     throw new Error("The payment isn't done for the order");
