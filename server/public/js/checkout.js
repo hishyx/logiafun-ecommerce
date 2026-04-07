@@ -187,7 +187,7 @@ async function applyCoupon(couponId, element) {
       method: "POST",
     });
 
-    result = await res.json();
+    const result = await res.json();
 
     if (res.ok) {
       updateCheckoutAmount(result.newCalculations);
@@ -201,11 +201,13 @@ async function applyCoupon(couponId, element) {
 
       element.closest(".coupon-card").classList.add("applied-coupon");
       element.textContent = "Applied";
+      showToast("Coupon applied successfully", "success");
     } else {
-      alert(result.message);
+      showToast(result.message || "Failed to apply coupon", "error");
     }
   } catch (err) {
     console.log(err);
+    showToast("Something went wrong while applying the coupon", "error");
   }
 }
 

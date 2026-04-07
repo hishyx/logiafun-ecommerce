@@ -8,6 +8,22 @@ const fileInput = document.querySelector('input[name="image"]');
 let cropper = null;
 let croppedBlob = null;
 
+function showToast(message, type = "success") {
+  if (typeof Swal !== "undefined") {
+    Swal.fire({
+      toast: true,
+      position: "top-end",
+      icon: type === "error" ? "error" : "success",
+      title: type === "error" ? "Error" : "Success",
+      text: message,
+      showConfirmButton: false,
+      timer: 3000,
+    });
+  } else {
+    alert(message);
+  }
+}
+
 function openModal() {
   modal.classList.add("active");
   document.body.style.overflow = "hidden";

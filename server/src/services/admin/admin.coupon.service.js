@@ -225,17 +225,10 @@ export const applyCouponService = async (couponId, userId) => {
 
   const orderPrice = cartCalaculations.subtotal;
 
-  const coupon = await Coupon.findOne({
-    _id: couponId,
-    minPurchaseAmount: { $lte: orderPrice },
-    isActive: true,
-    startDate: { $lte: new Date() },
-    expiryDate: { $gte: new Date() },
-    $expr: { $lt: ["$usedCount", "$usageLimit"] },
-  });
+  const coupon = await Coupon.findById(couponId);
 
   if (!coupon) {
-    throw new Error("Coupon not found or not eligible");
+    throw new Error("Coupon not found");
   }
 
   const usedCoupon = await couponUsage.findOne({
@@ -245,7 +238,27 @@ export const applyCouponService = async (couponId, userId) => {
 
   if (usedCoupon) throw new Error("This coupon is already used");
 
-  if (!coupon) throw new Error("Coupon not valid or expired");
+  if (!coupon.isActive) {
+    throw new Error("This coupon is inactive");
+  }
+
+  if (coupon.startDate && coupon.startDate > new Date()) {
+    throw new Error("This coupon is not active yet");
+  }
+
+  if (coupon.expiryDate && coupon.expiryDate < new Date()) {
+    throw new Error("This coupon has expired");
+  }
+
+  if (coupon.usedCount >= coupon.usageLimit) {
+    throw new Error("This coupon has reached its usage limit");
+  }
+
+  if (orderPrice < coupon.minPurchaseAmount) {
+    throw new Error(
+      `Minimum order amount for this coupon is Rs. ${coupon.minPurchaseAmount}`,
+    );
+  }
 
   let discount = 0;
 

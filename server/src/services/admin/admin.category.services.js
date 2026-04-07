@@ -1,5 +1,6 @@
 import cloudinaryFolders from "../../components/cloudinary.folders.js";
 import Category from "../../models/categories.model.js";
+import Product from "../../models/products.model.js";
 import uploadImageToCloudinary from "../../utils/cloudinary.upload.js";
 
 export const getProductCategories = async ({
@@ -74,12 +75,44 @@ export const addCategory = async (categoryInfo) => {
   return category;
 };
 
+
+const testCode = async (categoryId) => {
+  const result = await Product.aggregate([
+    {
+      $match: { categoryId },
+    },
+    {
+      $lookup: {
+        from: "offers",
+        localField: "_id",
+        foreignField: "targetId",
+        as: "productOffer",
+      },
+    },
+    {
+      $lookup: {
+        from: "offers",
+        localField: "categoryId",
+        foreignField: "targetId",
+        as: "categorytOffer",
+      },
+    },
+  ]);
+
+  return result;
+};
+
 export const toggleListUnlistCategory = async (categoryId) => {
   const category = await Category.findById(categoryId);
 
   if (!category) throw new Error("Category not found");
 
   category.isActive = category.isActive ? false : true;
+
+  if (!category.isActive) {
+    await testCode(category._id);
+  }
+
   await category.save();
 
   return category;

@@ -166,6 +166,8 @@
             background: var(--white);
             border-radius: var(--radius-sm);
             cursor: pointer;
+            text-decoration: none;
+            color: var(--text-dark, #0f172a);
         }
         
         .pagination .btn.active {
@@ -207,8 +209,8 @@
             </div>
 
             <div class="transaction-list">
-                <% if (wallet && wallet.transactions && wallet.transactions.length > 0) { %>
-                    <% wallet.transactions.sort((a,b)=> new Date(b.createdAt) - new Date(a.createdAt)).forEach(tx => {
+                <% if (transactions && transactions.length > 0) { %>
+                    <% transactions.forEach(tx => {
                         const isCredit = tx.type === 'credit';
                         const absAmount = Math.abs(tx.amount).toFixed(2);
                         %>
@@ -254,6 +256,29 @@
                     </div>
                 <% } %>
             </div>
+
+            <% if (pagination && pagination.totalPages > 1) { %>
+                <div class="pagination">
+                    <% if (pagination.hasPrevPage) { %>
+                        <a class="btn" href="/user/wallet/transactions?page=<%= pagination.currentPage - 1 %>">
+                            Previous
+                        </a>
+                    <% } %>
+
+                    <% for (let page = 1; page <= pagination.totalPages; page++) { %>
+                        <a class="btn <%= page === pagination.currentPage ? 'active' : '' %>"
+                            href="/user/wallet/transactions?page=<%= page %>">
+                            <%= page %>
+                        </a>
+                    <% } %>
+
+                    <% if (pagination.hasNextPage) { %>
+                        <a class="btn" href="/user/wallet/transactions?page=<%= pagination.currentPage + 1 %>">
+                            Next
+                        </a>
+                    <% } %>
+                </div>
+            <% } %>
         </div>
     </main>
 

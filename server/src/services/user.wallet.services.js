@@ -18,6 +18,56 @@ export const getWalletByUserId = async (userId, limit) => {
   }
 };
 
+export const getWalletTransactionsByUserId = async (
+  userId,
+  page = 1,
+  limit = 10,
+) => {
+  try {
+    const wallet = await Wallet.findOne({ userId });
+
+    if (!wallet) {
+      return {
+        wallet: null,
+        transactions: [],
+        pagination: {
+          currentPage: 1,
+          totalPages: 0,
+          totalTransactions: 0,
+          limit,
+          hasPrevPage: false,
+          hasNextPage: false,
+        },
+      };
+    }
+
+    const sortedTransactions = [...(wallet.transactions || [])].sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+    );
+
+    const totalTransactions = sortedTransactions.length;
+    const totalPages = totalTransactions > 0 ? Math.ceil(totalTransactions / limit) : 1;
+    const safePage = Math.min(Math.max(Number(page) || 1, 1), totalPages);
+    const skip = (safePage - 1) * limit;
+    const transactions = sortedTransactions.slice(skip, skip + limit);
+
+    return {
+      wallet,
+      transactions,
+      pagination: {
+        currentPage: safePage,
+        totalPages,
+        totalTransactions,
+        limit,
+        hasPrevPage: safePage > 1,
+        hasNextPage: safePage < totalPages,
+      },
+    };
+  } catch (error) {
+    throw new Error(`Error fetching wallet transactions: ${error.message}`);
+  }
+};
+
 export const addRefundToWallet = async ({
   userId,
   amount,

@@ -21,9 +21,17 @@ export const orderPage = async (req, res) => {
 
 export const ordersListPage = async (req, res) => {
   try {
-    const orders = await userOrderServices.getAllOrders(req.user._id);
+    const page = Math.max(Number(req.query.page) || 1, 1);
+    const limit = 8;
+    const { orders, pagination } = await userOrderServices.getPaginatedOrders(
+      req.user._id,
+      page,
+      limit,
+    );
+
     res.render("user/orders-list", {
       orders,
+      pagination,
     });
   } catch (err) {
     console.error(err);

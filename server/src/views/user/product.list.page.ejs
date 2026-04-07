@@ -810,10 +810,10 @@
 
                 <% products.forEach(product=> { %>
 
-                  <% const firstVariant=product.variants?.[0]; const variantPrice=firstVariant?.price || 0; const
+                  <% const firstVariant=product.variants?.[0]; const originalPrice=firstVariant?.price || 0; const
                     image=firstVariant?.images?.[0] || '/images/placeholder-toy.jpg' ; const
                     discount=product.finalDiscount || 0; const hasDiscount=discount> 0;
-                    const finalPrice = product.discountedPrice || variantPrice; const isWishlisted =
+                    const finalPrice = Math.round(originalPrice * (1 - discount / 100)); const isWishlisted =
                     !!firstVariant && Array.isArray(product.wishlistData) &&
                     product.wishlistData.some(item => String(item.variantId) === String(firstVariant._id));
                     %>
@@ -866,7 +866,7 @@
 
                               <% if (hasDiscount) { %>
                                 <span class="old-price">
-                                  ₹<%= variantPrice.toLocaleString() %>
+                                  ₹<%= Math.round(originalPrice).toLocaleString() %>
                                 </span>
                                 <% } %>
                             </div>

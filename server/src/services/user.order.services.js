@@ -27,7 +27,10 @@ import razorpay from "../config/razorpay.js";
 export const createOrder = async (userId, orderData) => {
   const [orderProducts, amounts] = await getAvailableCartItems(userId, true);
 
-  if (!amounts.subtotal) throw new Error("Subtotal invalid");
+  
+if (amounts.subtotal == null || Number.isNaN(amounts.subtotal)) {
+  throw new Error("Subtotal invalid");
+}
 
   console.log("Got items btw ");
   let couponDiscountAmount = 0;
@@ -242,6 +245,34 @@ export const getAllOrders = async (userId, limit) => {
   }
 
   return await query.lean();
+};
+
+export const getPaginatedOrders = async (userId, page = 1, limit = 10) => {
+  const safeLimit = Math.max(Number(limit) || 10, 1);
+  const requestedPage = Math.max(Number(page) || 1, 1);
+
+  const totalOrders = await Order.countDocuments({ userId });
+  const totalPages = totalOrders > 0 ? Math.ceil(totalOrders / safeLimit) : 1;
+  const safePage = Math.min(requestedPage, totalPages);
+  const skip = (safePage - 1) * safeLimit;
+
+  const orders = await Order.find({ userId })
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(safeLimit)
+    .lean();
+
+  return {
+    orders,
+    pagination: {
+      currentPage: safePage,
+      totalPages,
+      totalOrders,
+      limit: safeLimit,
+      hasPrevPage: safePage > 1,
+      hasNextPage: safePage < totalPages,
+    },
+  };
 };
 
 export const getOrderDetails = async (orderId, orderNumber) => {
