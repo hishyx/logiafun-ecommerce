@@ -355,16 +355,6 @@ export const cancelEntireOrder = async (orderId, reason) => {
   await order.save();
 };
 
-//Code test
-
-const isMaxCancellationReached=async (userId)=>{
-
-  const cancelled=await Order.find({userId,status:"cancelled"})
-
-  if(cancelled.length>=1)return false
-  else true
-}
-
 export const cancelSpecificOrderItem = async (
   orderId,
   itemId,
