@@ -175,6 +175,13 @@
 
       <div class="header-right">
         <div class="header-icons-group">
+          <button type="button" class="mobile-search-toggle" id="mobileSearchToggle" aria-label="Open search">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.35-4.35" />
+            </svg>
+          </button>
+
           <div class="search-box">
             <label for="searchBox" style="cursor: pointer; display: flex; align-items: center;">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -190,6 +197,13 @@
             <!-- Cancel Button -->
             <button type="button" class="clear-search" id="clearSearchBtn">
               ✕
+            </button>
+
+            <button type="button" class="mobile-search-close" id="mobileSearchClose" aria-label="Close search">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
             </button>
           </div>
 
@@ -286,15 +300,41 @@
 
   // Mobile navigation toggle
   document.addEventListener('DOMContentLoaded', () => {
+    const header = document.querySelector('.header');
     const menuToggle = document.querySelector('.menu-toggle');
     const nav = document.querySelector('.nav');
+    const mobileSearchToggle = document.getElementById('mobileSearchToggle');
+    const mobileSearchClose = document.getElementById('mobileSearchClose');
+    const searchInput = document.getElementById('searchBox');
 
     if (menuToggle && nav) {
       menuToggle.addEventListener('click', () => {
+        header?.classList.remove('mobile-search-open');
         nav.classList.toggle('nav-active');
         menuToggle.classList.toggle('active');
       });
     }
+
+    if (mobileSearchToggle && header && searchInput) {
+      mobileSearchToggle.addEventListener('click', () => {
+        header.classList.add('mobile-search-open');
+        nav?.classList.remove('nav-active');
+        menuToggle?.classList.remove('active');
+        setTimeout(() => searchInput.focus(), 50);
+      });
+    }
+
+    if (mobileSearchClose && header) {
+      mobileSearchClose.addEventListener('click', () => {
+        header.classList.remove('mobile-search-open');
+      });
+    }
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 768) {
+        header?.classList.remove('mobile-search-open');
+      }
+    });
   });
 </script>
 <script src="/js/helpers/user.search.js"></script>
