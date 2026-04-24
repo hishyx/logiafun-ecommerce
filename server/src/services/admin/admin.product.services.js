@@ -3,6 +3,24 @@ import uploadImageToCloudinary from "../../utils/cloudinary.upload.js";
 import cloudinaryFolders from "../../components/cloudinary.folders.js";
 import { hasDuplicateVariants } from "../../utils/variant.utils.js";
 
+const normalizeIncomingVariants = (variants) => {
+  if (!variants) return [];
+
+  if (Array.isArray(variants)) {
+    return variants
+      .map((variant, index) => ({ variant, originalIndex: String(index) }))
+      .filter(({ variant }) => variant && typeof variant === "object");
+  }
+
+  if (typeof variants === "object") {
+    return Object.entries(variants)
+      .map(([index, variant]) => ({ variant, originalIndex: String(index) }))
+      .filter(({ variant }) => variant && typeof variant === "object");
+  }
+
+  return [];
+};
+
 export const getProductById = async (productId) => {
   const product = await Product.findById(productId).lean();
 
@@ -161,7 +179,13 @@ export const updateProduct = async (productData, productImages) => {
     throw new Error("Product not found");
   }
 
-  if (hasDuplicateVariants(productData.variants)) {
+  const incomingVariants = normalizeIncomingVariants(productData.variants);
+
+  if (incomingVariants.length === 0) {
+    throw new Error("At least one variant is required");
+  }
+
+  if (hasDuplicateVariants(incomingVariants.map(({ variant }) => variant))) {
     throw new Error("Duplicate variant attribute combination found");
   }
 
@@ -173,7 +197,7 @@ export const updateProduct = async (productData, productImages) => {
 
   const updatedVariants = [];
 
-  for (const incoming of productData.variants) {
+  for (const { variant: incoming } of incomingVariants) {
     let existingVariant = null;
 
     if (incoming._id) {
@@ -207,8 +231,10 @@ export const updateProduct = async (productData, productImages) => {
       const match = file.fieldname.match(/variants\[(\d+)\]/);
       if (!match) continue;
 
-      const index = parseInt(match[1]);
-      if (!updatedVariants[index]) continue;
+      const index = incomingVariants.findIndex(
+        ({ originalIndex }) => originalIndex === match[1],
+      );
+      if (index === -1 || !updatedVariants[index]) continue;
 
       const imageUrl = await uploadImageToCloudinary(file);
 

@@ -12,7 +12,11 @@ export function variantKey(values) {
 export function hasDuplicateVariants(variants) {
   const seen = new Set();
 
-  for (const variant of variants) {
+  for (const variant of variants || []) {
+    if (!variant || typeof variant !== "object") {
+      continue;
+    }
+
     const key = variantKey(variant.values);
 
     if (seen.has(key)) {

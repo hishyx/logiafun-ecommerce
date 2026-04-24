@@ -399,7 +399,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!blob) return;
 
             const { mode, variantIndex, currentFile } = State.cropping;
-            if (!mode || !variantIndex) return;
+            if (!mode || variantIndex === null || variantIndex === undefined) return;
 
             const key = `${mode}-${variantIndex}`;
 
