@@ -61,35 +61,40 @@
             <p>Grab them before they're gone!</p>
           </div>
           <div class="products-grid">
-            <% if (locals.discountedProducts && discountedProducts.length > 0) { %>
-              <% discountedProducts.forEach(product => { %>
-                <% const variant = product.variants && product.variants[0]; %>
-                <% const price = variant ? variant.price : 0; %>
-                <% const discountAmount = (price * (product.discount || 0)) / 100; %>
-                <% const discountedPrice = price - discountAmount; %>
-                <a href="/products/<%= product._id %>" class="product-card" style="text-decoration: none; color: inherit;">
-                  <div class="product-image">
-                    <% if (product.discount > 0) { %>
-                      <span class="product-badge badge-sale">SAVE <%= product.discount %>%</span>
-                    <% } %>
-                    <img src="<%= (variant && variant.images && variant.images[0]) || '/images/placeholder.png' %>" alt="<%= product.name %>" />
-                  </div>
-                  <div class="product-info">
-                    <h3><%= product.name %></h3>
-                    <div class="product-price-row">
-                      <div class="product-price">
-                        <span class="price-current">₹<%= Math.round(discountedPrice).toLocaleString() %></span>
-                        <% if (product.discount > 0) { %>
-                          <span class="price-old">₹<%= price.toLocaleString() %></span>
-                        <% } %>
-                      </div>
-                    </div>
-                  </div>
-                </a>
-              <% }) %>
-            <% } else { %>
-              <p style="text-align: center; width: 100%; color: #64748b;">No discounted toys found.</p>
-            <% } %>
+            <% if (locals.discountedProducts && discountedProducts.length> 0) { %>
+              <% discountedProducts.forEach(product=> { %>
+                <% const variant=product.variants && product.variants[0]; %>
+                  <% const price=variant ? variant.price : 0; %>
+                    <% const discountAmount=(price * (product.discount || 0)) / 100; %>
+                      <% const discountedPrice=price - discountAmount; %>
+                        <a href="/products/<%= product._id %>" class="product-card"
+                          style="text-decoration: none; color: inherit;">
+                          <div class="product-image">
+                            <% if (product.discount> 0) { %>
+                              <span class="product-badge badge-sale">SAVE <%= product.discount %>%</span>
+                              <% } %>
+                                <img
+                                  src="<%= (variant && variant.images && variant.images[0]) || '/images/placeholder.png' %>"
+                                  alt="<%= product.name %>" />
+                          </div>
+                          <div class="product-info">
+                            <h3>
+                              <%= product.name %>
+                            </h3>
+                            <div class="product-price-row">
+                              <div class="product-price">
+                                <span class="price-current">₹<%= Math.round(discountedPrice).toLocaleString() %></span>
+                                <% if (product.discount> 0) { %>
+                                  <span class="price-old">₹<%= price.toLocaleString() %></span>
+                                  <% } %>
+                              </div>
+                            </div>
+                          </div>
+                        </a>
+                        <% }) %>
+                          <% } else { %>
+                            <p style="text-align: center; width: 100%; color: #64748b;">No discounted toys found.</p>
+                            <% } %>
           </div>
         </div>
       </section>
@@ -102,29 +107,34 @@
             <p>Most loved by our little customers</p>
           </div>
           <div class="products-grid">
-            <% if (locals.topSellingProducts && topSellingProducts.length > 0) { %>
-              <% topSellingProducts.forEach(product => { %>
-                <% const variant = product.variants && product.variants[0]; %>
-                <% const price = variant ? variant.price : 0; %>
-                <% const discountAmount = (price * (product.discount || 0)) / 100; %>
-                <% const discountedPrice = price - discountAmount; %>
-                <a href="/products/<%= product._id %>" class="product-card" style="text-decoration: none; color: inherit;">
-                  <div class="product-image">
-                    <img src="<%= (variant && variant.images && variant.images[0]) || '/images/placeholder.png' %>" alt="<%= product.name %>" />
-                  </div>
-                  <div class="product-info">
-                    <h3><%= product.name %></h3>
-                    <div class="product-price-row">
-                      <div class="product-price">
-                        <span class="price-current">₹<%= Math.round(discountedPrice).toLocaleString() %></span>
-                      </div>
-                    </div>
-                  </div>
-                </a>
-              <% }) %>
-            <% } else { %>
-              <p style="text-align: center; width: 100%; color: #64748b;">No products found.</p>
-            <% } %>
+            <% if (locals.topSellingProducts && topSellingProducts.length> 0) { %>
+              <% topSellingProducts.forEach(product=> { %>
+                <% const variant=product.variants && product.variants[0]; %>
+                  <% const price=variant ? variant.price : 0; %>
+                    <% const discountAmount=(price * (product.discount || 0)) / 100; %>
+                      <% const discountedPrice=price - discountAmount; %>
+                        <a href="/products/<%= product._id %>" class="product-card"
+                          style="text-decoration: none; color: inherit;">
+                          <div class="product-image">
+                            <img
+                              src="<%= (variant && variant.images && variant.images[0]) || '/images/placeholder.png' %>"
+                              alt="<%= product.name %>" />
+                          </div>
+                          <div class="product-info">
+                            <h3>
+                              <%= product.name %>
+                            </h3>
+                            <div class="product-price-row">
+                              <div class="product-price">
+                                <span class="price-current">₹<%= Math.round(discountedPrice).toLocaleString() %></span>
+                              </div>
+                            </div>
+                          </div>
+                        </a>
+                        <% }) %>
+                          <% } else { %>
+                            <p style="text-align: center; width: 100%; color: #64748b;">No products found.</p>
+                            <% } %>
           </div>
         </div>
       </section>
@@ -157,30 +167,35 @@
             <p>Fresh from the factory!</p>
           </div>
           <div class="products-grid">
-            <% if (locals.newArrivals && newArrivals.length > 0) { %>
-              <% newArrivals.forEach(product => { %>
-                <% const variant = product.variants && product.variants[0]; %>
-                <% const price = variant ? variant.price : 0; %>
-                <% const discountAmount = (price * (product.discount || 0)) / 100; %>
-                <% const discountedPrice = price - discountAmount; %>
-                <a href="/products/<%= product._id %>" class="product-card" style="text-decoration: none; color: inherit;">
-                  <div class="product-image">
-                    <span class="product-badge badge-hot">NEW</span>
-                    <img src="<%= (variant && variant.images && variant.images[0]) || '/images/placeholder.png' %>" alt="<%= product.name %>" />
-                  </div>
-                  <div class="product-info">
-                    <h3><%= product.name %></h3>
-                    <div class="product-price-row">
-                      <div class="product-price">
-                        <span class="price-current">₹<%= Math.round(discountedPrice).toLocaleString() %></span>
-                      </div>
-                    </div>
-                  </div>
-                </a>
-              <% }) %>
-            <% } else { %>
-              <p style="text-align: center; width: 100%; color: #64748b;">No new arrivals found.</p>
-            <% } %>
+            <% if (locals.newArrivals && newArrivals.length> 0) { %>
+              <% newArrivals.forEach(product=> { %>
+                <% const variant=product.variants && product.variants[0]; %>
+                  <% const price=variant ? variant.price : 0; %>
+                    <% const discountAmount=(price * (product.discount || 0)) / 100; %>
+                      <% const discountedPrice=price - discountAmount; %>
+                        <a href="/products/<%= product._id %>" class="product-card"
+                          style="text-decoration: none; color: inherit;">
+                          <div class="product-image">
+                            <span class="product-badge badge-hot">NEW</span>
+                            <img
+                              src="<%= (variant && variant.images && variant.images[0]) || '/images/placeholder.png' %>"
+                              alt="<%= product.name %>" />
+                          </div>
+                          <div class="product-info">
+                            <h3>
+                              <%= product.name %>
+                            </h3>
+                            <div class="product-price-row">
+                              <div class="product-price">
+                                <span class="price-current">₹<%= Math.round(discountedPrice).toLocaleString() %></span>
+                              </div>
+                            </div>
+                          </div>
+                        </a>
+                        <% }) %>
+                          <% } else { %>
+                            <p style="text-align: center; width: 100%; color: #64748b;">No new arrivals found.</p>
+                            <% } %>
           </div>
         </div>
       </section>
@@ -264,16 +279,16 @@
         </div>
         <div class="gallery-grid">
           <div class="gallery-item">
-            <img src="https://placehold.co/500x500/f8f9fa/1e3a5f?text=Photo+1" alt="Gallery" />
+            <img src="/images/gallery/gallery1.png" alt="Gallery - Playful Learning" />
           </div>
           <div class="gallery-item">
-            <img src="https://placehold.co/500x500/f8f9fa/1e3a5f?text=Photo+2" alt="Gallery" />
+            <img src="/images/gallery/gallery2.png" alt="Gallery - Creative Building" />
           </div>
           <div class="gallery-item">
-            <img src="https://placehold.co/500x500/f8f9fa/1e3a5f?text=Photo+3" alt="Gallery" />
+            <img src="/images/gallery/gallery3.png" alt="Gallery - Group Fun" />
           </div>
           <div class="gallery-item">
-            <img src="https://placehold.co/500x500/f8f9fa/1e3a5f?text=Photo+4" alt="Gallery" />
+            <img src="/images/gallery/gallery5.png" alt="Gallery - Outdoor Play" />
           </div>
         </div>
       </section>
@@ -331,69 +346,69 @@
 
     <!-- Footer -->
     <%- include('../partials/footer') %>
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+      <!-- SweetAlert2 -->
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <% if (locals.user && locals.user.isNew) { %>
-      <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-          const { value: referralCode } = await Swal.fire({
-            title: 'Welcome to logiaFun! 🎉',
-            text: 'Do you have a referral code? Enter it below to get ₹2 in your wallet, and your friend gets ₹5!',
-            input: 'text',
-            inputPlaceholder: 'Enter Referral Code',
-            showCancelButton: true,
-            confirmButtonText: 'Apply Code',
-            cancelButtonText: 'Skip for now',
-            confirmButtonColor: '#1e3a5f',
-            cancelButtonColor: '#94a3b8',
-            inputValidator: (value) => {
-              if (!value) {
-                return 'Please enter a code or skip.'
-              }
-            },
-            backdrop: `rgba(30, 58, 95, 0.4)`,
-            allowOutsideClick: false
-          });
+      <% if (locals.user && locals.user.isNew) { %>
+        <script>
+          document.addEventListener('DOMContentLoaded', async () => {
+            const { value: referralCode } = await Swal.fire({
+              title: 'Welcome to logiaFun! 🎉',
+              text: 'Do you have a referral code? Enter it below to get ₹2 in your wallet, and your friend gets ₹5!',
+              input: 'text',
+              inputPlaceholder: 'Enter Referral Code',
+              showCancelButton: true,
+              confirmButtonText: 'Apply Code',
+              cancelButtonText: 'Skip for now',
+              confirmButtonColor: '#1e3a5f',
+              cancelButtonColor: '#94a3b8',
+              inputValidator: (value) => {
+                if (!value) {
+                  return 'Please enter a code or skip.'
+                }
+              },
+              backdrop: `rgba(30, 58, 95, 0.4)`,
+              allowOutsideClick: false
+            });
 
-          if (referralCode) {
-            try {
-              const response = await fetch('/newuser/referral-code', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ referralCode })
-              });
-
-              const result = await response.json();
-
-              if (response.ok) {
-                Swal.fire({
-                  icon: 'success',
-                  title: 'Success!',
-                  text: result.message || 'Referral code applied successfully!',
-                  confirmButtonColor: '#1e3a5f'
+            if (referralCode) {
+              try {
+                const response = await fetch('/newuser/referral-code', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ referralCode })
                 });
-              } else {
+
+                const result = await response.json();
+
+                if (response.ok) {
+                  Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: result.message || 'Referral code applied successfully!',
+                    confirmButtonColor: '#1e3a5f'
+                  });
+                } else {
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: result.message || 'Invalid referral code.',
+                    confirmButtonColor: '#1e3a5f'
+                  });
+                }
+              } catch (error) {
+                console.error('Error applying referral:', error);
                 Swal.fire({
                   icon: 'error',
-                  title: 'Oops...',
-                  text: result.message || 'Invalid referral code.',
+                  title: 'Error',
+                  text: 'Something went wrong while applying the code.',
                   confirmButtonColor: '#1e3a5f'
                 });
               }
-            } catch (error) {
-              console.error('Error applying referral:', error);
-              Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Something went wrong while applying the code.',
-                confirmButtonColor: '#1e3a5f'
-              });
             }
-          }
-        });
-      </script>
-      <% } %>
-  </body>
+          });
+        </script>
+        <% } %>
+</body>
 
 </html>

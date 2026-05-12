@@ -77,7 +77,6 @@ export const checkProductAvailability = async (productId) => {
         "variants.0": { $exists: true },
       },
     },
-
   ]);
 
   return result[0] || null;
@@ -159,6 +158,16 @@ export const getAllProducts = async ({
     {
       $match: match,
     },
+    {
+      $lookup: {
+        from: "categories",
+        localField: "categoryId",
+        foreignField: "_id",
+        as: "category",
+      },
+    },
+    { $unwind: "$category" },
+    { $match: { "category.isActive": true } },
     {
       $match: {
         variants: { $elemMatch: { stock: { $gt: 0 } } },
@@ -373,7 +382,11 @@ export const getProductDetails = async (productId, userId = null) => {
   };
 };
 
-export const getRelatedProducts = async (categoryId, productId, userId = null) => {
+export const getRelatedProducts = async (
+  categoryId,
+  productId,
+  userId = null,
+) => {
   const limit = 4;
   const relatedProducts = await Product.aggregate([
     {

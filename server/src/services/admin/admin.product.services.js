@@ -283,21 +283,69 @@ export const toggleListUnlistProduct = async (productId) => {
 };
 
 export const getSelectedProductForHomePage = async () => {
-  const discountedProducts = await Product.find({ isActive: true })
-    .sort({ discount: -1 })
-    .limit(4)
-    .lean();
+  const discountedProducts = await Product.aggregate([
+    { $match: { isActive: true } },
+    {
+      $lookup: {
+        from: "categories",
+        localField: "categoryId",
+        foreignField: "_id",
+        as: "category",
+      },
+    },
+    { $unwind: "$category" },
+    { $match: { "category.isActive": true } },
+    {
+      $match: {
+        variants: { $elemMatch: { stock: { $gt: 0 } } },
+      },
+    },
+    { $sort: { discount: -1 } },
+    { $limit: 4 },
+  ]);
 
-  const newArrivals = await Product.find({ isActive: true })
-    .sort({ createdAt: -1 })
-    .limit(4)
-    .lean();
+  const newArrivals = await Product.aggregate([
+    { $match: { isActive: true } },
+    {
+      $lookup: {
+        from: "categories",
+        localField: "categoryId",
+        foreignField: "_id",
+        as: "category",
+      },
+    },
+    { $unwind: "$category" },
+    { $match: { "category.isActive": true } },
+    {
+      $match: {
+        variants: { $elemMatch: { stock: { $gt: 0 } } },
+      },
+    },
+    { $sort: { createdAt: -1 } },
+    { $limit: 4 },
+  ]);
 
   // For now, top selling can be based on highest ratings or most recent if sales field isn't available
   // Or just some random active products if sales tracking isn't implemented yet
-  const topSellingProducts = await Product.find({ isActive: true })
-    .limit(4)
-    .lean();
+  const topSellingProducts = await Product.aggregate([
+    { $match: { isActive: true } },
+    {
+      $lookup: {
+        from: "categories",
+        localField: "categoryId",
+        foreignField: "_id",
+        as: "category",
+      },
+    },
+    { $unwind: "$category" },
+    { $match: { "category.isActive": true } },
+    {
+      $match: {
+        variants: { $elemMatch: { stock: { $gt: 0 } } },
+      },
+    },
+    { $limit: 4 },
+  ]);
 
   return {
     discountedProducts,
